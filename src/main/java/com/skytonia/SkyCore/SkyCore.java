@@ -2,6 +2,7 @@ package com.skytonia.SkyCore;
 
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
+import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,12 +32,14 @@ public class SkyCore extends JavaPlugin
 			BUtil.logError("An issue occurred while initializing stored variables. Refer to the stack trace below.");
 			BUtil.logStackTrace(e);
 		}
+		
+		SocketManager.getInstance().start();
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		
+		SocketManager.getInstance().stop();
 	}
 	
 }

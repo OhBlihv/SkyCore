@@ -1,0 +1,4 @@
+#Sockets Configuration File
+host: localhost
+port: CHANGEME
+name: "Example Server"

@@ -69,6 +69,7 @@
 		<defaultGoal>clean package install</defaultGoal>
 		<finalName>${project.artifactId}</finalName>
 		<resources>
+			<!-- Plugin Resources/YAML Files -->
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>

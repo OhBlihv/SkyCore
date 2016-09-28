@@ -98,9 +98,25 @@ public class FlatFile
 	    {
 	        saveFile = new File(plugin.getDataFolder(), fileName);
 	    }
+	    
 	    if (!saveFile.exists())
-	    {            
-	    	plugin.saveResource(fileName, false);
+	    {
+		    try
+		    {
+			    plugin.saveResource(fileName, false);
+		    }
+		    catch(Exception e)
+		    {
+			    //Attempt to create a new text file to save to.
+			    try
+			    {
+				    saveFile.createNewFile();
+			    }
+			    catch(IOException ex)
+			    {
+				    ex.printStackTrace();
+			    }
+		    }
 	    }
 	}
 	
