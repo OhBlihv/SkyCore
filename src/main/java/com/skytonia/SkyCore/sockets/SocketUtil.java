@@ -1,8 +1,6 @@
 package com.skytonia.SkyCore.sockets;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import lombok.Getter;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -14,12 +12,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import javax.xml.bind.DatatypeConverter;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -30,14 +23,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SocketAPI
+public class SocketUtil
 {
 	
 	public static Gson gson = new Gson();

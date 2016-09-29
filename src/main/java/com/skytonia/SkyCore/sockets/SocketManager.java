@@ -9,10 +9,12 @@ import com.skytonia.SkyCore.sockets.events.BukkitSocketHandshakeEvent;
 import com.skytonia.SkyCore.sockets.events.BukkitSocketJSONEvent;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.FlatFile;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.security.KeyPair;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,11 +33,18 @@ public class SocketManager implements SocketClientApp
 		return instance;
 	}
 	
-	private SocketClient socketClient;
+	@Getter
+	private static SocketClient socketClient;
 	
-	private final KeyPair keys = SocketAPI.RSA.generateKeys();
+	private final KeyPair keys = SocketUtil.RSA.generateKeys();
 	
 	private FlatFile socketConfig;
+	
+	//Any message
+	private final Map<Integer, Runnable> requestWaitMap = new HashMap<>();
+	
+	@Getter
+	private static String serverName;
 	
 	private SocketManager()
 	{
@@ -47,19 +56,19 @@ public class SocketManager implements SocketClientApp
 		if(socketConfig.getSave().isString("port"))
 		{
 			BUtil.logMessage("WARNING: Sockets Configuration has not been set up!");
-			BUtil.logMessage("Sockets will not function until the config has been ");
+			BUtil.logMessage("Sockets will not function until the config is correctly set up.");
 			return;
 		}
 		
-		String  name = socketConfig.getString("name"),
-				hostName = socketConfig.getString("host");
+		serverName = socketConfig.getString("name");
+		String hostName = socketConfig.getString("host");
 		
 		int port = socketConfig.getInt("port");
 		
-		socketClient = new SocketClient(this, name, hostName, port, keys);
+		socketClient = new SocketClient(this, serverName, hostName, port, keys);
 		
 		Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getInstance(), socketClient);
-		BUtil.logMessage("Started socket server on " + hostName + ":" + port + " as '" + name + "'.");
+		BUtil.logMessage("Started socket server on " + hostName + ":" + port + " as '" + serverName + "'.");
 	}
 	
 	public boolean stop()
@@ -92,6 +101,8 @@ public class SocketManager implements SocketClientApp
 		}
 	}
 	
+	
+	
 	@Override
 	public void onConnect(SocketClient client)
 	{
@@ -117,4 +128,5 @@ public class SocketManager implements SocketClientApp
 	{
 		Bukkit.getPluginManager().callEvent(new BukkitSocketJSONEvent(client, map));
 	}
+	
 }

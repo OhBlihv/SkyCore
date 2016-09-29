@@ -2,6 +2,5 @@ name: ${project.artifactId}
 version: ${project.version}
 author: OhBlihv
 main: ${project.groupId}.${project.artifactId}.${project.artifactId}
-softdepend: [SocketAPI]
 commands:
     ${project.artifactId}:

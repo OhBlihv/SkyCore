@@ -1,7 +1,7 @@
 package com.skytonia.SkyCore.sockets.client;
 
 import com.google.gson.JsonSyntaxException;
-import com.skytonia.SkyCore.sockets.SocketAPI;
+import com.skytonia.SkyCore.sockets.SocketUtil;
 import lombok.Getter;
 
 import java.io.BufferedReader;
@@ -83,8 +83,8 @@ public class SocketClient implements Runnable
 							{
 								try
 								{
-									key = SocketAPI.RSA.loadPublicKey(keyread);
-									writer.println(SocketAPI.RSA.savePublicKey(keys.getPublic()));
+									key = SocketUtil.RSA.loadPublicKey(keyread);
+									writer.println(SocketUtil.RSA.savePublicKey(keys.getPublic()));
 									writer.println("--end--");
 									writer.flush();
 								}
@@ -96,7 +96,7 @@ public class SocketClient implements Runnable
 						}
 						else
 						{
-							String message = SocketAPI.RSA.decrypt(read, keys.getPrivate());
+							String message = SocketUtil.RSA.decrypt(read, keys.getPrivate());
 							if(message != null && !message.isEmpty())
 							{
 								if(!message.equals("--end--"))
@@ -110,8 +110,8 @@ public class SocketClient implements Runnable
 										try
 										{
 											@SuppressWarnings("unchecked")
-											Map<String, String> map = SocketAPI.gson().fromJson(fullmessage, Map.class);
-											if(map.get("channel").equals("SocketAPI"))
+											Map<String, String> map = SocketUtil.gson().fromJson(fullmessage, Map.class);
+											if(map.get("channel").equals("SocketUtil"))
 											{
 												if(map.get("data").equals("handshake"))
 												{
@@ -164,10 +164,10 @@ public class SocketClient implements Runnable
 		try
 		{
 			HashMap<String, String> hashmap = new HashMap<>();
-			hashmap.put("channel", "SocketAPI");
+			hashmap.put("channel", "SocketUtil");
 			hashmap.put("data", "handshake");
 			hashmap.put("name", name);
-			String json = SocketAPI.gson().toJson(hashmap);
+			String json = SocketUtil.gson().toJson(hashmap);
 			write(json);
 		}
 		catch(NullPointerException e)
@@ -182,7 +182,7 @@ public class SocketClient implements Runnable
 			HashMap<String, String> hashmap = new HashMap<>();
 			hashmap.put("channel", channel);
 			hashmap.put("data", data);
-			String json = SocketAPI.gson().toJson(hashmap);
+			String json = SocketUtil.gson().toJson(hashmap);
 			write(json);
 		}
 		catch(NullPointerException e)
@@ -194,12 +194,12 @@ public class SocketClient implements Runnable
 	{
 		try
 		{
-			String[] split = SocketAPI.split(data, 20);
+			String[] split = SocketUtil.split(data, 20);
 			for(String str : split)
 			{
-				writer.println(SocketAPI.RSA.encrypt(str, key));
+				writer.println(SocketUtil.RSA.encrypt(str, key));
 			}
-			writer.println(SocketAPI.RSA.encrypt("--end--", key));
+			writer.println(SocketUtil.RSA.encrypt("--end--", key));
 			writer.flush();
 		}
 		catch(NullPointerException e)
