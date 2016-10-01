@@ -83,10 +83,12 @@ public class MovementManager implements Listener
 	private static final Map<String, MovementInfo> movementMap = new HashMap<>();
 	private static final Set<String> incomingPlayers = new HashSet<>();
 	
-	protected static long timeoutDelay = 100L; //5 second timeout as default (TODO: Configurable)
+	protected static long timeoutDelay = 40L; //2 second timeout as default (TODO: Configurable)
 	
 	private MovementManager()
 	{
+		SocketManager.getInstance();
+		
 		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getInstance(), "BungeeCord");
 		
 		Bukkit.getPluginManager().registerEvents(this, SkyCore.getInstance());
@@ -141,6 +143,8 @@ public class MovementManager implements Listener
 	@EventHandler
 	public void onPlayerReceived(BukkitSocketJSONEvent event)
 	{
+		BUtil.logMessage("Received: " + event.getChannel() + " > " + event.getData());
+		
 		String channel = event.getChannel();
 		
 		if( !channel.equals(CHANNEL_MOVE_PLAYER_REQ) &&
@@ -154,7 +158,8 @@ public class MovementManager implements Listener
 		if(event.getChannel().equals(CHANNEL_MOVE_PLAYER_REQ))
 		{
 			//TODO: Check whitelist, if the player is banned, and other reasons
-			String playerName = splitData[1];
+			String  serverName = splitData[0],
+					playerName = splitData[1];
 			String response = ""; //Blank message for success
 			if(Bukkit.hasWhitelist())
 			{
@@ -166,7 +171,7 @@ public class MovementManager implements Listener
 			}
 			
 			BUtil.logMessage("Responding to " + playerName + "'s request with '" + response + "'");
-			event.getClient().writeJSON(CHANNEL_MOVE_PLAYER_REPLY, SocketManager.getServerName() + SPLITTER + splitData[1] + SPLITTER + response);
+			event.getClient().writeJSON(CHANNEL_MOVE_PLAYER_REPLY, serverName + SPLITTER + playerName + SPLITTER + response);
 			
 			//Ensure the player can join once their request has been accepted
 			incomingPlayers.add(playerName);

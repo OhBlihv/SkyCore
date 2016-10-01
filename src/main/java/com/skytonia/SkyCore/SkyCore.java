@@ -2,6 +2,7 @@ package com.skytonia.SkyCore;
 
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
+import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class SkyCore extends JavaPlugin
 		}
 		
 		SocketManager.getInstance().start();
+		MovementManager.getInstance(); //Register Listeners
 	}
 	
 	@Override

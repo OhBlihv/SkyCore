@@ -2,6 +2,7 @@ package com.skytonia.SkyCore.sockets.client;
 
 import com.google.gson.JsonSyntaxException;
 import com.skytonia.SkyCore.sockets.SocketUtil;
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 
 import java.io.BufferedReader;
@@ -111,14 +112,17 @@ public class SocketClient implements Runnable
 										{
 											@SuppressWarnings("unchecked")
 											Map<String, String> map = SocketUtil.gson().fromJson(fullmessage, Map.class);
-											if(map.get("channel").equals("SocketUtil"))
+											
+											if(map.get("channel").equals("SocketAPI"))
 											{
 												if(map.get("data").equals("handshake"))
 												{
+													BUtil.logMessage("Attempting handshake with proxy...");
 													handshake();
 												}
 												else if(map.get("data").equals("handshaked"))
 												{
+													BUtil.logMessage("Registered socket listener as '" + name + "'");
 													handshaked.set(true);
 													app.onHandshake(this);
 												}
@@ -164,7 +168,7 @@ public class SocketClient implements Runnable
 		try
 		{
 			HashMap<String, String> hashmap = new HashMap<>();
-			hashmap.put("channel", "SocketUtil");
+			hashmap.put("channel", "SocketAPI");
 			hashmap.put("data", "handshake");
 			hashmap.put("name", name);
 			String json = SocketUtil.gson().toJson(hashmap);

@@ -68,7 +68,7 @@ public class SocketManager implements SocketClientApp
 		socketClient = new SocketClient(this, serverName, hostName, port, keys);
 		
 		Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getInstance(), socketClient);
-		BUtil.logMessage("Started socket server on " + hostName + ":" + port + " as '" + serverName + "'.");
+		BUtil.logMessage("Started socket client listener on " + hostName + ":" + port + " as '" + serverName + "'.");
 	}
 	
 	public boolean stop()
@@ -100,8 +100,6 @@ public class SocketManager implements SocketClientApp
 			start();
 		}
 	}
-	
-	
 	
 	@Override
 	public void onConnect(SocketClient client)
