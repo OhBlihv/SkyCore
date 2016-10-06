@@ -93,6 +93,47 @@ public class SocketManager implements SocketClientApp
 		}
 	}
 	
+	private static String concatenateData(String... data)
+	{
+		if(data.length == 0)
+		{
+			return "";
+		}
+		
+		StringBuilder stringData = new StringBuilder();
+		for(String dataLoop : data)
+		{
+			stringData.append(dataLoop).append("|");
+		}
+		
+		return stringData.toString().substring(0, stringData.length() - 1);
+	}
+	
+	public static void sendMessage(String channel, String... data)
+	{
+		socketClient.writeJSON(channel,concatenateData(data));
+	}
+	
+	public static void sendMessageTo(String targetServer, String channel, String... data)
+	{
+		socketClient.writeJSON("PASSTHROUGH", stripSplitters(targetServer) + "|" + stripSplitters(channel) + "|" + concatenateData(data));
+	}
+	
+	private static String stripSplitters(String inputString)
+	{
+		if(inputString == null)
+		{
+			return "";
+		}
+		
+		if(inputString.contains("|"))
+		{
+			inputString = inputString.replaceAll("[|]", "");
+		}
+		
+		return inputString;
+	}
+	
 	public void restart()
 	{
 		if(stop())
