@@ -116,7 +116,7 @@ public class MovementManager implements Listener
 			movementAction = DEFAULT_MOVEMENT_ACTION;
 		}
 		
-		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
+		//BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
 		SocketManager.getSocketClient().writeJSON(CHANNEL_MOVE_PLAYER_REQ, server + SPLITTER + player.getName());
@@ -143,8 +143,6 @@ public class MovementManager implements Listener
 	@EventHandler
 	public void onPlayerReceived(BukkitSocketJSONEvent event)
 	{
-		BUtil.logMessage("Received: " + event.getChannel() + " > " + event.getData());
-		
 		String channel = event.getChannel();
 		
 		if( !channel.equals(CHANNEL_MOVE_PLAYER_REQ) &&
@@ -170,7 +168,7 @@ public class MovementManager implements Listener
 				}
 			}
 			
-			BUtil.logMessage("Responding to " + playerName + "'s request with '" + response + "'");
+			//BUtil.logMessage("Responding to " + playerName + "'s request with '" + response + "'");
 			event.getClient().writeJSON(CHANNEL_MOVE_PLAYER_REPLY, serverName + SPLITTER + playerName + SPLITTER + response);
 			
 			//Ensure the player can join once their request has been accepted
@@ -219,13 +217,13 @@ public class MovementManager implements Listener
 			//Attempt to get our player on!
 			if(incomingPlayers.contains(event.getName()))
 			{
-				BUtil.logMessage("Expected " + event.getName() + ". Allowing...");
+				//BUtil.logMessage("Expected " + event.getName() + ". Allowing...");
 				event.allow();
 			}
-			else
+			/*else
 			{
 				BUtil.logMessage("Did not expect " + event.getName() + ". Ignoring...");
-			}
+			}*/
 		}
 	}
 	
