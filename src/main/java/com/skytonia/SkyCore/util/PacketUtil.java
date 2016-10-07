@@ -2,8 +2,10 @@ package com.skytonia.SkyCore.util;
 
 import com.skytonia.SkyCore.SkyCore;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
+import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -95,16 +97,6 @@ public class PacketUtil
 	
 	private static Map<UUID, Persistence> persistenceMap = new HashMap<>();
 	
-	public static void sendActionBar(Player player, String message, int lifespan)
-	{
-		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-		PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(new ChatComponentText(message), (byte) 2);
-
-		//Action bar lasts about 2-3 seconds. Send an update after 2 seconds to ensure it does not disappear
-		startPersistingTask(player.getUniqueId(), PersistingType.ACTION_BAR, 40L, lifespan / 2,
-		                    () -> sendPacket(playerConnection, packetPlayOutChat));
-	}
-	
 	private static void sendPacket(PlayerConnection playerConnection, Packet packet)
 	{
 		playerConnection.sendPacket(packet);
@@ -120,6 +112,44 @@ public class PacketUtil
 		}
 		
 		playerPersistence.addOrReplaceRunnable(persistingType, tickDelay, executions, runnable);
+	}
+	
+	/*
+	 *  Title/ActionBar Sending
+	 */
+	
+	public static void sendActionBar(Player player, String message, int lifespan)
+	{
+		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+		PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(new ChatComponentText(message), (byte) 2);
+		
+		//Action bar lasts about 2-3 seconds. Send an update after 2 seconds to ensure it does not disappear
+		startPersistingTask(player.getUniqueId(), PersistingType.ACTION_BAR, 40L, lifespan / 2,
+		                    () -> sendPacket(playerConnection, packetPlayOutChat));
+	}
+	
+	public static void sendTitle(Player player, String title, String subTitle, int persistTime, int fadeIn, int fadeOut)
+	{
+		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+		
+		PacketPlayOutTitle timesPacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, persistTime, fadeOut);
+		playerConnection.sendPacket(timesPacket);
+		
+		if(subTitle != null)
+		{
+			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle);
+		}
+		
+		if(title != null)
+		{
+			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TITLE, title);
+		}
+	}
+	
+	private static void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message)
+	{
+		playerConnection.sendPacket(new PacketPlayOutTitle(titleAction,
+		                       IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}")));
 	}
 	
 }
