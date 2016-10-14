@@ -106,7 +106,7 @@ public abstract class GUIVariable
 	{
 		//Copy the source material to avoid altering it
 		List<String>    line = new ArrayList<>(original),
-			replacement = null;
+						replacement = null;
 		
 		//Avoid altering intended behaviour
 		if(originalReplacement != null)
@@ -153,9 +153,9 @@ public abstract class GUIVariable
 				}
 				else
 				{
-					String  replacementString = replacement.get(0),
-						currentLine = line.get(lineNum);
-					if(replacementString == null)
+					String  replacementString,
+							currentLine = line.get(lineNum);
+					if(replacement.isEmpty() || (replacementString = replacement.get(0)) == null)
 					{
 						//Is the current line entire comprised of this variable?
 						if(currentLine.length() == variable.length())
