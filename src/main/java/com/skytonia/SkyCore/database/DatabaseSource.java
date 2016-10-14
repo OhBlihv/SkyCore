@@ -51,6 +51,9 @@ public class DatabaseSource
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 		
 		dataSource = new HikariDataSource(config);
+		
+		//Attempt a test query
+		executeQuery("SELECT 1", null, null);
 	}
 	
 	public void executeAsync(String sqlQuery)
