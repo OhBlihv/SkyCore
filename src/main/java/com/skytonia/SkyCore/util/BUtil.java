@@ -87,17 +87,31 @@ public class BUtil
 
 	public static String getLargestUnitAgo(long comparedMillis)
 	{
-		LocalDateTime   currentTime = LocalDateTime.now(Clock.tickSeconds(ZoneId.systemDefault())),
-						comparedTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(comparedMillis), ZoneId.systemDefault()),
+		return compareTimes(-1, comparedMillis);
+	}
+	
+	public static String compareTimes(long timeStamp, long comparedTimeStamp)
+	{
+		LocalDateTime   initialTime,
+						comparedTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(comparedTimeStamp), ZoneId.systemDefault()),
 						runningTime = LocalDateTime.from(comparedTime);
+		
+		if(timeStamp < 0)
+		{
+			initialTime = LocalDateTime.now(Clock.tickSeconds(ZoneId.systemDefault()));
+		}
+		else
+		{
+			initialTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(comparedTimeStamp), ZoneId.systemDefault());
+		}
 
 		long    days, hours, minutes, seconds,
 				largestValue = 0;
 		ChronoUnit largestUnit = null; //Default to the lowest unit
 
 		//Calculate the unit, then add it on to total time
-		days = runningTime.until(currentTime, ChronoUnit.DAYS);
-		if(days > 0)
+		days = runningTime.until(initialTime, ChronoUnit.DAYS);
+		if(days != 0)
 		{
 			largestUnit = ChronoUnit.DAYS; //No Checking required
 			largestValue = days;
@@ -106,8 +120,8 @@ public class BUtil
 
 		if(largestUnit == null)
 		{
-			hours = runningTime.until(currentTime, ChronoUnit.HOURS);
-			if(hours > 0)
+			hours = runningTime.until(initialTime, ChronoUnit.HOURS);
+			if(hours != 0)
 			{
 				largestUnit = ChronoUnit.HOURS;
 				largestValue = hours;
@@ -117,8 +131,8 @@ public class BUtil
 
 		if(largestUnit == null)
 		{
-			minutes = runningTime.until(currentTime, ChronoUnit.MINUTES);
-			if(minutes > 0)
+			minutes = runningTime.until(initialTime, ChronoUnit.MINUTES);
+			if(minutes != 0)
 			{
 				largestUnit = ChronoUnit.MINUTES;
 				largestValue = minutes;
@@ -128,12 +142,10 @@ public class BUtil
 
 		if(largestUnit == null)
 		{
-			seconds = runningTime.until(currentTime, ChronoUnit.SECONDS);
-			if(seconds > 0)
-			{
-				largestUnit = ChronoUnit.SECONDS;
-				largestValue = seconds;
-			}
+			seconds = runningTime.until(initialTime, ChronoUnit.SECONDS);
+			
+			largestUnit = ChronoUnit.SECONDS;
+			largestValue = seconds;
 			//runningTime = runningTime.plusSeconds(seconds);
 		}
 
@@ -204,6 +216,11 @@ public class BUtil
 
 	public static String translateColours(String toFix)
 	{
+		if(toFix == null || toFix.isEmpty())
+		{
+			return toFix;
+		}
+		
 		// Convert every single colour code and formatting code, excluding
 		// 'magic' (&k), capitals and lowercase are converted.
 		return colourPattern.matcher(toFix).replaceAll("\u00A7$1");
@@ -401,7 +418,11 @@ public class BUtil
 		for(int i = 2;i < 10;i++) //Parse 8 lines for a plugin name before giving up.
 		{
 			String thirdPackage = stackTrace[i].getClassName();
-			if(thirdPackage.startsWith("com.skytonia"))
+			//Package Blacklist
+			if( !thirdPackage.startsWith("org.bukkit") &&   //Bukkit/CraftBukkit
+				!thirdPackage.startsWith("org.spigot") &&   //Spigot/PaperSpigot
+				!thirdPackage.startsWith("java") &&         //Java API
+				!thirdPackage.startsWith("sun"))            //Internal Oracle/Sun Libraries
 			{
 				pluginName = thirdPackage.split("[.]")[2];
 				
