@@ -5,13 +5,17 @@ import com.skytonia.SkyCore.gui.variables.GUIVariables;
 import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.FlatFile;
 import lombok.Getter;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Created by Chris Brown (OhBlihv) on 25/09/2016.
  */
-public class SkyCore extends JavaPlugin
+public class SkyCore extends JavaPlugin implements Listener
 {
 	
 	@Getter
@@ -21,6 +25,8 @@ public class SkyCore extends JavaPlugin
 	public void onEnable()
 	{
 		instance = this;
+		
+		getServer().getPluginManager().registerEvents(this, this);
 		
 		//Initialize Addon Registries
 		try
@@ -42,6 +48,13 @@ public class SkyCore extends JavaPlugin
 	public void onDisable()
 	{
 		SocketManager.getInstance().stop();
+	}
+	
+	@EventHandler
+	public void onPluginDisable(PluginDisableEvent event)
+	{
+		//Attempt to strip the version number from the plugin name and just retrieve the initial name
+		FlatFile.unregisterFlatFile(event.getPlugin().getName().split("[ ]")[0]);
 	}
 	
 }

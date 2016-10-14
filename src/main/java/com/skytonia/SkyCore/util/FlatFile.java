@@ -28,6 +28,11 @@ public class FlatFile
 	
 	private static final Map<String, FlatFile> flatfileInstances = new HashMap<>();
 	
+	public static void unregisterFlatFile(String plugin)
+	{
+		flatfileInstances.remove(plugin);
+	}
+	
 	public static FlatFile getInstance()
 	{
 		FlatFile instance;
@@ -114,7 +119,8 @@ public class FlatFile
 			    }
 			    catch(IOException ex)
 			    {
-				    ex.printStackTrace();
+				    //ex.printStackTrace();
+				    BUtil.logError("This plugin is not compatible with SkyCore.");
 			    }
 		    }
 	    }
