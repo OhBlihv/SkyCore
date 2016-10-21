@@ -24,7 +24,7 @@ public class HubManager implements Listener
 	
 	private HubManager()
 	{
-		Bukkit.getPluginManager().registerEvents(this, SkyCore.getInstance());
+		Bukkit.getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
 	}
 	
 	@EventHandler

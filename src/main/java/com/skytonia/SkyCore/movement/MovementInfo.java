@@ -34,7 +34,7 @@ public class MovementInfo
 		this.targetServer = targetServer;
 		this.movementAction = movementAction;
 		
-		timeoutTaskId = Bukkit.getScheduler().runTaskLater(SkyCore.getInstance(), () -> MovementManager.onFailTransfer(player, "TIMEOUT"), MovementManager.timeoutDelay).getTaskId();
+		timeoutTaskId = Bukkit.getScheduler().runTaskLater(SkyCore.getPluginInstance(), () -> MovementManager.onFailTransfer(player, "TIMEOUT"), MovementManager.timeoutDelay).getTaskId();
 	}
 	
 	public void processSuccess()
@@ -51,7 +51,7 @@ public class MovementInfo
 		out.writeUTF("Connect");
 		out.writeUTF(targetServer);
 		
-		player.sendPluginMessage(SkyCore.getInstance(), "BungeeCord", out.toByteArray());
+		player.sendPluginMessage(SkyCore.getPluginInstance(), "BungeeCord", out.toByteArray());
 	}
 	
 	public void processFailure()

@@ -89,9 +89,9 @@ public class MovementManager implements Listener
 	{
 		SocketManager.getInstance();
 		
-		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getInstance(), "BungeeCord");
+		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
 		
-		Bukkit.getPluginManager().registerEvents(this, SkyCore.getInstance());
+		Bukkit.getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
 	}
 	
 	public static void requestMove(String server, Player player) throws IllegalArgumentException

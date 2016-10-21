@@ -24,7 +24,7 @@ public abstract class AddonRegistry implements Listener
 	public AddonRegistry()
 	{
 		//Register our plugin disable listener
-		Bukkit.getPluginManager().registerEvents(this, SkyCore.getInstance());
+		Bukkit.getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
 	}
 	
 	/**

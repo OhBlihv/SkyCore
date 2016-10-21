@@ -67,7 +67,7 @@ public class SocketManager implements SocketClientApp
 		
 		socketClient = new SocketClient(this, serverName, hostName, port, keys);
 		
-		Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getInstance(), socketClient);
+		Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getPluginInstance(), socketClient);
 		BUtil.logMessage("Started socket client listener on " + hostName + ":" + port + " as '" + serverName + "'.");
 	}
 	
