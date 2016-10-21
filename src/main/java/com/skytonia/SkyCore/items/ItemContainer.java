@@ -125,7 +125,7 @@ public class ItemContainer
 		
 		if(enchantmentMap != null)
 		{
-			itemStack.addEnchantments(enchantmentMap);
+			itemStack.addUnsafeEnchantments(enchantmentMap);
 		}
 		
 		return enchantStatus.alterEnchantmentStatus(itemStack);
