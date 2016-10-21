@@ -1,78 +1,52 @@
 package com.skytonia.SkyCore.firework;
 
-import net.minecraft.server.v1_8_R3.EntityFireworks;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityStatus;
-import net.minecraft.server.v1_8_R3.World;
+import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-public class CustomEntityFirework extends EntityFireworks
+/**
+ * Created by Chris Brown (OhBlihv) on 16/10/2016.
+ */
+public class CustomEntityFirework
 {
 	
-	Player[] players = null;
-	
-	public CustomEntityFirework(World world, Player... p)
-	{
-		super(world);
-		players = p;
-		a(0.25F, 0.25F);
-	}
-	
-	boolean gone = false;
-	
-	@Override
-	public void t_()
-	{
-		if(gone)
-		{
-			return;
-		}
-		
-		if(!world.isClientSide)
-		{
-			gone = true;
-			
-			if(players != null)
-			{
-				if(players.length > 0)
-				{
-					for(Player player : players)
-					{
-						(((CraftPlayer) player).getHandle()).playerConnection.sendPacket(new PacketPlayOutEntityStatus(this, (byte) 17));
-					}
-				}
-				else
-				{
-					world.broadcastEntityEffect(this, (byte) 17);
-				}
-			}
-			die();
-		}
-	}
-	
-	public static void spawn(Location location, FireworkEffect effect, Player... players)
+	public static void spawn(Location location, FireworkEffect effect, int tickDuration)
 	{
 		try
 		{
-			CustomEntityFirework firework = new CustomEntityFirework(((CraftWorld) location.getWorld()).getHandle(), players);
+			ICustomEntityFirework firework = getNMSFirework(location, tickDuration);
 			FireworkMeta meta = ((Firework) firework.getBukkitEntity()).getFireworkMeta();
 			meta.addEffect(effect);
 			((Firework) firework.getBukkitEntity()).setFireworkMeta(meta);
 			firework.setPosition(location.getX(), location.getY(), location.getZ());
 			
-			if((((CraftWorld) location.getWorld()).getHandle()).addEntity(firework))
-			{
-				firework.setInvisible(true);
-			}
+			firework.addFirework();
+			firework.setInvisible(true);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
+	
+	private static ICustomEntityFirework getNMSFirework(Location location, int tickDuration)
+	{
+		ICustomEntityFirework nmsFirework;
+		if(tickDuration > 0)
+		{
+			return new BukkitWrapperFirework(location.getWorld().spawn(location, Firework.class));
+		}
+		
+		switch(BUtil.getNMSVersion())
+		{
+			case "v1_8_R3":  nmsFirework = new CustomEntityFirework_1_8_R3(location.getWorld()); break;
+			case "v1_10_R1": nmsFirework = new CustomEntityFirework_1_10_R1(location.getWorld(), tickDuration); break;
+			default:
+				throw new IllegalArgumentException("NMS Version '" + BUtil.getNMSVersion() + "' not supported!");
+		}
+		return nmsFirework;
+	}
+	
 }
