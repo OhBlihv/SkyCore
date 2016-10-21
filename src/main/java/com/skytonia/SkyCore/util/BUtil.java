@@ -54,7 +54,7 @@ public class BUtil
 		if(instantExplosion)
 		{
 			location.setY(location.getY() + 2.0D);
-			//CustomEntityFirework.spawn(location, effect);
+			//CustomEntityFirework_1_8_R3.spawn(location, effect);
 		}
 		else
 		{
@@ -419,10 +419,13 @@ public class BUtil
 		{
 			String thirdPackage = stackTrace[i].getClassName();
 			//Package Blacklist
-			if( !thirdPackage.startsWith("org.bukkit") &&   //Bukkit/CraftBukkit
-				!thirdPackage.startsWith("org.spigot") &&   //Spigot/PaperSpigot
-				!thirdPackage.startsWith("java") &&         //Java API
-				!thirdPackage.startsWith("sun"))            //Internal Oracle/Sun Libraries
+			if( !thirdPackage.startsWith("org.bukkit") &&       //Bukkit/CraftBukkit
+				!thirdPackage.startsWith("org.spigot") &&       //Spigot
+				!thirdPackage.startsWith("com.destroystokyo*") &&//PaperSpigot
+				!thirdPackage.startsWith("co.aikar") &&        //Timings
+				!thirdPackage.startsWith("java") &&             //Java API
+				!thirdPackage.startsWith("sun") &&             //Internal Oracle/Sun Libraries
+			    !thirdPackage.contains(".shade.")) //Ignore shaded libraries. They do not count towards a plugin.
 			{
 				pluginName = thirdPackage.split("[.]")[2];
 				
