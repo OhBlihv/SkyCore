@@ -48,7 +48,7 @@ public class PacketUtil
 			this.maxExecutions = executions;
 			
 			//Run immediately, then every 'tickDelay' ticks.
-			this.taskId = Bukkit.getScheduler().runTaskTimer(SkyCore.getInstance(), () ->
+			this.taskId = Bukkit.getScheduler().runTaskTimer(SkyCore.getPluginInstance(), () ->
 			{
 				try
 				{

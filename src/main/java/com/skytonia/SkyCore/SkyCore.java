@@ -7,9 +7,11 @@ import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.FlatFile;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -20,6 +22,29 @@ public class SkyCore extends JavaPlugin implements Listener
 	
 	@Getter
 	private static SkyCore instance = null;
+	public static JavaPlugin getPluginInstance()
+	{
+		//We're shaded!
+		if(instance == null)
+		{
+			String callingPlugin = BUtil.getCallingPlugin();
+			
+			Plugin plugin = Bukkit.getPluginManager().getPlugin(callingPlugin);
+			if(plugin != null)
+			{
+				return (JavaPlugin) plugin;
+			}
+			else
+			{
+				BUtil.logError("Could not find calling plugin for getInstance()");
+				return null;
+			}
+		}
+		else
+		{
+			return instance;
+		}
+	}
 	
 	@Override
 	public void onEnable()

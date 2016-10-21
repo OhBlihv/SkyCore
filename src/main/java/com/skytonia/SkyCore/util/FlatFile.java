@@ -22,7 +22,8 @@ public class FlatFile
 	protected File saveFile = null;
 	protected FileConfiguration save = null;
 	
-	static JavaPlugin plugin = null;
+	String pluginString = null;
+	JavaPlugin plugin = null;
 	
 	String fileName = "config.yml";
 	
@@ -66,11 +67,13 @@ public class FlatFile
 		
 		if(owningPlugin != null)
 		{
+			pluginString = owningPlugin;
 			plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(owningPlugin);
 		}
 		else
 		{
-			plugin = BUtil.getCallingJavaPlugin();
+			pluginString = BUtil.getCallingPlugin();
+			plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(pluginString);
 		}
 		
 		//Support extending classes
@@ -101,7 +104,14 @@ public class FlatFile
 	{
 	    if (saveFile == null)
 	    {
-	        saveFile = new File(plugin.getDataFolder(), fileName);
+		    try
+		    {
+			    saveFile = new File(plugin.getDataFolder(), fileName);
+		    }
+		    catch(Exception e)
+		    {
+			    BUtil.logError("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
+		    }
 	    }
 	    
 	    if (!saveFile.exists())
