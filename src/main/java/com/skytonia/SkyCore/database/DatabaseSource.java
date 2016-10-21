@@ -1,7 +1,10 @@
 package com.skytonia.SkyCore.database;
 
+import com.skytonia.SkyCore.util.BUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +24,8 @@ public class DatabaseSource
 	/**
 	 * Single Execution Thread for SQL Executions
 	 */
-	private final ExecutorService threadExecutor = Executors.newSingleThreadExecutor();
+	@Getter(AccessLevel.PROTECTED)
+	private final ExecutorService threadExecutor = Executors.newCachedThreadPool();
 	
 	/*
 	 * Attempts to set up a database connection object with the following url:
@@ -53,35 +57,98 @@ public class DatabaseSource
 		dataSource = new HikariDataSource(config);
 		
 		//Attempt a test query
-		executeQuery("SELECT 1", null, null);
+		executeQuery("SELECT 1", null, null, null);
 	}
 	
-	public void executeAsync(String sqlQuery)
-	{
-		executeQueryAsync(sqlQuery, null, null);
-	}
-	
-	public void execute(String sqlQuery) throws SQLException
-	{
-		executeQuery(sqlQuery, null, null);
-	}
-	
-	public void executeQueryAsync(String sqlQuery, QueryAction queryAction, ResultAction resultAction)
+	/**
+	 * MySQL Execution API containing proper setup and cleanup for ease-of-use.
+	 * Completes on this class's dedicated SQL Execution Thread.
+	 *
+	 * @param sqlQuery Basic SQL Query to be sent.
+	 * @param queryAction QueryAction which fills in the blanks of the Statement
+	 * @param postTransaction Runnable which will always run post-transaction, whether a result is returned or error occurs.
+	 * @throws SQLException
+	 */
+	public void executeAsync(String sqlQuery, QueryAction queryAction, Runnable postTransaction)
 	{
 		threadExecutor.submit(() ->
 		{
 			try
 			{
-				executeQuery(sqlQuery, queryAction, resultAction);
+				executeQuery(sqlQuery, queryAction, null, postTransaction, QueryType.EXECUTE);
+			}
+			catch(SQLException e)
+			{
+				BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+				e.printStackTrace();
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				BUtil.logStackTrace(e);
 			}
 		});
 	}
 	
-	public void executeQuery(String sqlQuery, QueryAction queryAction, ResultAction resultAction) throws SQLException
+	/**
+	 * MySQL Execution API containing proper setup and cleanup for ease-of-use.
+	 * Completes on the current thread.
+	 *
+	 * @param sqlQuery Basic SQL Query to be sent.
+	 * @param queryAction QueryAction which fills in the blanks of the Statement
+	 * @param postTransaction Runnable which will always run post-transaction, whether a result is returned or error occurs.
+	 * @throws SQLException
+	 */
+	public void execute(String sqlQuery, QueryAction queryAction, Runnable postTransaction) throws SQLException
+	{
+		executeQuery(sqlQuery, queryAction, null, postTransaction, QueryType.EXECUTE);
+	}
+	
+	/**
+	 * MySQL Query API containing proper setup and cleanup for ease-of-use.
+	 * Completes on this class's dedicated SQL Execution Thread.
+	 *
+	 * @param sqlQuery Basic SQL Query to be sent.
+	 * @param queryAction QueryAction which fills in the blanks of the Statement
+	 * @param resultAction ResultAction which is called if a ResultSet is found and contains at least 1 row
+	 * @param postTransaction Runnable which will always run post-transaction, whether a result is returned or error occurs.
+	 * @throws SQLException
+	 */
+	public void executeQueryAsync(String sqlQuery, QueryAction queryAction, ResultAction resultAction, Runnable postTransaction)
+	{
+		threadExecutor.submit(() ->
+		{
+			try
+			{
+				executeQuery(sqlQuery, queryAction, resultAction, postTransaction, QueryType.QUERY);
+			}
+			catch(SQLException e)
+			{
+				BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+				e.printStackTrace();
+			}
+			catch(Exception e)
+			{
+				BUtil.logStackTrace(e);
+			}
+		});
+	}
+	
+	/**
+	 * MySQL Query API containing proper setup and cleanup for ease-of-use.
+	 * Completes on the current thread.
+	 *
+	 * @param sqlQuery Basic SQL Query to be sent.
+	 * @param queryAction QueryAction which fills in the blanks of the Statement
+	 * @param resultAction ResultAction which is called if a ResultSet is found and contains at least 1 row
+	 * @param postTransaction Runnable which will always run post-transaction, whether a result is returned or error occurs.
+	 * @throws SQLException
+	 */
+	public void executeQuery(String sqlQuery, QueryAction queryAction, ResultAction resultAction, Runnable postTransaction) throws SQLException
+	{
+		executeQuery(sqlQuery, queryAction, resultAction, postTransaction, QueryType.QUERY);
+	}
+	
+	private void executeQuery(String sqlQuery, QueryAction queryAction, ResultAction resultAction, Runnable postTransaction, QueryType queryType) throws SQLException
 	{
 		Connection connection = null;
 		PreparedStatement statement = null;
@@ -95,19 +162,59 @@ public class DatabaseSource
 			
 			if(queryAction != null)
 			{
-				queryAction.query(statement);
+				try
+				{
+					queryAction.query(statement);
+				}
+				catch(SQLException e)
+				{
+					BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+					e.printStackTrace();
+				}
+				catch(Exception e)
+				{
+					BUtil.logError("Unhandled Exception:");
+					BUtil.logStackTrace(e);
+				}
 			}
 			
-			resultSet = statement.executeQuery();
+			if(queryType == QueryType.QUERY)
+			{
+				resultSet = statement.executeQuery();
+			}
+			else //if(queryType == QueryType.EXECUTE)
+			{
+				statement.execute();
+			}
 			
 			if(resultAction != null && resultSet != null && resultSet.next())
 			{
-				resultAction.processResults(resultSet);
+				try
+				{
+					resultAction.processResults(resultSet);
+				}
+				catch(Exception e)
+				{
+					BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+					e.printStackTrace();
+				}
 			}
 		}
 		finally
 		{
 			cleanupSQL(connection, resultSet, statement);
+			
+			if(postTransaction != null)
+			{
+				try
+				{
+					postTransaction.run();
+				}
+				catch(Exception e)
+				{
+					BUtil.logStackTrace(e);
+				}
+			}
 		}
 	}
 	
@@ -115,6 +222,10 @@ public class DatabaseSource
 	 * Helper Methods
 	 */
 	
+	/**
+	 * @return An available pooled thread
+	 * @throws SQLException
+	 */
 	public Connection getConnection() throws SQLException
 	{
 		return dataSource.getConnection();
