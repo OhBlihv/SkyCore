@@ -32,11 +32,19 @@
 		<!-- Spigot NMS Dependency -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
-			<artifactId>Spigot</artifactId>
+			<artifactId>Spigot-v1_8_R3</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
 			<systemPath>${project.basedir}/lib/spigot-1.8.8.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>Spigot-v1_10_R1</artifactId>
+			<version>1.10-R0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<optional>true</optional>
+			<systemPath>${project.basedir}/lib/spigot-1.10.jar</systemPath>
 		</dependency>
 		
 		<!-- Database -->

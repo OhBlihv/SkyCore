@@ -24,6 +24,11 @@ public class CustomEntityFirework
 			
 			firework.addFirework();
 			firework.setInvisible(true);
+			
+			if(tickDuration <= 1)
+			{
+				((Firework) firework.getBukkitEntity()).detonate();
+			}
 		}
 		catch(Exception e)
 		{
@@ -34,7 +39,7 @@ public class CustomEntityFirework
 	private static ICustomEntityFirework getNMSFirework(Location location, int tickDuration)
 	{
 		ICustomEntityFirework nmsFirework;
-		if(tickDuration > 0)
+		if(tickDuration > 1)
 		{
 			return new BukkitWrapperFirework(location.getWorld().spawn(location, Firework.class));
 		}

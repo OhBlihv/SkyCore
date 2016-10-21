@@ -417,6 +417,11 @@ public class BUtil
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		for(int i = 2;i < 10;i++) //Parse 8 lines for a plugin name before giving up.
 		{
+			if(i >= stackTrace.length)
+			{
+				break;
+			}
+			
 			String thirdPackage = stackTrace[i].getClassName();
 			//Package Blacklist
 			if( !thirdPackage.startsWith("org.bukkit") &&       //Bukkit/CraftBukkit
@@ -438,15 +443,21 @@ public class BUtil
 			}
 		}
 		
+		//Default to claiming responsibility
+		if(pluginName == null)
+		{
+			pluginName = "SkyCore";
+		}
+		
 		return pluginName;
 	}
 	
-	public static JavaPlugin getCallingJavaPlugin()
+	public static JavaPlugin getCallingJavaPlugin(int depth)
 	{
-		return getCallingJavaPlugin(3);
+		return getCallingJavaPlugin();
 	}
 	
-	public static JavaPlugin getCallingJavaPlugin(int depth)
+	public static JavaPlugin getCallingJavaPlugin()
 	{
 		String mainClassName = getCallingPlugin();
 		
