@@ -63,22 +63,48 @@ public class LocationUtil
 		return new Location(world, x, y, z, yaw, pitch);
 	}
 	
+	public static Location parseLocationWithWorld(String locationString)
+	{
+		String[] locationSplit = locationString.split("[:]");
+		
+		World world = Bukkit.getWorld(locationSplit[0]);
+		
+		return parseLocation(locationString, world, 1);
+	}
+	
 	public static Location parseLocation(String locationString)
+	{
+		return parseLocation(locationString, null, 0);
+	}
+	
+	public static Location parseLocation(String locationString, World world, int startVal)
 	{
 		String[] locationSplit = locationString.split("[:]");
 		try
 		{
-			double 	x = Double.parseDouble(locationSplit[0]),
-				y = Double.parseDouble(locationSplit[1]),
-				z = Double.parseDouble(locationSplit[2]);
-			float 	yaw = 0, pitch = 90;
-			if(locationSplit.length > 3)
+			double 	x = Double.parseDouble(locationSplit[startVal]),
+					y = Double.parseDouble(locationSplit[startVal + 1]),
+					z = Double.parseDouble(locationSplit[startVal + 2]);
+			float 	yaw = 0, pitch = 0;
+			if(locationSplit.length > (3 + startVal))
 			{
-				yaw = Float.parseFloat(locationSplit[3]);
-				pitch = Float.parseFloat(locationSplit[4]);
+				yaw = Float.parseFloat(locationSplit[startVal + 3]);
+				pitch = Float.parseFloat(locationSplit[startVal + 4]);
 			}
 			
-			return new Location(Bukkit.getWorlds().get(0), x, y, z, yaw, pitch);
+			if(world == null)
+			{
+				if(startVal > 0)
+				{
+					world = Bukkit.getWorld(locationSplit[0]);
+				}
+				else
+				{
+					world = Bukkit.getWorlds().get(0);
+				}
+			}
+			
+			return new Location(world, x, y, z, yaw, pitch);
 		}
 		catch(NumberFormatException e)
 		{
