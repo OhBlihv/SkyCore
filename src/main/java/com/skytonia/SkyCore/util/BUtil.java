@@ -400,6 +400,8 @@ public class BUtil
 	// Plugin Retrieval
 	// ------------------------------------------------------------------------------------------------------
 	
+	private String skyCoreName = null;
+	
 	/**
 	 * Assuming a structure of 'com.skytonia.<plugin>.package.class' and so-forth,
 	 * this method will return the <plugin> portion of the fully-qualified class name.
@@ -529,8 +531,11 @@ public class BUtil
 	{
 		logMessageAsPlugin(null, "Caught Exception (" + e.getClass().getSimpleName() + ")" + (e.getMessage() != null ? (": " + e.getMessage()) : ""));
 		
-		StackTraceElement[] stackTrace = e.getStackTrace();
-		
+		logStackTrace(e.getStackTrace());
+	}
+	
+	public static void logStackTrace(StackTraceElement[] stackTrace)
+	{
 		int element = 0;
 		for(StackTraceElement stackTraceElement : stackTrace)
 		{

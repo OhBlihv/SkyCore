@@ -220,18 +220,19 @@ public class ItemContainer
 		}
 		int damage = overriddenValues.containsKey(ItemContainerVariable.DAMAGE) ?
 			             (int) overriddenValues.get(ItemContainerVariable.DAMAGE) :
-				                                                                      configurationSection.getInt("damage", 0),
+				         configurationSection.getInt("damage", 0),
 			amount = overriddenValues.containsKey(ItemContainerVariable.AMOUNT) ?
 				         (int) overriddenValues.get(ItemContainerVariable.AMOUNT) :
-					                                                                  configurationSection.getInt("amount", 1);
+					     configurationSection.getInt("amount", 1);
 		
 		String displayName = overriddenValues.containsKey(ItemContainerVariable.DISPLAYNAME) ?
 			                     BUtil.translateColours((String) overriddenValues.get(ItemContainerVariable.DISPLAYNAME)) :
-				                                                                                                              BUtil.translateColours(configurationSection.getString("displayname", ""));
+				                 BUtil.translateColours(configurationSection.getString("displayname", ""));
 		
 		Map<Enchantment, Integer> enchantmentMap = (Map<Enchantment, Integer>) overriddenValues.get(ItemContainerVariable.ENCHANTMENTS);
 		int isEnchanted = (int) overriddenValues.getOrDefault(ItemContainerVariable.ENCHANTED, -1);
-		if((isEnchanted != -1 || enchantmentMap != null) && configurationSection.get("enchanted") != null)
+		//If either one of these values are overridden, do not read from config
+		if((isEnchanted != -1 || enchantmentMap == null) && configurationSection.get("enchanted") != null)
 		{
 			if(configurationSection.isBoolean("enchanted"))
 			{
@@ -245,7 +246,7 @@ public class ItemContainer
 		
 		List<String> lore = overriddenValues.containsKey(ItemContainerVariable.LORE) ?
 			                    BUtil.translateColours((List<String>) overriddenValues.get(ItemContainerVariable.LORE)) :
-				                                                                                                            BUtil.translateColours(configurationSection.getStringList("lore"));
+				                BUtil.translateColours(configurationSection.getStringList("lore"));
 		
 		String owner = (String) overriddenValues.get(ItemContainerVariable.OWNER);
 		if(owner == null && configurationSection.contains("owner"))

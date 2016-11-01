@@ -200,7 +200,14 @@ public class GUIUtil
 		for(String enchantLine : enchantList)
 		{
 			String[] split = COLON_SPLIT.split(enchantLine);
-			enchantMap.put(Enchantment.getByName(split[0]), Integer.parseInt(split[1]));
+			
+			Enchantment enchantment = Enchantment.getByName(split[0]);
+			if(enchantment == null)
+			{
+				BUtil.logError("Loaded invalid Enchantment: '" + split[0] + "'");
+				continue;
+			}
+			enchantMap.put(enchantment, Integer.parseInt(split[1]));
 		}
 		
 		return enchantMap;

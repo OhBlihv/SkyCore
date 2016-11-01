@@ -91,7 +91,7 @@ public class ElementActions extends AddonRegistry implements Listener
 				}
 				catch(IllegalArgumentException e)
 				{
-					//Ignored
+					//Actions are configured under actions:, and not a clickType.
 				}
 			}
 			
@@ -133,6 +133,12 @@ public class ElementActions extends AddonRegistry implements Listener
 			SkyAddon elementActionClass = registeredAddons.get(actionIdentifier);
 			if(elementActionClass == null)
 			{
+				if(actionName == null)
+				{
+					BUtil.logInfo("Slot '" + slot + "' in " + subSection.getCurrentPath() + " contains an actions section, but no defined actions!");
+					continue;
+				}
+				
 				BUtil.logInfo("Slot '" + slot + "' in " + subSection.getCurrentPath() + " uses an un-recognised action: '" + actionName + "'");
 				continue;
 			}

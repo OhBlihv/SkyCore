@@ -67,6 +67,7 @@ public class SkyCore extends JavaPlugin implements Listener
 		
 		SocketManager.getInstance().start();
 		MovementManager.getInstance(); //Register Listeners
+		
 	}
 	
 	@Override

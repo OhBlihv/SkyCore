@@ -8,6 +8,7 @@ import com.skytonia.SkyCore.items.GUIUtil;
 import com.skytonia.SkyCore.items.ItemContainer;
 import com.skytonia.SkyCore.items.ItemContainerVariable;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -103,7 +104,8 @@ public class GUIContainer implements Listener
 			return;
 		}
 		
-		Inventory inventory = Bukkit.createInventory(null, guiSize, guiTitle);
+		//Inventory inventory = Bukkit.createInventory(null, guiSize, guiTitle);
+		Inventory inventory = createInventory(guiSize, guiTitle);
 		inventory = getInventory(inventory, player);
 		player.openInventory(inventory);
 		
@@ -111,6 +113,16 @@ public class GUIContainer implements Listener
 		{
 			openSound.playSound(player);
 		}
+	}
+	
+	protected Inventory createInventory(int guiSize, String guiTitle)
+	{
+		if(guiSize > 9 && guiSize % 9 != 0)
+		{
+			throw new IllegalArgumentException("Gui Size must be a multiple of 9 above 9 itself!");
+		}
+		
+		return StaticNMS.createInventory(guiSize, guiTitle);
 	}
 
 	public boolean updateInventory(Player player)
