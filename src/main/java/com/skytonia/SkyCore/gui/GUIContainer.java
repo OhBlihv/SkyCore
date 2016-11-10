@@ -117,7 +117,7 @@ public class GUIContainer implements Listener
 	
 	protected Inventory createInventory(int guiSize, String guiTitle)
 	{
-		if(guiSize > 9 && guiSize % 9 != 0)
+		if((guiSize > 9 && guiSize % 9 != 0) || (guiSize < 9 && guiSize != 5))
 		{
 			throw new IllegalArgumentException("Gui Size must be a multiple of 9 above 9 itself!");
 		}

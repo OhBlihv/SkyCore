@@ -3,6 +3,7 @@ package com.skytonia.SkyCore.util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -247,6 +248,25 @@ public class FlatFile
 	public Location getLocation(String path)
 	{
 		return LocationUtil.parseLocation(save.getString(path));
+	}
+	
+	public Location getLocation(ConfigurationSection configurationSection)
+	{
+		World world = Bukkit.getWorld(configurationSection.getString("world"));
+		if(world == null)
+		{
+			BUtil.logError("Could not find world named '" + configurationSection.getString("world") + "'");
+			return LocationUtil.DEFAULT_LOCATION;
+		}
+		
+		int x = configurationSection.getInt("x"),
+			y = configurationSection.getInt("y"),
+			z = configurationSection.getInt("z");
+		
+		float   yaw = (float) configurationSection.getDouble("yaw", 0),
+				pitch = (float) configurationSection.getDouble("pitch", 0);
+		
+		return new Location(world, x, y, z, yaw, pitch);
 	}
 
 	/*

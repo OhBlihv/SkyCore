@@ -295,19 +295,43 @@ public class BUtil
 
 		int startIndex = variableMatcher.start(),
 			endFoundIndex = -1;
-		char charAfterVariable = original.charAt(variableMatcher.end() + 1);
-
-		for(int charIdx = startIndex;charIdx < original.length();charIdx++)
+		boolean charAfterIsEnd = false;
+		char charAfterVariable;
+		if(variableMatcher.end() + 1 >= original.length())
 		{
-			if(string.charAt(charIdx) != charAfterVariable)
-			{
-				continue;
-			}
-
-			endFoundIndex = charIdx;
-			break;
+			charAfterVariable = '^';
+			charAfterIsEnd = true;
+		}
+		else
+		{
+			charAfterVariable = original.charAt(variableMatcher.end() + 1);
 		}
 
+		if(charAfterIsEnd)
+		{
+			return string.substring(startIndex, string.length());
+		}
+		else
+		{
+			for(int charIdx = startIndex;charIdx < original.length();charIdx++)
+			{
+				//We've 'found the end'
+				if(charIdx == string.length())
+				{
+					endFoundIndex = charIdx;
+					break;
+				}
+				
+				if(string.charAt(charIdx) != charAfterVariable)
+				{
+					continue;
+				}
+				
+				endFoundIndex = charIdx;
+				break;
+			}
+		}
+		
 		if(endFoundIndex != -1)
 		{
 			return string.substring(startIndex, endFoundIndex);
