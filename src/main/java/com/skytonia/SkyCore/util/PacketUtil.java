@@ -132,24 +132,28 @@ public class PacketUtil
 	{
 		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
 		
-		PacketPlayOutTitle timesPacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, persistTime, fadeOut);
-		playerConnection.sendPacket(timesPacket);
+		//PacketPlayOutTitle timesPacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, persistTime, fadeOut);
+		//playerConnection.sendPacket(timesPacket);
+		//BUtil.logInfo("Sent times packet as " + persistTime + ", " + fadeIn + ", " + fadeOut);
 		
 		if(subTitle != null)
 		{
-			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle);
+			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle, persistTime, fadeIn, fadeOut);
 		}
 		
 		if(title != null)
 		{
-			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TITLE, title);
+			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TITLE, title, persistTime, fadeIn, fadeOut);
 		}
 	}
 	
-	private static void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message)
+	private static void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message,
+	                                    int persistTime, int fadeIn, int fadeOut)
 	{
+		//BUtil.logInfo("Printing " + titleAction.name() + " with '" + message + "'");
 		playerConnection.sendPacket(new PacketPlayOutTitle(titleAction,
-		                       IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}")));
+		                       IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}"),
+		                                                   persistTime, fadeIn, fadeOut));
 	}
 	
 }
