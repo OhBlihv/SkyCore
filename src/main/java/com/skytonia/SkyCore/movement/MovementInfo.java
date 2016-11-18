@@ -34,7 +34,17 @@ public class MovementInfo
 		this.targetServer = targetServer;
 		this.movementAction = movementAction;
 		
-		timeoutTaskId = Bukkit.getScheduler().runTaskLater(SkyCore.getPluginInstance(), () -> MovementManager.onFailTransfer(player, "TIMEOUT"), MovementManager.timeoutDelay).getTaskId();
+		timeoutTaskId = Bukkit.getScheduler().runTaskLater(SkyCore.getPluginInstance(),
+		                () -> MovementManager.onFailTransfer(player, "TIMEOUT"), MovementManager.timeoutDelay).getTaskId();
+	}
+	
+	public void cancelTimeout()
+	{
+		if(timeoutTaskId != -1)
+		{
+			Bukkit.getScheduler().cancelTask(timeoutTaskId);
+			timeoutTaskId = -1;
+		}
 	}
 	
 	public void processSuccess()

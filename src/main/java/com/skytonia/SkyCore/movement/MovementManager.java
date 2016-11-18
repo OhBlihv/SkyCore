@@ -116,7 +116,7 @@ public class MovementManager implements Listener
 			movementAction = DEFAULT_MOVEMENT_ACTION;
 		}
 		
-		//BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
+		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
 		SocketManager.getSocketClient().writeJSON(CHANNEL_MOVE_PLAYER_REQ, server + SPLITTER + player.getName());
@@ -124,7 +124,12 @@ public class MovementManager implements Listener
 	
 	protected static MovementInfo removePlayer(Player player)
 	{
-		return movementMap.remove(player.getName());
+		MovementInfo movementInfo = movementMap.remove(player.getName());
+		
+		//Ensure we don't try to remove this twice.
+		movementInfo.cancelTimeout();
+		
+		return movementInfo;
 	}
 	
 	protected static void onSuccessfulTransfer(Player player)
@@ -177,7 +182,7 @@ public class MovementManager implements Listener
 		else if(event.getChannel().equals(CHANNEL_MOVE_PLAYER_REPLY))
 		{
 			String  targetServer = splitData[0],
-					playerName = splitData[1];
+					playerName   = splitData[1];
 			Player player;
 			{
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
@@ -198,12 +203,12 @@ public class MovementManager implements Listener
 			
 			if(response != null && !response.isEmpty())
 			{
-				BUtil.logMessage("Received Failed Reply for " + playerName);
+				BUtil.logMessage("Received Failed Reply for " + playerName + " to " + targetServer + " (" + response + ")");
 				onFailTransfer(player, response);
 			}
 			else
 			{
-				BUtil.logMessage("Received Successful reply for " + playerName);
+				//BUtil.logMessage("Received Successful reply for " + playerName);
 				onSuccessfulTransfer(player);
 			}
 		}
