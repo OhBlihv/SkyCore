@@ -44,10 +44,11 @@ public class MovementManager implements Listener
 			
 			switch(response)
 			{
-				case "WHITELIST": formattedResponse = "§c" + BUtil.capitaliseFirst(server) + " is currently locked."; break;
+				case "WHITELIST": formattedResponse = "§c§l(!) §cYou do not have access to this server!"; break;
 				//TODO: Allow the banned message to be suffixed by the ban reason?
-				case "BANNED": formattedResponse = "§cYou are currently banned from " + BUtil.capitaliseFirst(server) + "."; break;
-				case "TIMEOUT": formattedResponse = "§cFailed to connect to " + BUtil.capitaliseFirst(server) + ". (Timeout)"; break;
+				case "BANNED": formattedResponse = "§c§l(!) §cYou are banned from this server!"; break;
+				case "TIMEOUT": formattedResponse = "§c§l(!) §cFailed to connect to... " + BUtil.capitaliseFirst(server); break;
+				case "OFFLINE": formattedResponse = "§c§l(!) §cThis server is currently offline."; break;
 			}
 			
 			player.sendMessage(formattedResponse);
