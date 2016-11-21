@@ -124,7 +124,11 @@ public class MovementManager implements Listener
 	
 	protected static MovementInfo removePlayer(Player player)
 	{
-		MovementInfo movementInfo = movementMap.remove(player.getName());
+		MovementInfo movementInfo;
+		if((movementInfo = movementMap.remove(player.getName())) == null)
+		{
+			return null;
+		}
 		
 		//Ensure we don't try to remove this twice.
 		movementInfo.cancelTimeout();
@@ -134,12 +138,23 @@ public class MovementManager implements Listener
 	
 	protected static void onSuccessfulTransfer(Player player)
 	{
-		removePlayer(player).processSuccess();
+		MovementInfo movementInfo = removePlayer(player);
+		if(movementInfo == null)
+		{
+			return;
+		}
+		
+		movementInfo.processSuccess();
 	}
 	
 	protected static void onFailTransfer(Player player, String response)
 	{
 		MovementInfo movementInfo = removePlayer(player);
+		if(movementInfo == null)
+		{
+			return;
+		}
+		
 		movementInfo.setResponse(response);
 			
 		movementInfo.processFailure();

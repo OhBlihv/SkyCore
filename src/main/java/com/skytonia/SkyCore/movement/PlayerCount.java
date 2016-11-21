@@ -74,7 +74,7 @@ public class PlayerCount implements Listener
 		
 		if(event.getChannel().equals(CHANNEL_REQ_PLAYER_COUNT))
 		{
-			//BUtil.logInfo("REQ: " + Arrays.toString(splitData));
+			//BUtil.logInfo("REQ: " + Arrays.toString(splitData) + " >> '" + splitData[0] + "'");
 			SocketManager.sendMessageTo(splitData[0], CHANNEL_RECV_PLAYER_COUNT, SocketManager.getServerName(),
 			                            String.valueOf(Bukkit.getOnlinePlayers().size()));
 		}
@@ -129,7 +129,7 @@ public class PlayerCount implements Listener
 		
 		playerCountRequests.put(server, playerCountRequest);
 		
-		SocketManager.sendMessageTo(server, CHANNEL_REQ_PLAYER_COUNT);
+		SocketManager.sendMessageTo(server, CHANNEL_REQ_PLAYER_COUNT, SocketManager.getServerName());
 	}
 	
 }
