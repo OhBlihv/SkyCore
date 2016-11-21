@@ -3,6 +3,7 @@ package com.skytonia.SkyCore;
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
 import com.skytonia.SkyCore.movement.MovementManager;
+import com.skytonia.SkyCore.movement.PlayerCount;
 import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.FlatFile;
@@ -66,8 +67,8 @@ public class SkyCore extends JavaPlugin implements Listener
 		}
 		
 		SocketManager.getInstance().start();
-		MovementManager.getInstance(); //Register Listeners
-		
+		MovementManager.getInstance();  //Register Listeners
+		PlayerCount.getInstance();      //Register Listeners
 	}
 	
 	@Override
