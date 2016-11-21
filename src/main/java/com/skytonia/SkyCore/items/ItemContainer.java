@@ -1,5 +1,7 @@
 package com.skytonia.SkyCore.items;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.FlatFile;
 import lombok.Getter;
@@ -12,11 +14,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.bukkit.Material.AIR;
@@ -54,6 +58,9 @@ public class ItemContainer
 	@Getter
 	private final String owner;
 	
+	@Getter
+	private final String skullTexture;
+	
 	public ItemStack toItemStack()
 	{
 		return toItemStack(null);
@@ -89,28 +96,55 @@ public class ItemContainer
 		{
 			itemMeta.setDisplayName(displayName);
 		}
-		if((material == Material.SKULL_ITEM || material == Material.SKULL) && (playerName != null || owner != null))
+		if((material == Material.SKULL_ITEM || material == Material.SKULL))
 		{
-			String skullOwner;
-			//Allow the input player to override the owner for this skull
-			if(this.owner == null || this.owner.equals("PLAYER"))
+			if(skullTexture == null)
 			{
-				skullOwner = playerName;
+				if((playerName != null || owner != null))
+				{
+					String skullOwner;
+					//Allow the input player to override the owner for this skull
+					if(owner == null || owner.equals("PLAYER"))
+					{
+						skullOwner = playerName;
+					}
+					else
+					{
+						skullOwner = owner;
+					}
+					
+					if(skullOwner != null)
+					{
+						((SkullMeta) itemMeta).setOwner(skullOwner);
+						if(itemMeta.hasDisplayName())
+						{
+							itemMeta.setDisplayName(itemMeta.getDisplayName().replace("{player}", skullOwner));
+						}
+					}
+				}
 			}
 			else
 			{
-				skullOwner = this.owner;
-			}
-			
-			if(skullOwner != null)
-			{
-				((SkullMeta) itemMeta).setOwner(skullOwner);
-				if(itemMeta.hasDisplayName())
+				GameProfile skinProfile = new GameProfile(UUID.randomUUID(), null);
+				
+				
+				skinProfile.getProperties().put("textures", new Property("textures",
+				                                                         skullTexture,
+				                                                         "signed"));
+				
+				try
 				{
-					itemMeta.setDisplayName(itemMeta.getDisplayName().replace("{player}", skullOwner));
+					Field profileField = itemMeta.getClass().getDeclaredField("profile");
+					profileField.setAccessible(true);
+					profileField.set(itemMeta, skinProfile);
+				}
+				catch(IllegalAccessException | NoSuchFieldException e)
+				{
+					e.printStackTrace();
 				}
 			}
 		}
+		
 		if(lore != null)
 		{
 			itemMeta.setLore(lore);
@@ -161,7 +195,7 @@ public class ItemContainer
 		}
 		
 		return new ItemContainer(itemStack.getType(), itemStack.getDurability(), itemStack.getAmount(), displayname, lore,
-		                         EnchantStatus.NO_CHANGE, enchantmentMap, itemStack.getData(), owner);
+		                         EnchantStatus.NO_CHANGE, enchantmentMap, itemStack.getData(), owner, null);
 	}
 	
 	public static ItemContainer buildItemContainer(ConfigurationSection configurationSection)
@@ -254,7 +288,15 @@ public class ItemContainer
 			owner = configurationSection.getString("owner");
 		}
 		
-		return new ItemContainer(material, damage, amount, displayName, lore, EnchantStatus.getEnchantStatus(isEnchanted), enchantmentMap, null, owner);
+		String skullTexture = (String) overriddenValues.get(ItemContainerVariable.SKULL_TEXTURE);
+		if(skullTexture == null && configurationSection.contains("texture"))
+		{
+			skullTexture = configurationSection.getString("texture");
+		}
+		
+		return new ItemContainer(material, damage, amount, displayName, lore,
+		                         EnchantStatus.getEnchantStatus(isEnchanted), enchantmentMap,
+		                         null, owner, skullTexture);
 	}
 	
 	private static final Pattern PATTERN_SEPERATOR = Pattern.compile(":");
@@ -278,8 +320,9 @@ public class ItemContainer
 			return null;
 		}
 		
-		String  displayName = BUtil.translateColours(FlatFile.getString(configurationMap, "displayname", null)),
-				owner = FlatFile.getString(configurationMap, "owner", null);
+		String  displayName     =  BUtil.translateColours(FlatFile.getString(configurationMap, "displayname", null)),
+				owner           =  FlatFile.getString(configurationMap, "owner",   null),
+				skullTexture    =  FlatFile.getString(configurationMap, "texture", null);
 		int     damage = FlatFile.getInt(configurationMap, "damage", 0),
 				amount = FlatFile.getInt(configurationMap, "amount", 1);
 		List<String> lore = FlatFile.getStringList(configurationMap, "lore");
@@ -326,7 +369,9 @@ public class ItemContainer
 			}
 		}
 		
-		return new ItemContainer(material, damage, amount, displayName, lore, EnchantStatus.getEnchantStatus(enchanted), enchantmentMap, null, owner);
+		return new ItemContainer(material, damage, amount, displayName, lore,
+		                         EnchantStatus.getEnchantStatus(enchanted), enchantmentMap,
+		                         null, owner, skullTexture);
 	}
 	
 	public int getMaxStackSize()

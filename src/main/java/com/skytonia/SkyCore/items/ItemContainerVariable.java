@@ -13,6 +13,7 @@ public enum ItemContainerVariable
 	LORE,
 	ENCHANTMENTS,
 	ENCHANTED,
-	OWNER
+	OWNER,
+	SKULL_TEXTURE
 	
 }

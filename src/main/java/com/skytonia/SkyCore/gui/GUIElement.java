@@ -23,7 +23,8 @@ public class GUIElement
 {
 	
 	public static final GUIElement DEFAULT_GUI_ELEMENT =
-		new GUIElement(new ItemContainer(Material.POTATO_ITEM, 0, 1, null, null, EnchantStatus.NO_CHANGE, null, null, null),
+		new GUIElement(new ItemContainer(Material.POTATO_ITEM, 0, 1, null, null, EnchantStatus.NO_CHANGE,
+		                                 null, null, null, null),
 		               new ArrayDeque<>());
 	
 	@Getter
