@@ -161,7 +161,7 @@ public class GUIUtil
 
 		try
 		{
-			Object  nmsStack = CRAFT_ItemStack_asNMSCopy.invoke(item),
+			Object  nmsStack = CRAFT_ItemStack_asNMSCopy.invoke(null, item),
 					tag = null;
 
 			if(!((boolean) NMS_ItemStack_hasTag.invoke(nmsStack)))
@@ -177,7 +177,7 @@ public class GUIUtil
 
 			NMS_NBTTagCompound_remove.invoke(tag, "ench");
 			NMS_ItemStack_setTag.invoke(nmsStack, tag);
-			return (ItemStack) CRAFT_ItemStack_asCraftMirror.invoke(nmsStack);
+			return (ItemStack) CRAFT_ItemStack_asCraftMirror.invoke(null, nmsStack);
 		}
 		catch(InvocationTargetException | IllegalAccessException | InstantiationException e)
 		{
