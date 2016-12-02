@@ -150,7 +150,10 @@ public class PacketUtil
 	private static void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message,
 	                                    int persistTime, int fadeIn, int fadeOut)
 	{
-		//BUtil.logInfo("Printing " + titleAction.name() + " with '" + message + "'");
+		//BUtil.logInfo("Printing " + titleAction.name() + " with '" + "{\"text\": \"" + message + "\"}" + "'");
+		playerConnection.sendPacket(new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE,
+		                                                   IChatBaseComponent.ChatSerializer.a("{\"text\": \" \"}"),
+		                                                   persistTime, fadeIn, fadeOut));
 		playerConnection.sendPacket(new PacketPlayOutTitle(titleAction,
 		                       IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}"),
 		                                                   persistTime, fadeIn, fadeOut));
