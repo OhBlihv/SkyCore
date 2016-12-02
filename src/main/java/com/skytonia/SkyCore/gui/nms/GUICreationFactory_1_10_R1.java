@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.gui.nms;
 
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -15,7 +16,7 @@ public class GUICreationFactory_1_10_R1 implements GUICreationFactory
 	{
 		if(guiSize == 5)
 		{
-			return new CraftInventoryCustom(null, InventoryType.HOPPER, guiTitle);
+			return Bukkit.createInventory(null, InventoryType.HOPPER, guiTitle);
 		}
 		else
 		{

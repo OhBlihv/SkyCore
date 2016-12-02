@@ -1,14 +1,14 @@
 package com.skytonia.SkyCore.gui.nms;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 /**
- * Created by Chris Brown (OhBlihv) on 10/28/2016.
+ * Created by OhBlihv (Chris) on 12/1/2016.
+ * This file is part of a project created for SkyCore
  */
-public class GUICreationFactory_1_8_R3 implements GUICreationFactory
+public class GUICreationFactory_1_11_R1 implements GUICreationFactory
 {
 	
 	@Override
@@ -20,7 +20,8 @@ public class GUICreationFactory_1_8_R3 implements GUICreationFactory
 		}
 		else
 		{
-			return new CraftInventoryCustom(null, guiSize, guiTitle);
+			return Bukkit.createInventory(null, guiSize, guiTitle);
 		}
 	}
+	
 }
