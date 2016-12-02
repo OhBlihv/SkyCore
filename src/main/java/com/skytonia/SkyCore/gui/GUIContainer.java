@@ -84,7 +84,8 @@ public class GUIContainer implements Listener
 	{
 		if(event.getInventory() != null && event.getInventory().getTitle() != null &&
 				   compareGUITitle(event.getInventory().getTitle()) &&
-			event.getRawSlot() != -999 && event.getRawSlot() < guiSize)
+			   //guiTitle.equals(event.getInventory().getTitle()) &&
+			event.getRawSlot() > -1 && event.getRawSlot() < guiSize)
 		{
 			event.setCancelled(true);
 			doActions((Player) event.getWhoClicked(), event.getClick(), event.getSlot());

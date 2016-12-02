@@ -38,7 +38,7 @@ public class GUIElement
 	public ItemStack toItemStack(Deque<GUIVariable> guiVariables, Player player)
 	{
 		ItemStack itemStack = itemContainer.toItemStack(player == null ? "" : player.getName());
-		if(guiVariables != null && !guiVariables.isEmpty())
+		if(itemStack != null && itemStack.getType() != Material.AIR && guiVariables != null && !guiVariables.isEmpty())
 		{
 			ItemMeta itemMeta = itemStack.getItemMeta();
 			
