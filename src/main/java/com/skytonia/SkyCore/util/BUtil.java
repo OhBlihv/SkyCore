@@ -24,7 +24,9 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +36,7 @@ public class BUtil
 {
 
 	private static boolean useConsoleColours = false;
-	private static final Random rand = new Random();
+	private static final Random random = new Random();
 
 	// ------------------------------------------------------------------------------------------------------
 	// Miscellaneous
@@ -47,9 +49,9 @@ public class BUtil
 			fireworkType = FireworkType.CRATE_SPAWN;
 		}
 
-		FireworkEffect effect = FireworkEffect.builder().flicker(rand.nextBoolean())
+		FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean())
 				.withColor(fireworkType.getColour1(), fireworkType.getColour2()).withFade(fireworkType.getColour3())
-				.with(fireworkType.getType()).trail(rand.nextBoolean()).build();
+				.with(fireworkType.getType()).trail(random.nextBoolean()).build();
 
 		if(instantExplosion)
 		{
@@ -64,6 +66,16 @@ public class BUtil
 			firework.setFireworkMeta(meta);
 			firework.setVelocity(new Vector(0.00, 0.05, 0.00));
 		}
+	}
+	
+	public static int getPosNegIntFromRange(int range)
+	{
+		return random.nextBoolean() ? 0 - random.nextInt(range) : random.nextInt(range);
+	}
+	
+	public static double getPosNegDoubleFromRange(double range)
+	{
+		return random.nextBoolean() ? 0 - (random.nextDouble() * range) : (random.nextDouble() * range);
 	}
 	
 	public static String getNMSVersion()
@@ -163,9 +175,61 @@ public class BUtil
 	// String Translation
 	// ------------------------------------------------------------------------------------------------------
 
+	private static final Map<Integer, Character> numeralMap = new TreeMap<>(
+	(o1, o2) ->
+	{
+		int compare = 0 - Integer.compare(o1, o2);
+		if(compare == 0)
+		{
+			compare = 1;
+		}
+		return compare;
+	}
+	);
+	
+	static
+	{
+		numeralMap.put(1000, 'M');
+		numeralMap.put(500, 'D');
+		numeralMap.put(100, 'C');
+		numeralMap.put(50, 'L');
+		numeralMap.put(10, 'X');
+		numeralMap.put(5, 'V');
+		numeralMap.put(1, 'I');
+	}
+	
+	public static String toRomanNumerals(int number)
+	{
+		StringBuilder romanNumeralString = new StringBuilder();
+		
+		for(Map.Entry<Integer, Character> entry : numeralMap.entrySet())
+		{
+			while(number >= entry.getKey())
+			{
+				number -= entry.getKey();
+				romanNumeralString.append(entry.getValue());
+			}
+		}
+		
+		return romanNumeralString.toString();
+	}
+	
 	public static String capitaliseFirst(String string)
 	{
 		return Character.toTitleCase(string.charAt(0)) + string.substring(1, string.length());
+	}
+	
+	public static String capitaliseAllFirst(String string)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		String[] split = string.split(" ");
+		for(String splitWord : split)
+		{
+			stringBuilder.append(capitaliseFirst(splitWord)).append(" ");
+		}
+		
+		return stringBuilder.toString().substring(0, stringBuilder.length() - 1);
 	}
 	
 	public static List<String> translateVariable(List<String> lines, String variable, String content)
@@ -455,8 +519,8 @@ public class BUtil
 				!thirdPackage.startsWith("com.destroystokyo*") &&//PaperSpigot
 				!thirdPackage.startsWith("co.aikar") &&        //Timings
 				!thirdPackage.startsWith("java") &&             //Java API
-				!thirdPackage.startsWith("sun") &&             //Internal Oracle/Sun Libraries
-			    !thirdPackage.contains(".shade.")) //Ignore shaded libraries. They do not count towards a plugin.
+				!thirdPackage.startsWith("sun")) //&&             //Internal Oracle/Sun Libraries
+			    //!thirdPackage.contains(".shade.")) //Ignore shaded libraries. They do not count towards a plugin.
 			{
 				pluginName = thirdPackage.split("[.]")[2];
 				
