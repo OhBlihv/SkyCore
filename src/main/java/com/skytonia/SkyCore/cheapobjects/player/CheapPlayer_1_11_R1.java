@@ -37,6 +37,6 @@ public class CheapPlayer_1_11_R1 extends CheapPlayer
 			throw new IllegalArgumentException("queuePacket() expects a Packet, and was given a " + (packet != null ? packet.getClass().getName() : "null"));
 		}
 		
-		((CraftPlayer) getPlayer()).getHandle().playerConnection.sendPacket((Packet<?>) packet);
+		playerConnection.sendPacket((Packet<?>) packet);
 	}
 }
