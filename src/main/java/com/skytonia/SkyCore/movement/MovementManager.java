@@ -1,6 +1,8 @@
 package com.skytonia.SkyCore.movement;
 
 import com.skytonia.SkyCore.SkyCore;
+import com.skytonia.SkyCore.movement.events.PlayerChangeServerEvent;
+import com.skytonia.SkyCore.movement.events.PlayerEnterServerEvent;
 import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.sockets.events.BukkitSocketJSONEvent;
 import com.skytonia.SkyCore.util.BUtil;
@@ -117,6 +119,19 @@ public class MovementManager implements Listener
 			movementAction = DEFAULT_MOVEMENT_ACTION;
 		}
 		
+		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, server);
+		Bukkit.getPluginManager().callEvent(event);
+		
+		if(event.isCancelled())
+		{
+			if(event.getCancelReason() != null && !event.getCancelReason().isEmpty())
+			{
+				player.sendMessage(event.getCancelReason());
+			}
+		
+			return;
+		}
+		
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
@@ -176,7 +191,6 @@ public class MovementManager implements Listener
 		
 		if(event.getChannel().equals(CHANNEL_MOVE_PLAYER_REQ))
 		{
-			//TODO: Check whitelist, if the player is banned, and other reasons
 			String  serverName = splitData[0],
 					playerName = splitData[1];
 			String response = ""; //Blank message for success
@@ -194,6 +208,8 @@ public class MovementManager implements Listener
 			
 			//Ensure the player can join once their request has been accepted
 			incomingPlayers.add(playerName);
+			
+			Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(playerName));
 		}
 		else if(event.getChannel().equals(CHANNEL_MOVE_PLAYER_REPLY))
 		{
