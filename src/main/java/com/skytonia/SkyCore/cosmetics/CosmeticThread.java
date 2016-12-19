@@ -91,7 +91,7 @@ public class CosmeticThread extends Thread
 					cosmetic.onTick(currentTick);
 					
 					//If this cosmetic is a single-use cosmetic
-					if(cosmetic.shouldRemove(currentTick))
+					if(cosmetic.isTemporary() && cosmetic.shouldRemove(currentTick))
 					{
 						cosmeticsToRemove.add(cosmetic);
 					}

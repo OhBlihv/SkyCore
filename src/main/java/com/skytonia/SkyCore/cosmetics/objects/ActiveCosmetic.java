@@ -107,6 +107,11 @@ public class ActiveCosmetic
 		}
 	}
 	
+	public void remove()
+	{
+		CosmeticThread.getInstance().removeCosmetic(this);
+	}
+	
 	/**
 	 * Used for temporary cosmetics (that may last for a couple of seconds or a single tick)
 	 * @param tick Tick the CosmeticThread is currently at
@@ -119,7 +124,7 @@ public class ActiveCosmetic
 	
 	public boolean isTemporary()
 	{
-		return endAtTick != 0;
+		return endAtTick > 0;
 	}
 	
 	public boolean canUpdateNearbyPlayers(long ticks)
