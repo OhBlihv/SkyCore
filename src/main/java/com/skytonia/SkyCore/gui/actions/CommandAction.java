@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -40,7 +41,7 @@ public class CommandAction extends ElementAction
 	private Deque<CommandContainer> commands;
 	
 	@Override
-	public boolean onClick(Player player, int slot)
+	public boolean onClick(Player player, ClickType clickType, int slot)
 	{
 		for(CommandContainer commandContainer : commands)
 		{

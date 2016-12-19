@@ -96,11 +96,11 @@ public class ItemContainer
 		{
 			itemMeta.setDisplayName(displayName);
 		}
-		if((material == Material.SKULL_ITEM || material == Material.SKULL))
+		if((material == Material.SKULL_ITEM || material == Material.SKULL) && damage == 3)
 		{
 			if(skullTexture == null)
 			{
-				if((playerName != null || owner != null))
+				if(playerName != null || owner != null)
 				{
 					String skullOwner;
 					//Allow the input player to override the owner for this skull
@@ -113,7 +113,7 @@ public class ItemContainer
 						skullOwner = owner;
 					}
 					
-					if(skullOwner != null)
+					if(skullOwner != null && !skullOwner.isEmpty())
 					{
 						((SkullMeta) itemMeta).setOwner(skullOwner);
 						if(itemMeta.hasDisplayName())
@@ -433,4 +433,9 @@ public class ItemContainer
 		return original;
 	}
 	
+	@Override
+	public String toString()
+	{
+		return material + ":" + damage + " (" + amount + ") \"" + displayName + "\"";
+	}
 }

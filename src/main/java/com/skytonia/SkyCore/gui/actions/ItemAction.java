@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ public class ItemAction extends ElementAction
 	private ItemContainer item;
 	
 	@Override
-	public boolean onClick(Player player, int slot)
+	public boolean onClick(Player player, ClickType clickType, int slot)
 	{
 		Map<Integer, ItemStack> leftOver = player.getInventory().addItem(item.toItemStack(player.getName()));
 		//TODO: Configurable value allowing the plugin to decide whether to drop the item or not

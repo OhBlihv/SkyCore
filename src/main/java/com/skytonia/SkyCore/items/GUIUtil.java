@@ -253,6 +253,22 @@ public class GUIUtil
 		}
 		return count;
 	}
+	
+	public static int countItem(Inventory inventory, ItemStack itemStack)
+	{
+		ItemStack comparedItemStack = itemStack.clone();
+		comparedItemStack.setAmount(1);
+		
+		int count = 0;
+		for(ItemStack item : inventory.all(itemStack.getType()).values())
+		{
+			if(item.equals(comparedItemStack))
+			{
+				count += item.getAmount();
+			}
+		}
+		return count;
+	}
 
 	/**
 	 * Overly simplistic 'merge stacks' function.
@@ -453,6 +469,33 @@ public class GUIUtil
 				continue; //Only remove what is matched
 			}
 
+			if(count > entry.getValue().getAmount())
+			{
+				count -= entry.getValue().getAmount();
+				inventory.setItem(entry.getKey(), BLANK_ITEM);
+			}
+			else //Set
+			{
+				int setAmount = entry.getValue().getAmount() - count;
+				count -= entry.getValue().getAmount();
+				entry.getValue().setAmount(setAmount);
+				inventory.setItem(entry.getKey(), entry.getValue()); //May be useless, find out.
+				break;
+			}
+		}
+	}
+	
+	public static void removeItemCount(Inventory inventory, ItemStack itemStack, int count)
+	{
+		Iterator<? extends Map.Entry<Integer, ? extends ItemStack>> itemStackItr = inventory.all(itemStack.getType()).entrySet().iterator();
+		while(count > 0 && itemStackItr.hasNext())
+		{
+			Map.Entry<Integer, ? extends ItemStack> entry = itemStackItr.next();
+			if(!entry.getValue().equals(itemStack))
+			{
+				continue; //Only remove what is matched
+			}
+			
 			if(count > entry.getValue().getAmount())
 			{
 				count -= entry.getValue().getAmount();

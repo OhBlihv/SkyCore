@@ -24,7 +24,7 @@ public abstract class ElementAction
 	@Setter
 	public ClickType clickType = ClickType.UNKNOWN;
 	
-	public abstract boolean onClick(Player player, int slot);
+	public abstract boolean onClick(Player player, ClickType clickType, int slot);
 	
 	public boolean hasClickType()
 	{

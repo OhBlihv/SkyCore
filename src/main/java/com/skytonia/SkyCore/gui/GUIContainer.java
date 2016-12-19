@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryCrafting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -105,12 +106,18 @@ public class GUIContainer implements Listener
 			return;
 		}
 		
+		boolean newOpen = false;
+		if(player.getOpenInventory().getTopInventory() instanceof CraftInventoryCrafting)
+		{
+			newOpen = true;
+		}
+		
 		//Inventory inventory = Bukkit.createInventory(null, guiSize, guiTitle);
 		Inventory inventory = createInventory(guiSize, guiTitle);
 		inventory = getInventory(inventory, player);
 		player.openInventory(inventory);
 		
-		if(openSound != null)
+		if(openSound != null && newOpen)
 		{
 			openSound.playSound(player);
 		}
@@ -183,7 +190,7 @@ public class GUIContainer implements Listener
 			}
 			
 			//Only do actions while the previous one succeeded
-			if(!elementAction.onClick(player, slot))
+			if(!elementAction.onClick(player, clickAction, slot))
 			{
 				break;
 			}
