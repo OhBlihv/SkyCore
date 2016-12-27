@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryCrafting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -106,21 +105,34 @@ public class GUIContainer implements Listener
 			return;
 		}
 		
-		boolean newOpen = false;
-		if(player.getOpenInventory().getTopInventory() instanceof CraftInventoryCrafting)
-		{
-			newOpen = true;
-		}
+		boolean newOpen = showOpenSound(player);
 		
 		//Inventory inventory = Bukkit.createInventory(null, guiSize, guiTitle);
 		Inventory inventory = createInventory(guiSize, guiTitle);
 		inventory = getInventory(inventory, player);
 		player.openInventory(inventory);
 		
-		if(openSound != null && newOpen)
+		if(newOpen) //OpenSound check is done above
 		{
 			openSound.playSound(player);
 		}
+	}
+	
+	protected boolean showOpenSound(Player player)
+	{
+		if(openSound != null)
+		{
+			Inventory topInventory = player.getOpenInventory().getTopInventory();
+			String nmsVersion = BUtil.getNMSVersion();
+			
+			if( nmsVersion.equals("1_8_R3")  && topInventory instanceof org.bukkit.craftbukkit.v1_8_R3 .inventory.CraftInventoryCrafting ||
+				    nmsVersion.equals("1_10_R1") && topInventory instanceof org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryCrafting ||
+				    nmsVersion.equals("1_11_R1") && topInventory instanceof org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryCrafting)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	protected Inventory createInventory(int guiSize, String guiTitle)
