@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 public class DatabaseSource
 {
 	
-	private final HikariDataSource dataSource;
+	private HikariDataSource dataSource;
 	
 	/**
 	 * Single Execution Thread for SQL Executions
@@ -58,6 +58,26 @@ public class DatabaseSource
 		
 		//Attempt a test query
 		executeQuery("SELECT 1", null, null, null);
+	}
+	
+	/**
+	 * Must be called on plugin disable to avoid connection leaks
+	 */
+	public void close()
+	{
+		dataSource.close();
+		dataSource = null;
+	}
+	
+	@Override
+	protected void finalize() throws Throwable
+	{
+		if(dataSource != null)
+		{
+			close();
+		}
+		
+		super.finalize();
 	}
 	
 	/**
