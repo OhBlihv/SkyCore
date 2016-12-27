@@ -111,7 +111,7 @@ public class SocketManager implements SocketClientApp
 	
 	public static void sendMessage(String channel, String... data)
 	{
-		socketClient.writeJSON(channel,concatenateData(data));
+		socketClient.writeJSON(channel, concatenateData(data));
 	}
 	
 	public static void sendMessageTo(String targetServer, String channel, String... data)

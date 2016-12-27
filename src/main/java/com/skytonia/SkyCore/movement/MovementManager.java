@@ -91,6 +91,7 @@ public class MovementManager implements Listener
 	private MovementManager()
 	{
 		SocketManager.getInstance();
+		HubManager.getInstance();
 		
 		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
 		
@@ -111,7 +112,7 @@ public class MovementManager implements Listener
 	 *
 	 * @throws IllegalStateException If the player is already in an attempted transfer/move.
 	 */
-	public static void requestMove(String server, Player player, MovementAction movementAction) throws IllegalStateException
+	public static String requestMove(String server, Player player, MovementAction movementAction) throws IllegalStateException
 	{
 		if(movementAction == null)
 		{
@@ -129,13 +130,21 @@ public class MovementManager implements Listener
 				player.sendMessage(event.getCancelReason());
 			}
 		
-			return;
+			return null;
+		}
+		
+		//If the server requested is not specific, pick one for them
+		if(server.toLowerCase().equals("hub"))
+		{
+			server = HubManager.getInstance().getHubServer();
 		}
 		
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
 		SocketManager.getSocketClient().writeJSON(CHANNEL_MOVE_PLAYER_REQ, server + SPLITTER + player.getName());
+		
+		return server;
 	}
 	
 	protected static MovementInfo removePlayer(Player player)
