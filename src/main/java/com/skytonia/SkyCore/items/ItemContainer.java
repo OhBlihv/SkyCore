@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -83,7 +84,8 @@ public class ItemContainer
 		int             amount = (amount = (int) overriddenValues.getOrDefault(ItemContainerVariable.AMOUNT, 0)) > 0 ? amount : this.amount,
 						damage = (damage = (int) overriddenValues.getOrDefault(ItemContainerVariable.DAMAGE, 0)) > 0 ? damage : this.damage;
 		String          displayName = (displayName = (String) overriddenValues.get(ItemContainerVariable.DISPLAYNAME)) != null ? displayName : this.displayName;
-		List<String>    lore = (lore = (List<String>) overriddenValues.get(ItemContainerVariable.LORE)) != null ? lore : this.lore;
+		List<String>    lore = (lore = (List<String>) overriddenValues.get(ItemContainerVariable.LORE)) != null ? lore :
+			                                                                      this.lore == null ? this.lore : new ArrayList<>(this.lore);
 		EnchantStatus   enchantStatus = (enchantStatus = (EnchantStatus) overriddenValues.get(ItemContainerVariable.ENCHANTED)) != null ? enchantStatus : this.enchantStatus;
 		Map<Enchantment, Integer> enchantmentMap =
 						(enchantmentMap = (Map<Enchantment, Integer>) overriddenValues.get(ItemContainerVariable.ENCHANTMENTS)) != null ? enchantmentMap : this.enchantmentMap;
@@ -147,6 +149,22 @@ public class ItemContainer
 		
 		if(lore != null)
 		{
+			if(playerName != null && !playerName.isEmpty())
+			{
+				int lineNum = 0;
+				for(String line : lore)
+				{
+					if(line.contains("{player}"))
+					{
+						line = line.replace("{player}", playerName);
+					}
+					
+					lore.set(lineNum, line);
+					
+					lineNum++;
+				}
+			}
+			
 			itemMeta.setLore(lore);
 		}
 		
