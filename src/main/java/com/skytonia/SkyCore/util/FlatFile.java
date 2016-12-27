@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.util;
 
+import com.skytonia.SkyCore.SkyCore;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,6 +8,9 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -19,6 +23,26 @@ import java.util.Set;
 
 public class FlatFile
 {
+	
+	private static class FlatFileHandler implements Listener
+	{
+		
+		@EventHandler
+		public void onPluginUnload(PluginDisableEvent event)
+		{
+			String pluginName = event.getPlugin().getName().split("[ ]")[0];
+			FlatFile oldFlatFile;
+			//Remove old instance of flatfile to support plugin reloads
+			if((oldFlatFile = flatfileInstances.remove(pluginName)) != null)
+			{
+				BUtil.logMessageAsPlugin("SkyCore", "Unloaded " + oldFlatFile.getClass().getSimpleName() +
+					                                    " from: " + pluginName + " (" + oldFlatFile.fileName + ")");
+			}
+		}
+		
+	}
+	
+	private static FlatFileHandler fileHandler = null;
 
 	protected File saveFile = null;
 	protected FileConfiguration save = null;
@@ -37,6 +61,12 @@ public class FlatFile
 	
 	public static FlatFile getInstance()
 	{
+		if(fileHandler == null)
+		{
+			//Register plugin unload listener
+			Bukkit.getPluginManager().registerEvents((fileHandler = new FlatFileHandler()), SkyCore.getPluginInstance());
+		}
+		
 		FlatFile instance;
 		String owningPlugin = BUtil.getCallingPlugin();
 		
