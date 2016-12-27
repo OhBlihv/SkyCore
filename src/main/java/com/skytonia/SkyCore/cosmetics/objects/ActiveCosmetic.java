@@ -36,7 +36,7 @@ public class ActiveCosmetic
 	@Getter
 	final int viewDistance;
 	
-	public long endAtTick;
+	public final long endAtTick;
 	
 	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, int viewDistance)
 	{
@@ -73,7 +73,14 @@ public class ActiveCosmetic
 		this.staticLocation = staticLocation;
 		
 		this.viewDistance = viewDistance;
-		this.endAtTick = CosmeticThread.getInstance().getCurrentTick() + endAtTick;
+		if(endAtTick > 0L)
+		{
+			this.endAtTick = CosmeticThread.getInstance().getCurrentTick() + endAtTick;
+		}
+		else
+		{
+			this.endAtTick = 0L;
+		}
 		
 		this.expiryAction = expiryAction;
 		
@@ -119,7 +126,7 @@ public class ActiveCosmetic
 	 */
 	public boolean shouldRemove(long tick)
 	{
-		return tick >= endAtTick;
+		return isTemporary() && tick >= endAtTick;
 	}
 	
 	public boolean isTemporary()

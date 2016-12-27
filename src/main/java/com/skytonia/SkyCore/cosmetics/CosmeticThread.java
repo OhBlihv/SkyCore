@@ -34,7 +34,7 @@ public class CosmeticThread extends Thread
 								EMPTY_TIMEOUT_TICKS = 100L; //If we're empty for 5 seconds (100 ticks) close.
 
 	@Getter
-	private long currentTick = 0L;
+	private long currentTick = 1L;
 	private long startEmptyTick = 0L; //Ticks since we've had nothing to process
 
 	//Cosmetics
@@ -68,6 +68,8 @@ public class CosmeticThread extends Thread
 				{
 					//We've been empty for two long.
 					//Stop thrashing and sleep forever.
+					printMessage("Cosmetic Thread Empty, Sleeping Permanently.");
+					isRunning = false;
 					this.interrupt();
 				}
 				
@@ -91,7 +93,7 @@ public class CosmeticThread extends Thread
 					cosmetic.onTick(currentTick);
 					
 					//If this cosmetic is a single-use cosmetic
-					if(cosmetic.isTemporary() && cosmetic.shouldRemove(currentTick))
+					if(cosmetic.shouldRemove(currentTick))
 					{
 						cosmeticsToRemove.add(cosmetic);
 					}
@@ -101,7 +103,6 @@ public class CosmeticThread extends Thread
 					printMessage("An unexpected error occurred while ticking cosmetic.");
 					e.printStackTrace();
 					
-					//removeCosmetic(cosmetic);
 					cosmeticsToRemove.add(cosmetic);
 				}
 			}
@@ -113,15 +114,6 @@ public class CosmeticThread extends Thread
 				for(ActiveCosmetic activeCosmetic : cosmeticsToRemove)
 				{
 					activeCosmetic.onRemove();
-					
-					//Ignore any duplicated/temporary cosmetics, since they won't be attached to any players
-					/*if(activeCosmetic.isTemporary())
-					{
-						continue;
-					}*/
-					
-					//removeCosmetic(activeCosmetic, false);
-					
 				}
 			}
 
@@ -159,6 +151,8 @@ public class CosmeticThread extends Thread
 	{
 		try
 		{
+			//Allow the first tick to process correctly
+			activeCosmetic.updateNearbyPlayers();
 			activeCosmetic.onTick(0L);
 			
 			cosmeticSet.add(activeCosmetic);
@@ -166,6 +160,7 @@ public class CosmeticThread extends Thread
 			//Kickstart!
 			if(!isRunning)
 			{
+				printMessage("Thread Halted. Kickstarting...");
 				start();
 			}
 		}
