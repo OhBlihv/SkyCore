@@ -83,6 +83,11 @@ public class CosmeticThread extends Thread
 
 			for(ActiveCosmetic cosmetic : cosmeticSet)
 			{
+				if(currentTick % cosmetic.updateRate != 0)
+				{
+					continue;
+				}
+				
 				if(cosmetic.canUpdateNearbyPlayers(currentTick))
 				{
 					cosmetic.updateNearbyPlayers();

@@ -38,6 +38,8 @@ public class ActiveCosmetic
 	
 	public final long endAtTick;
 	
+	public final int updateRate;
+	
 	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, int viewDistance)
 	{
 		this(cosmetic, cosmeticOptions, activatingPlayer, viewDistance, 0L);
@@ -81,6 +83,8 @@ public class ActiveCosmetic
 		{
 			this.endAtTick = 0L;
 		}
+		
+		this.updateRate = cosmetic.getUpdateRate();
 		
 		this.expiryAction = expiryAction;
 		
