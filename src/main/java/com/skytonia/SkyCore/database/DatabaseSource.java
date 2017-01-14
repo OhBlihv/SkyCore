@@ -46,7 +46,7 @@ public class DatabaseSource
 	                      String password) throws SQLException
 	{
 		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl("jdbc:mysql://" + server + ":" + port + "/" + database);
+		config.setJdbcUrl("jdbc:mysql://" + server + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false");
 		config.setUsername(username);
 		config.setPassword(password);
 		
