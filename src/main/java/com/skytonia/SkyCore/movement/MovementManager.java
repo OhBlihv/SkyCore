@@ -212,6 +212,11 @@ public class MovementManager implements Listener
 				}
 			}
 			
+			if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
+			{
+				response = "FULL";
+			}
+			
 			//BUtil.logMessage("Responding to " + playerName + "'s request with '" + response + "'");
 			event.getClient().writeJSON(CHANNEL_MOVE_PLAYER_REPLY, serverName + SPLITTER + playerName + SPLITTER + response);
 			
@@ -244,14 +249,23 @@ public class MovementManager implements Listener
 			
 			if(response != null && !response.isEmpty())
 			{
+				if(response.equals("FULL"))
+				{
+					//Check our player's permissions to see if they have server-full permissions
+					if(player.hasPermission("serverfull.bypass"))
+					{
+						onSuccessfulTransfer(player);
+						return;
+					}
+				}
+				
 				BUtil.logMessage("Received Failed Reply for " + playerName + " to " + targetServer + " (" + response + ")");
 				onFailTransfer(player, response);
+				
+				return;
 			}
-			else
-			{
-				//BUtil.logMessage("Received Successful reply for " + playerName);
-				onSuccessfulTransfer(player);
-			}
+			
+			onSuccessfulTransfer(player);
 		}
 	}
 	
