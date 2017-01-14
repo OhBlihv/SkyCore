@@ -65,6 +65,8 @@ public class ParticlePacket_1_8_R3 extends ParticlePacket
 			                                                amount,                                         //i) Particle Amount
 			                                                packetData                                      //k) Particle Data
 		);
+		
+		serverVersion = 8;
 	}
 	
 	@Override

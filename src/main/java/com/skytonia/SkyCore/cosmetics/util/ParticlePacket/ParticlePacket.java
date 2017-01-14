@@ -29,7 +29,8 @@ public abstract class ParticlePacket
 	 * Upon selection of the correct NMS ParticlePacket class, this value
 	 * is to be set to the correct value aligning with the server's Bukkit version.
 	 */
-	private static final int serverVersion = -1;
+	@Getter
+	protected static int serverVersion = -1;
 	
 	//NMS Fields
 	@Getter
