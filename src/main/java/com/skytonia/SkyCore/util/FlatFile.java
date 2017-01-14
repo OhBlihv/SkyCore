@@ -47,8 +47,8 @@ public class FlatFile
 	protected File saveFile = null;
 	protected FileConfiguration save = null;
 	
-	String pluginString = null;
-	JavaPlugin plugin = null;
+	protected final String pluginString;
+	protected final JavaPlugin plugin;
 	
 	String fileName = "config.yml";
 	
@@ -282,7 +282,25 @@ public class FlatFile
 	
 	public Location getLocation(ConfigurationSection configurationSection)
 	{
-		World world = Bukkit.getWorld(configurationSection.getString("world"));
+		if(configurationSection == null)
+		{
+			BUtil.logError("Configuration Section linked null!");
+			
+			new Exception().printStackTrace();
+			
+			return LocationUtil.DEFAULT_LOCATION;
+		}
+		
+		World world = null;
+		try
+		{
+			world = Bukkit.getWorld(configurationSection.getString("world"));
+		}
+		catch(Exception e)
+		{
+			//Ignore
+		}
+		
 		if(world == null)
 		{
 			BUtil.logError("Could not find world named '" + configurationSection.getString("world") + "'");
