@@ -28,12 +28,16 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class BUtil
 {
+	
+	//Get either SkyCore OR the hosting plugin
+	private static Plugin pluginInstance = null;
 
 	private static boolean useConsoleColours = false;
 	private static final Random random = new Random();
@@ -169,6 +173,92 @@ public class BUtil
 		}
 
 		return largestValue + " " + unitString;
+	}
+
+	public static String getTimeTilFuture(long futureTime)
+	{
+		long timeTilFuture = (futureTime - System.currentTimeMillis()) / 1000L;
+		
+		long hours = TimeUnit.SECONDS.toHours(timeTilFuture);
+		long minutes = TimeUnit.SECONDS.toMinutes(timeTilFuture) - (TimeUnit.SECONDS.toHours(timeTilFuture) * 60);
+		long seconds = TimeUnit.SECONDS.toSeconds(timeTilFuture) - (TimeUnit.SECONDS.toMinutes(timeTilFuture) * 60);
+		
+		StringBuilder timeVariable = new StringBuilder();
+		
+		if(hours > 0)
+		{
+			timeVariable.append(String.valueOf(hours)).append(" hour");
+			if(hours > 1)
+			{
+				timeVariable.append('s');
+			}
+		}
+		
+		if(minutes > 0)
+		{
+			if(hours > 0)
+			{
+				timeVariable.append(" and ");
+			}
+			timeVariable.append(String.valueOf(minutes)).append(" minute");
+			if(minutes > 1)
+			{
+				timeVariable.append('s');
+			}
+		}
+		
+		if(seconds > 0 && minutes < 1 && hours == 0)
+		{
+			if(minutes > 0)
+			{
+				timeVariable.append(" and ");
+			}
+			timeVariable.append(String.valueOf(seconds)).append(" second");
+			if(seconds > 1)
+			{
+				timeVariable.append('s');
+			}
+		}
+		
+		return timeVariable.toString();
+	}
+	
+	// ------------------------------------------------------------------------------------------------------
+	// Task Running
+	// ------------------------------------------------------------------------------------------------------
+	
+	private static void setupPlugin()
+	{
+		if(pluginInstance == null)
+		{
+			pluginInstance = getCallingJavaPlugin();
+		}
+	}
+	
+	public static void ensureSync(Runnable runnable)
+	{
+		setupPlugin();
+		
+		if(!Bukkit.isPrimaryThread())
+		{
+			Bukkit.getScheduler().runTask(pluginInstance, runnable);
+			return;
+		}
+		
+		runnable.run();
+	}
+	
+	public static void ensureASync(Runnable runnable)
+	{
+		setupPlugin();
+		
+		if(Bukkit.isPrimaryThread())
+		{
+			Bukkit.getScheduler().runTaskAsynchronously(pluginInstance, runnable);
+			return;
+		}
+		
+		runnable.run();
 	}
 	
 	// ------------------------------------------------------------------------------------------------------
