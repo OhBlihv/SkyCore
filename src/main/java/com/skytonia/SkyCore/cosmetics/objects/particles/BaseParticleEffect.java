@@ -38,8 +38,6 @@ public abstract class BaseParticleEffect extends BaseCosmetic
 		
 	}
 	
-	
-	
 	ParticleEffect particleEffect;
 	
 	@Setter(AccessLevel.PACKAGE)

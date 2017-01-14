@@ -80,6 +80,8 @@ public abstract class CheapPlayer implements Player
 		return player != null && player.get() != null && player.get().isOnline();
 	}
 	
+	final UUID playerUUID;
+	
 	final String playerName;
 	private WeakReference<Player> player; //I wouldn't normally do this, but this needs easy access to a player's location.
 	
@@ -87,11 +89,14 @@ public abstract class CheapPlayer implements Player
 	public CheapPlayer(String playerName)
 	{
 		this.playerName = playerName;
+		
+		this.playerUUID = getPlayer().getUniqueId();
 	}
 	
 	public CheapPlayer(Player player)
 	{
 		this.playerName = player.getName();
+		this.playerUUID = player.getUniqueId();
 		
 		setPlayer(player);
 	}
@@ -105,7 +110,7 @@ public abstract class CheapPlayer implements Player
 	@Override
 	public UUID getUniqueId()
 	{
-		return getPlayer().getUniqueId();
+		return playerUUID;
 	}
 
 	public abstract Object getPlayerConnection();
@@ -700,7 +705,7 @@ public abstract class CheapPlayer implements Player
 	@Override
 	public Location getLocation()
 	{
-		throw new IllegalArgumentException("Operation not Permitted.");
+		return player.get().getLocation();
 	}
 	
 	@Override
