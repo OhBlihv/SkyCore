@@ -123,11 +123,12 @@ public class GUIContainer implements Listener
 		if(openSound != null)
 		{
 			Inventory topInventory = player.getOpenInventory().getTopInventory();
-			String nmsVersion = BUtil.getNMSVersion();
+			//String nmsVersion = BUtil.getNMSVersion();
 			
-			if( nmsVersion.equals("1_8_R3")  && topInventory instanceof org.bukkit.craftbukkit.v1_8_R3 .inventory.CraftInventoryCrafting ||
+			/*if(     nmsVersion.equals("1_8_R3")  && topInventory instanceof org.bukkit.craftbukkit.v1_8_R3 .inventory.CraftInventoryCrafting ||
 				    nmsVersion.equals("1_10_R1") && topInventory instanceof org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryCrafting ||
-				    nmsVersion.equals("1_11_R1") && topInventory instanceof org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryCrafting)
+				    nmsVersion.equals("1_11_R1") && topInventory instanceof org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryCrafting)*/
+			if(topInventory.getClass().getSimpleName().equals("CraftInventoryCrafting"))
 			{
 				return true;
 			}
