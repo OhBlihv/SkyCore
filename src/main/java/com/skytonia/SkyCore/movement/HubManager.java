@@ -172,7 +172,15 @@ public class HubManager implements Listener
 			}
 			case CHANNEL_PING_RECV:
 			{
-				hubServers.get(hubName).receivePing();
+				HubServer hubServer = hubServers.get(hubName);
+				if(hubServer == null)
+				{
+					hubServer = new HubServer();
+					
+					hubServers.put(hubName, hubServer);
+				}
+				
+				hubServer.receivePing();
 				break;
 			}
 		}

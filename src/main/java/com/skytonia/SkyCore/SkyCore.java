@@ -66,9 +66,12 @@ public class SkyCore extends JavaPlugin implements Listener
 			BUtil.logStackTrace(e);
 		}
 		
-		SocketManager.getInstance().start();
-		MovementManager.getInstance();  //Register Listeners
-		PlayerCount.getInstance();      //Register Listeners
+		Bukkit.getScheduler().runTaskLater(this, () ->
+		{
+			SocketManager.getInstance().start();
+			MovementManager.getInstance();  //Register Listeners
+			PlayerCount.getInstance();      //Register Listeners
+		}, 20L); //Allow 1 second after the server has started to start accepting players/messages
 	}
 	
 	@Override

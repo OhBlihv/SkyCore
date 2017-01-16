@@ -46,6 +46,9 @@ public class SocketManager implements SocketClientApp
 	@Getter
 	private static String serverName;
 	
+	@Getter
+	private static boolean isConnected = false;
+	
 	private SocketManager()
 	{
 		socketConfig = SocketFlatFile.getInstance();
@@ -69,6 +72,8 @@ public class SocketManager implements SocketClientApp
 		
 		Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getPluginInstance(), socketClient);
 		BUtil.logMessage("Started socket client listener on " + hostName + ":" + port + " as '" + serverName + "'.");
+		
+		isConnected = true;
 	}
 	
 	public boolean stop()
@@ -78,6 +83,8 @@ public class SocketManager implements SocketClientApp
 		{
 			return true;
 		}
+		
+		isConnected = false;
 		
 		IOException exception = socketClient.interrupt();
 		if(exception != null)
@@ -111,11 +118,21 @@ public class SocketManager implements SocketClientApp
 	
 	public static void sendMessage(String channel, String... data)
 	{
+		if(!isConnected())
+		{
+			throw new IllegalStateException("Not Connected");
+		}
+		
 		socketClient.writeJSON(channel, concatenateData(data));
 	}
 	
 	public static void sendMessageTo(String targetServer, String channel, String... data)
 	{
+		if(!isConnected())
+		{
+			throw new IllegalStateException("Not Connected");
+		}
+		
 		socketClient.writeJSON("PASSTHROUGH", stripSplitters(targetServer) + "|" + stripSplitters(channel) + "|" + concatenateData(data));
 	}
 	
