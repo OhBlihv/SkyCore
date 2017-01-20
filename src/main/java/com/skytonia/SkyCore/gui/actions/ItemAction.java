@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.gui.actions;
 
-import com.skytonia.SkyCore.items.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainerConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -40,7 +41,7 @@ public class ItemAction extends ElementAction
 	@Override
 	public ElementAction loadAction(ConfigurationSection configurationSection)
 	{
-		this.item = ItemContainer.buildItemContainer(configurationSection.getConfigurationSection("item"));
+		this.item = ItemContainerConstructor.buildItemContainer(configurationSection.getConfigurationSection("item"));
 		return this;
 	}
 	

@@ -1,6 +1,6 @@
 package com.skytonia.SkyCore.gui.actions;
 
-import com.skytonia.SkyCore.gui.GUISound;
+import com.skytonia.SkyCore.gui.config.GUISound;
 import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;

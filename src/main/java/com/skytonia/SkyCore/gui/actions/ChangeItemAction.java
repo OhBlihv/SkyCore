@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.gui.actions;
 
-import com.skytonia.SkyCore.items.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainerConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -25,7 +26,7 @@ public class ChangeItemAction extends ElementAction
 	@Override
 	public ElementAction loadAction(ConfigurationSection configurationSection)
 	{
-		this.toItem = ItemContainer.buildItemContainer(configurationSection.getConfigurationSection("item"));
+		this.toItem = ItemContainerConstructor.buildItemContainer(configurationSection.getConfigurationSection("item"));
 		return this;
 	}
 	

@@ -1,4 +1,4 @@
-package com.skytonia.SkyCore.gui;
+package com.skytonia.SkyCore.gui.config;
 
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Sound;

@@ -2,8 +2,8 @@ package com.skytonia.SkyCore.gui;
 
 import com.skytonia.SkyCore.gui.actions.ElementAction;
 import com.skytonia.SkyCore.gui.variables.GUIVariable;
-import com.skytonia.SkyCore.items.EnchantStatus;
-import com.skytonia.SkyCore.items.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainerConstructor.ItemContainerBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -23,8 +23,7 @@ public class GUIElement
 {
 	
 	public static final GUIElement DEFAULT_GUI_ELEMENT =
-		new GUIElement(new ItemContainer(Material.POTATO_ITEM, 0, 1, null, null, EnchantStatus.NO_CHANGE,
-		                                 null, null, null, null),
+		new GUIElement(new ItemContainerBuilder().material(Material.POTATO_ITEM).build(),
 		               new ArrayDeque<>());
 	
 	@Getter
@@ -37,7 +36,7 @@ public class GUIElement
 	
 	public ItemStack toItemStack(Deque<GUIVariable> guiVariables, Player player)
 	{
-		ItemStack itemStack = itemContainer.toItemStack(player == null ? "" : player.getName());
+		ItemStack itemStack = itemContainer.toItemStack(player == null ? null : player.getName());
 		if(itemStack != null && itemStack.getType() != Material.AIR && guiVariables != null && !guiVariables.isEmpty())
 		{
 			ItemMeta itemMeta = itemStack.getItemMeta();
