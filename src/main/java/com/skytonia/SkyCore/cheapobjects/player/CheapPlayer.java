@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.cheapobjects.player;
 
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Achievement;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -41,6 +42,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
+import org.github.paperspigot.Title;
 
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
@@ -1619,4 +1621,89 @@ public abstract class CheapPlayer implements Player
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
+	
+	@Override
+	public void sendMessage(BaseComponent baseComponent)
+	{
+	
+	}
+	
+	@Override
+	public void sendMessage(BaseComponent... baseComponents)
+	{
+	
+	}
+	
+	@Override
+	public void setPlayerListHeaderFooter(BaseComponent[] baseComponents, BaseComponent[] baseComponents1)
+	{
+	
+	}
+	
+	@Override
+	public void setPlayerListHeaderFooter(BaseComponent baseComponent, BaseComponent baseComponent1)
+	{
+	
+	}
+	
+	@Override
+	public void setTitleTimes(int i, int i1, int i2)
+	{
+	
+	}
+	
+	@Override
+	public void setSubtitle(BaseComponent[] baseComponents)
+	{
+	
+	}
+	
+	@Override
+	public void setSubtitle(BaseComponent baseComponent)
+	{
+	
+	}
+	
+	@Override
+	public void showTitle(BaseComponent[] baseComponents)
+	{
+	
+	}
+	
+	@Override
+	public void showTitle(BaseComponent baseComponent)
+	{
+	
+	}
+	
+	@Override
+	public void showTitle(BaseComponent[] baseComponents, BaseComponent[] baseComponents1, int i, int i1, int i2)
+	{
+	
+	}
+	
+	@Override
+	public void showTitle(BaseComponent baseComponent, BaseComponent baseComponent1, int i, int i1, int i2)
+	{
+	
+	}
+	
+	@Override
+	public void sendTitle(Title title)
+	{
+	
+	}
+	
+	@Override
+	public void updateTitle(Title title)
+	{
+	
+	}
+
+	@Override
+	public void hideTitle()
+	{
+	
+	}
+	
 }

@@ -1,11 +1,13 @@
 package com.skytonia.SkyCore.cheapobjects.player;
 
 import lombok.Getter;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.server.v1_10_R1.EntityPlayer;
 import net.minecraft.server.v1_10_R1.Packet;
 import net.minecraft.server.v1_10_R1.PlayerConnection;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.github.paperspigot.Title;
 
 /**
  * Created by Chris Brown (OhBlihv) on 7/08/2016.
@@ -39,4 +41,5 @@ public class CheapPlayer_1_10_R1 extends CheapPlayer
 		
 		playerConnection.sendPacket((Packet<?>) packet);
 	}
+	
 }
