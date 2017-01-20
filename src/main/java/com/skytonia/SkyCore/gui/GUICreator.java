@@ -22,6 +22,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -31,7 +33,7 @@ import java.util.Map;
 /**
  * Created by Chris Brown (OhBlihv) on 1/20/2017.
  */
-public class GUICreator
+public class GUICreator<T>
 {
 	
 	@RequiredArgsConstructor
@@ -46,12 +48,19 @@ public class GUICreator
 		
 	}
 	
-	public static class GUIBuilder
+	public static class GUIBuilder<T>
 	{
+		
+		final Class<T> guiTypeClass;
 		
 		private String guiTitle;
 		
-		public GUIContainer build(ConfigurationSection configurationSection)
+		public GUIBuilder(Class<T> guiTypeClass)
+		{
+			this.guiTypeClass = guiTypeClass;
+		}
+		
+		public T build(ConfigurationSection configurationSection) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException
 		{
 			guiTitle = BUtil.translateColours(configurationSection.getString("title", "Inventory"));
 			
@@ -143,7 +152,12 @@ public class GUICreator
 			Deque<GUIVariable> guiVariables = new ArrayDeque<>();
 			guiVariables.addAll(GUIVariables.getInstance().getAllRegisteredVariables());
 			
-			return new GUIContainer(guiTitle, inventorySize,
+			Constructor<T> constructor =  guiTypeClass.getConstructor( String.class, InventorySize.class,
+							                                           String.class, String.class,
+							                                           GUISound.class, ItemContainer.class, GUIElementInfo[].class, Deque.class,
+							                                           ConfigurationSection.class);
+			
+			return constructor.newInstance(guiTitle, inventorySize,
 			                        requiredPermission, noPermissionMessage,
 			                        openSound, fillerItem, guiElements, guiVariables,
 			                        configurationSection);
@@ -238,13 +252,27 @@ public class GUICreator
 	
 	public static GUIContainer loadGUI(ConfigurationSection configurationSection)
 	{
+		return loadGUI(configurationSection, GUIContainer.class);
+	}
+	
+	public static GUIContainer loadGUI(ConfigurationSection configurationSection, Class<? extends GUIContainer> guiTypeClass)
+	{
 		if(configurationSection == null || configurationSection.getKeys(false).isEmpty())
 		{
 			BUtil.logError("Error loading GUI named: " + (configurationSection == null ? "NULL" : configurationSection.getName()));
 			throw new IllegalArgumentException("Configuration Section given to GUIBuilder was empty or invalid!");
 		}
 		
-		return new GUIBuilder().build(configurationSection);
+		try
+		{
+			return (GUIContainer) new GUIBuilder(guiTypeClass).build(configurationSection);
+		}
+		catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e)
+		{
+			BUtil.logInfo("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ". Does it extend GUIContainer.class correctly?");
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }
