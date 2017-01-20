@@ -58,7 +58,7 @@ public class GUIContainer implements Listener
 	
 	public GUIContainer(String guiTitle, InventorySize guiSize,
 	                    String requiredPermission, String noPermissionMessage,
-	                    GUISound openSound, ItemStack fillerItem, GUICreator.GUIElementInfo[] guiElementInfos, Deque<GUIVariable> guiVariables,
+	                    GUISound openSound, ItemStack fillerItem, GUIBuilder.GUIElementInfo[] guiElementInfos, Deque<GUIVariable> guiVariables,
 	                    //Include ConfigurationSection used for loading to load gui-specific extras
 	                    ConfigurationSection configurationSection)
 	{
@@ -75,7 +75,7 @@ public class GUIContainer implements Listener
 		GUIElement[] guiElements = new GUIElement[guiElementInfos.length];
 		
 		int i = 0;
-		for(GUICreator.GUIElementInfo guiElementInfo : guiElementInfos)
+		for(GUIBuilder.GUIElementInfo guiElementInfo : guiElementInfos)
 		{
 			guiElements[i++] = updateGUIEElement(guiElementInfo);
 		}
@@ -96,7 +96,7 @@ public class GUIContainer implements Listener
 		//
 	}
 	
-	public GUIElement updateGUIEElement(GUICreator.GUIElementInfo guiElementInfo)
+	public GUIElement updateGUIEElement(GUIBuilder.GUIElementInfo guiElementInfo)
 	{
 		return guiElementInfo.getGuiElement();
 	}
