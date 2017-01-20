@@ -224,44 +224,6 @@ public class BUtil
 	}
 	
 	// ------------------------------------------------------------------------------------------------------
-	// Task Running
-	// ------------------------------------------------------------------------------------------------------
-	
-	private static void setupPlugin()
-	{
-		if(pluginInstance == null)
-		{
-			pluginInstance = getCallingJavaPlugin();
-		}
-	}
-	
-	public static void ensureSync(Runnable runnable)
-	{
-		setupPlugin();
-		
-		if(!Bukkit.isPrimaryThread())
-		{
-			Bukkit.getScheduler().runTask(pluginInstance, runnable);
-			return;
-		}
-		
-		runnable.run();
-	}
-	
-	public static void ensureASync(Runnable runnable)
-	{
-		setupPlugin();
-		
-		if(Bukkit.isPrimaryThread())
-		{
-			Bukkit.getScheduler().runTaskAsynchronously(pluginInstance, runnable);
-			return;
-		}
-		
-		runnable.run();
-	}
-	
-	// ------------------------------------------------------------------------------------------------------
 	// String Translation
 	// ------------------------------------------------------------------------------------------------------
 
