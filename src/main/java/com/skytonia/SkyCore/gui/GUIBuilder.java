@@ -46,6 +46,9 @@ public class GUIBuilder<T>
 		@Getter
 		private final ConfigurationSection elementConfiguration;
 		
+		@Getter
+		private final int slot;
+		
 	}
 	
 	final Class<T> guiTypeClass;
@@ -169,7 +172,7 @@ public class GUIBuilder<T>
 		}
 	}
 	
-	public GUIElementInfo[] loadGUIElements(ConfigurationSection configurationSection, GUIElementInfo[] guiElements)
+	private GUIElementInfo[] loadGUIElements(ConfigurationSection configurationSection, GUIElementInfo[] guiElements)
 	{
 		if(configurationSection.contains("elements") && configurationSection.isConfigurationSection("elements"))
 		{
@@ -187,7 +190,7 @@ public class GUIBuilder<T>
 						}
 						
 						//Assume the GUIElement Configuration is valid since the default element was not returned.
-						guiElements[slot] = new GUIElementInfo(guiElement, configurationSection.getConfigurationSection("elements." + slotString));
+						guiElements[slot] = new GUIElementInfo(guiElement, configurationSection.getConfigurationSection("elements." + slotString), slot);
 					}
 					else
 					{
@@ -203,12 +206,12 @@ public class GUIBuilder<T>
 		return guiElements;
 	}
 	
-	protected GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot)
+	private GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot)
 	{
 		return loadGUIElement(baseSection, subSection, slot, EnumSet.allOf(ItemContainerVariable.class), new HashMap<>());
 	}
 	
-	protected GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot,
+	private GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot,
 		/*ItemContainer Specifics*/         EnumSet<ItemContainerVariable> checkedErrors,
 		                                Map<ItemContainerVariable, Object> overriddenValues)
 	{
