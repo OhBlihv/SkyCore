@@ -1,186 +1,131 @@
-package com.skytonia.SkyCore.items;
+package com.skytonia.SkyCore.items.construction;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.skytonia.SkyCore.items.EnchantStatus;
+import com.skytonia.SkyCore.items.GUIUtil;
 import com.skytonia.SkyCore.util.BUtil;
-import com.skytonia.SkyCore.util.FlatFile;
+import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.MaterialData;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.SKULL_ITEM;
 
 /**
- * Created by Chris Brown (OhBlihv) on 26/09/2016.
+ * Created by Chris Brown (OhBlihv) on 1/20/2017.
  */
-@RequiredArgsConstructor
-public class ItemContainer
+public class ItemContainerConstructor
 {
 	
-	//Set all to a 'default' unusable value to indicate if it needs changing
-	@Getter
-	private final Material material;
-	
-	@Getter
-	private final int   damage,
-						amount;
-	@Getter
-	private final String displayName;
-	
-	@Getter
-	private final List<String> lore;
-	
-	@Getter
-	private final EnchantStatus enchantStatus;
-	
-	@Getter
-	private final Map<Enchantment, Integer> enchantmentMap;
-	
-	@Getter
-	private final MaterialData storedData;
-	
-	@Getter
-	private final String owner;
-	
-	@Getter
-	private final String skullTexture;
-	
-	public ItemStack toItemStack()
+	public static class ItemContainerBuilder
 	{
-		return toItemStack(null);
-	}
-	
-	public ItemStack toItemStack(String playerName)
-	{
-		return toItemStack(playerName, new HashMap<>());
-	}
-	
-	public ItemStack toItemStack(String playerName, Map<ItemContainerVariable, Object> overriddenValues)
-	{
-		if(material == AIR && !overriddenValues.containsKey(ItemContainerVariable.MATERIAL))
-		{
-			return null;
-		}
 		
-		//Load any overridden values
-		Material        material = (material = (Material) overriddenValues.get(ItemContainerVariable.MATERIAL)) != null ? material : this.material;
-		int             amount = (amount = (int) overriddenValues.getOrDefault(ItemContainerVariable.AMOUNT, 0)) > 0 ? amount : this.amount,
-						damage = (damage = (int) overriddenValues.getOrDefault(ItemContainerVariable.DAMAGE, 0)) > 0 ? damage : this.damage;
-		String          displayName = (displayName = (String) overriddenValues.get(ItemContainerVariable.DISPLAYNAME)) != null ? displayName : this.displayName;
-		List<String>    lore = (lore = (List<String>) overriddenValues.get(ItemContainerVariable.LORE)) != null ? lore :
-			                                                                      this.lore == null ? this.lore : new ArrayList<>(this.lore);
-		EnchantStatus   enchantStatus = (enchantStatus = (EnchantStatus) overriddenValues.get(ItemContainerVariable.ENCHANTED)) != null ? enchantStatus : this.enchantStatus;
-		Map<Enchantment, Integer> enchantmentMap =
-						(enchantmentMap = (Map<Enchantment, Integer>) overriddenValues.get(ItemContainerVariable.ENCHANTMENTS)) != null ? enchantmentMap : this.enchantmentMap;
-		String          owner = (owner = (String) overriddenValues.get(ItemContainerVariable.OWNER)) != null ? owner : this.owner;
+		@Getter
+		private Material material = AIR;
 		
-		ItemStack itemStack = new ItemStack(material, amount, (short) damage);
-		ItemMeta itemMeta = itemStack.getItemMeta();
+		@Getter
+		private int   damage = 0,
+					  amount = 1;
+		@Getter
+		private String displayName = null;
 		
-		if(displayName != null)
-		{
-			itemMeta.setDisplayName(displayName);
-		}
-		if((material == Material.SKULL_ITEM || material == Material.SKULL) && damage == 3)
-		{
-			if(skullTexture == null)
-			{
-				if(playerName != null || owner != null)
-				{
-					String skullOwner;
-					//Allow the input player to override the owner for this skull
-					if(owner == null || owner.equals("PLAYER"))
-					{
-						skullOwner = playerName;
-					}
-					else
-					{
-						skullOwner = owner;
-					}
-					
-					if(skullOwner != null && !skullOwner.isEmpty())
-					{
-						((SkullMeta) itemMeta).setOwner(skullOwner);
-						if(itemMeta.hasDisplayName())
-						{
-							itemMeta.setDisplayName(itemMeta.getDisplayName().replace("{player}", skullOwner));
-						}
-					}
-				}
-			}
-			else
-			{
-				GameProfile skinProfile = new GameProfile(UUID.randomUUID(), null);
-				
-				
-				skinProfile.getProperties().put("textures", new Property("textures",
-				                                                         skullTexture,
-				                                                         "signed"));
-				
-				try
-				{
-					Field profileField = itemMeta.getClass().getDeclaredField("profile");
-					profileField.setAccessible(true);
-					profileField.set(itemMeta, skinProfile);
-				}
-				catch(IllegalAccessException | NoSuchFieldException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
+		@Getter
+		private List<String> lore = null;
 		
-		if(lore != null)
+		@Getter
+		private EnchantStatus enchantStatus = EnchantStatus.NO_CHANGE;
+		
+		@Getter
+		private Map<Enchantment, Integer> enchantments = null;
+		
+		@Getter
+		private String owner = "player";
+		
+		@Getter
+		private String skullTexture = null;
+		
+		public ItemContainerBuilder material(Material material)
 		{
-			if(playerName != null && !playerName.isEmpty())
-			{
-				int lineNum = 0;
-				for(String line : lore)
-				{
-					if(line.contains("{player}"))
-					{
-						line = line.replace("{player}", playerName);
-					}
-					
-					lore.set(lineNum, line);
-					
-					lineNum++;
-				}
-			}
+			this.material = material;
 			
-			itemMeta.setLore(lore);
+			return this;
 		}
 		
-		itemStack.setItemMeta(itemMeta);
-		
-		if(this.storedData != null)
+		public ItemContainerBuilder damage(int damage)
 		{
-			itemStack.setData(storedData);
+			this.damage = damage;
+			
+			return this;
 		}
 		
-		if(enchantmentMap != null)
+		public ItemContainerBuilder amount(int amount)
 		{
-			itemStack.addUnsafeEnchantments(enchantmentMap);
+			this.amount = amount;
+			
+			return this;
 		}
 		
-		return enchantStatus.alterEnchantmentStatus(itemStack);
+		public ItemContainerBuilder displayname(String displayName)
+		{
+			this.displayName = displayName;
+			
+			return this;
+		}
+		
+		public ItemContainerBuilder lore(List<String> lore)
+		{
+			this.lore = lore;
+			
+			return this;
+		}
+		
+		public ItemContainerBuilder enchantStatus(EnchantStatus enchantStatus)
+		{
+			this.enchantStatus = enchantStatus;
+			
+			return this;
+		}
+		
+		public ItemContainerBuilder enchantments(Map<Enchantment, Integer> enchantments)
+		{
+			this.enchantments = enchantments;
+			
+			return this;
+		}
+		
+		public ItemContainerBuilder owner(String owner)
+		{
+			this.owner = owner;
+			
+			return this;
+		}
+		
+		public ItemContainerBuilder skullTexture(String skullTexture)
+		{
+			this.skullTexture = skullTexture;
+			
+			return this;
+		}
+		
+		public ItemContainer build()
+		{
+			return new ItemContainer(material, damage, amount,
+			                         displayName, lore,
+			                         enchantStatus, enchantments,
+			                         owner, skullTexture);
+		}
+		
 	}
 	
 	public static ItemContainer fromItemStack(ItemStack itemStack)
@@ -213,7 +158,7 @@ public class ItemContainer
 		}
 		
 		return new ItemContainer(itemStack.getType(), itemStack.getDurability(), itemStack.getAmount(), displayname, lore,
-		                         EnchantStatus.NO_CHANGE, enchantmentMap, itemStack.getData(), owner, null);
+		                         EnchantStatus.NO_CHANGE, enchantmentMap, owner, null);
 	}
 	
 	public static ItemContainer buildItemContainer(ConfigurationSection configurationSection)
@@ -272,14 +217,14 @@ public class ItemContainer
 		}
 		int damage = overriddenValues.containsKey(ItemContainerVariable.DAMAGE) ?
 			             (int) overriddenValues.get(ItemContainerVariable.DAMAGE) :
-				         configurationSection.getInt("damage", 0),
+				                                                                      configurationSection.getInt("damage", 0),
 			amount = overriddenValues.containsKey(ItemContainerVariable.AMOUNT) ?
 				         (int) overriddenValues.get(ItemContainerVariable.AMOUNT) :
-					     configurationSection.getInt("amount", 1);
+					                                                                  configurationSection.getInt("amount", 1);
 		
 		String displayName = overriddenValues.containsKey(ItemContainerVariable.DISPLAYNAME) ?
 			                     BUtil.translateColours((String) overriddenValues.get(ItemContainerVariable.DISPLAYNAME)) :
-				                 BUtil.translateColours(configurationSection.getString("displayname", ""));
+				                                                                                                              BUtil.translateColours(configurationSection.getString("displayname", ""));
 		
 		Map<Enchantment, Integer> enchantmentMap = (Map<Enchantment, Integer>) overriddenValues.get(ItemContainerVariable.ENCHANTMENTS);
 		int isEnchanted = (int) overriddenValues.getOrDefault(ItemContainerVariable.ENCHANTED, -1);
@@ -298,7 +243,7 @@ public class ItemContainer
 		
 		List<String> lore = overriddenValues.containsKey(ItemContainerVariable.LORE) ?
 			                    BUtil.translateColours((List<String>) overriddenValues.get(ItemContainerVariable.LORE)) :
-				                BUtil.translateColours(configurationSection.getStringList("lore"));
+				                                                                                                            BUtil.translateColours(configurationSection.getStringList("lore"));
 		
 		String owner = (String) overriddenValues.get(ItemContainerVariable.OWNER);
 		if(owner == null && configurationSection.contains("owner"))
@@ -314,7 +259,7 @@ public class ItemContainer
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(isEnchanted), enchantmentMap,
-		                         null, owner, skullTexture);
+		                         owner, skullTexture);
 	}
 	
 	private static final Pattern PATTERN_SEPERATOR = Pattern.compile(":");
@@ -339,10 +284,10 @@ public class ItemContainer
 		}
 		
 		String  displayName     =  BUtil.translateColours(FlatFile.getString(configurationMap, "displayname", null)),
-				owner           =  FlatFile.getString(configurationMap, "owner",   null),
-				skullTexture    =  FlatFile.getString(configurationMap, "texture", null);
+			owner           =  FlatFile.getString(configurationMap, "owner",   null),
+			skullTexture    =  FlatFile.getString(configurationMap, "texture", null);
 		int     damage = FlatFile.getInt(configurationMap, "damage", 0),
-				amount = FlatFile.getInt(configurationMap, "amount", 1);
+			amount = FlatFile.getInt(configurationMap, "amount", 1);
 		List<String> lore = FlatFile.getStringList(configurationMap, "lore");
 		
 		Map<Enchantment, Integer> enchantmentMap = null;
@@ -389,71 +334,7 @@ public class ItemContainer
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(enchanted), enchantmentMap,
-		                         null, owner, skullTexture);
+		                         owner, skullTexture);
 	}
 	
-	public int getMaxStackSize()
-	{
-		return material.getMaxStackSize();
-	}
-	
-	public int getMaxDurability()
-	{
-		return material.getMaxDurability();
-	}
-	
-	public ItemStack replaceItemStack(ItemStack original, String playerName)
-	{
-		ItemMeta meta = original.getItemMeta();
-		//Cannot clone, since it loses attributes for some reason.
-		if(material != null)
-		{
-			original.setType(material);
-		}
-		if((material == Material.SKULL_ITEM || material == Material.SKULL) && playerName != null)
-		{
-			((SkullMeta) meta).setOwner(playerName);
-		}
-		if(damage != -1)
-		{
-			original.setDurability((short) damage);
-		}
-		if(amount != -1)
-		{
-			original.setAmount(amount);
-		}
-		if(displayName != null)
-		{
-			meta.setDisplayName(displayName);
-		}
-		if(playerName != null && meta.hasDisplayName())
-		{
-			meta.setDisplayName(meta.getDisplayName().replace("{player}", playerName));
-		}
-		if(lore != null)
-		{
-			meta.setLore(lore);
-		}
-		
-		original.setItemMeta(meta);
-		
-		original = enchantStatus.alterEnchantmentStatus(original);
-		
-		if(enchantmentMap != null && !enchantmentMap.isEmpty())
-		{
-			for(Enchantment enchantment : original.getEnchantments().keySet())
-			{
-				original.removeEnchantment(enchantment);
-			}
-			original.addEnchantments(enchantmentMap);
-		}
-		
-		return original;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return material + ":" + damage + " (" + amount + ") \"" + displayName + "\"";
-	}
 }
