@@ -102,7 +102,8 @@ public class HubManager implements Listener
 		
 		for(Map.Entry<String, HubServer> entry : entrySet)
 		{
-			if(entry.getValue().online)
+			//Avoid sending us to offline hubs and the hub we're on!
+			if(entry.getValue().online && !entry.getKey().equalsIgnoreCase(SocketManager.getServerName()))
 			{
 				return entry.getKey();
 			}

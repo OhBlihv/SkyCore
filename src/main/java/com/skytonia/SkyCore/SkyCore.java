@@ -6,7 +6,7 @@ import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.movement.PlayerCount;
 import com.skytonia.SkyCore.sockets.SocketManager;
 import com.skytonia.SkyCore.util.BUtil;
-import com.skytonia.SkyCore.util.FlatFile;
+import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;

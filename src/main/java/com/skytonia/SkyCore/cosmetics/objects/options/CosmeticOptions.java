@@ -4,7 +4,7 @@ import com.skytonia.SkyCore.cosmetics.objects.BaseCosmetic;
 import com.skytonia.SkyCore.cosmetics.objects.particles.BaseParticleEffect;
 import com.skytonia.SkyCore.cosmetics.objects.particles.SimpleParticleEffect;
 import com.skytonia.SkyCore.cosmetics.util.ParticleEffect;
-import com.skytonia.SkyCore.util.FlatFile;
+import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 

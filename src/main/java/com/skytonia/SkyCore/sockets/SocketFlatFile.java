@@ -1,6 +1,6 @@
 package com.skytonia.SkyCore.sockets;
 
-import com.skytonia.SkyCore.util.FlatFile;
+import com.skytonia.SkyCore.util.file.FlatFile;
 
 /**
  * Created by Chris Brown (OhBlihv) on 28/09/2016.

@@ -8,7 +8,7 @@ import com.skytonia.SkyCore.sockets.events.BukkitSocketDisconnectEvent;
 import com.skytonia.SkyCore.sockets.events.BukkitSocketHandshakeEvent;
 import com.skytonia.SkyCore.sockets.events.BukkitSocketJSONEvent;
 import com.skytonia.SkyCore.util.BUtil;
-import com.skytonia.SkyCore.util.FlatFile;
+import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
