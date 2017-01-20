@@ -1,5 +1,6 @@
-package com.skytonia.SkyCore.util;
+package com.skytonia.SkyCore.util.file;
 
+import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Bukkit;
 
 /**

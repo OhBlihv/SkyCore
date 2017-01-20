@@ -1,6 +1,8 @@
-package com.skytonia.SkyCore.util;
+package com.skytonia.SkyCore.util.file;
 
 import com.skytonia.SkyCore.SkyCore;
+import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.LocationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -181,22 +183,6 @@ public class FlatFile
 	    {
 	    	BUtil.logError("Could not save config to " + saveFile);
 	    }
-	}
-	
-	public void removeEntry(String path)
-	{
-		save.set(path, null);
-	}
-	
-	public void saveEntry(String path, String entry)
-	{
-		save.set(path, entry);
-		saveToFile();
-	}
-
-	public String loadEntry(String path)
-	{
-		return save.getString(path);
 	}
 	
 	public Set<String> getChildren(String path)
