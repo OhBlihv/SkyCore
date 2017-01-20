@@ -1293,19 +1293,7 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
-	public int _INVALID_getLastDamage()
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
 	public void setLastDamage(double damage)
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
-	public void _INVALID_setLastDamage(int damage)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
@@ -1425,19 +1413,7 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
-	public void _INVALID_damage(int amount)
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
 	public void damage(double amount, Entity source)
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
-	public void _INVALID_damage(int amount, Entity source)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
@@ -1449,19 +1425,7 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
-	public int _INVALID_getHealth()
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
 	public void setHealth(double health)
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
-	public void _INVALID_setHealth(int health)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
@@ -1473,19 +1437,7 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
-	public int _INVALID_getMaxHealth()
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
 	public void setMaxHealth(double health)
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
-	public void _INVALID_setMaxHealth(int health)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
