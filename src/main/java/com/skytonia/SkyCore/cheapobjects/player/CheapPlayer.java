@@ -1291,7 +1291,7 @@ public abstract class CheapPlayer implements Player
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
-	
+
 	@Override
 	public void setLastDamage(double damage)
 	{

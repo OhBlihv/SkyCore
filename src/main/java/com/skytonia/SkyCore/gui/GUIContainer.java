@@ -8,7 +8,6 @@ import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -26,7 +25,6 @@ import java.util.regex.Pattern;
 /**
  * Created by OhBlihv (Chris) on 22/11/2015.
  */
-@RequiredArgsConstructor
 public class GUIContainer implements Listener
 {
 
