@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -59,7 +60,9 @@ public class GUIContainer implements Listener
 	
 	public GUIContainer(String guiTitle, InventorySize guiSize,
 	                    String requiredPermission, String noPermissionMessage,
-	                    GUISound openSound, ItemStack fillerItem, GUIElement[] guiElements, Deque<GUIVariable> guiVariables)
+	                    GUISound openSound, ItemStack fillerItem, GUIElement[] guiElements, Deque<GUIVariable> guiVariables,
+	                    //Include ConfigurationSection used for loading to load gui-specific extras
+	                    ConfigurationSection configurationSection)
 	{
 		this.guiTitlePattern = Pattern.compile(guiTitle.replaceAll("\\{.*\\}", ".*"));
 		this.guiTitle = guiTitle;
@@ -71,11 +74,18 @@ public class GUIContainer implements Listener
 		this.guiElements = guiElements;
 		this.guiVariables = guiVariables;
 		
+		loadExtras(configurationSection);
+		
 		Plugin registeringPlugin = BUtil.getCallingJavaPlugin();
 		
 		Bukkit.getServer().getPluginManager().registerEvents(this, registeringPlugin);
 		
 		BUtil.logMessageAsPlugin("SkyCore", "Registered new " + getClass().getSimpleName() + " to: " + registeringPlugin);
+	}
+	
+	public void loadExtras(ConfigurationSection configurationSection)
+	{
+		//
 	}
 
 	@EventHandler

@@ -129,7 +129,10 @@ public class GUICreator
 			Deque<GUIVariable> guiVariables = new ArrayDeque<>();
 			guiVariables.addAll(GUIVariables.getInstance().getAllRegisteredVariables());
 			
-			return new GUIContainer(guiTitle, inventorySize, requiredPermission, noPermissionMessage, openSound, fillerItem, guiElements, guiVariables);
+			return new GUIContainer(guiTitle, inventorySize,
+			                        requiredPermission, noPermissionMessage,
+			                        openSound, fillerItem, guiElements, guiVariables,
+			                        configurationSection);
 		}
 		
 		public GUIElement[] loadGUIElements(ConfigurationSection configurationSection, GUIElement[] guiElements)
