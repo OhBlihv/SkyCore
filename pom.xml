@@ -22,8 +22,8 @@
 	<dependencies>
 		<!-- Spigot/Bukkit Dependency -->
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
+			<groupId>org.github.paperspigot</groupId>
+			<artifactId>paperspigot</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
