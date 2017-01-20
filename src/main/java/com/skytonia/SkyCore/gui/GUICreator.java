@@ -13,6 +13,8 @@ import com.skytonia.SkyCore.items.construction.ItemContainerConstructor.ItemCont
 import com.skytonia.SkyCore.items.construction.ItemContainerVariable;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -31,6 +33,18 @@ import java.util.Map;
  */
 public class GUICreator
 {
+	
+	@RequiredArgsConstructor
+	public static class GUIElementInfo
+	{
+		
+		@Getter
+		private final GUIElement guiElement;
+		
+		@Getter
+		private final ConfigurationSection elementConfiguration;
+		
+	}
 	
 	public static class GUIBuilder
 	{
@@ -124,7 +138,7 @@ public class GUICreator
 				}
 			}
 			
-			GUIElement[] guiElements = loadGUIElements(configurationSection, new GUIElement[inventorySize.getSize()]);
+			GUIElementInfo[] guiElements = loadGUIElements(configurationSection, new GUIElementInfo[inventorySize.getSize()]);
 			
 			Deque<GUIVariable> guiVariables = new ArrayDeque<>();
 			guiVariables.addAll(GUIVariables.getInstance().getAllRegisteredVariables());
@@ -135,7 +149,7 @@ public class GUICreator
 			                        configurationSection);
 		}
 		
-		public GUIElement[] loadGUIElements(ConfigurationSection configurationSection, GUIElement[] guiElements)
+		public GUIElementInfo[] loadGUIElements(ConfigurationSection configurationSection, GUIElementInfo[] guiElements)
 		{
 			if(configurationSection.contains("elements") && configurationSection.isConfigurationSection("elements"))
 			{
@@ -152,7 +166,8 @@ public class GUICreator
 								continue;
 							}
 							
-							guiElements[slot] = guiElement;
+							//Assume the GUIElement Configuration is valid since the default element was not returned.
+							guiElements[slot] = new GUIElementInfo(guiElement, configurationSection.getConfigurationSection("elements." + slotString));
 						}
 						else
 						{

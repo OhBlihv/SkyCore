@@ -58,7 +58,7 @@ public class GUIContainer implements Listener
 	
 	public GUIContainer(String guiTitle, InventorySize guiSize,
 	                    String requiredPermission, String noPermissionMessage,
-	                    GUISound openSound, ItemStack fillerItem, GUIElement[] guiElements, Deque<GUIVariable> guiVariables,
+	                    GUISound openSound, ItemStack fillerItem, GUICreator.GUIElementInfo[] guiElementInfos, Deque<GUIVariable> guiVariables,
 	                    //Include ConfigurationSection used for loading to load gui-specific extras
 	                    ConfigurationSection configurationSection)
 	{
@@ -69,8 +69,18 @@ public class GUIContainer implements Listener
 		this.noPermissionMessage = noPermissionMessage;
 		this.openSound = openSound;
 		this.fillerItem = fillerItem;
-		this.guiElements = guiElements;
 		this.guiVariables = guiVariables;
+		
+		//Allow subclasses to override the gui element creation process
+		GUIElement[] guiElements = new GUIElement[guiElementInfos.length];
+		
+		int i = 0;
+		for(GUICreator.GUIElementInfo guiElementInfo : guiElementInfos)
+		{
+			guiElements[i++] = updateGUIEElement(guiElementInfo);
+		}
+		
+		this.guiElements = guiElements;
 		
 		loadExtras(configurationSection);
 		
@@ -84,6 +94,11 @@ public class GUIContainer implements Listener
 	public void loadExtras(ConfigurationSection configurationSection)
 	{
 		//
+	}
+	
+	public GUIElement updateGUIEElement(GUICreator.GUIElementInfo guiElementInfo)
+	{
+		return guiElementInfo.getGuiElement();
 	}
 
 	@EventHandler
