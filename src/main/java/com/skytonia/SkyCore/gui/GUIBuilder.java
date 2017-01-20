@@ -147,7 +147,7 @@ public class GUIBuilder<T>
 			}
 		}
 		
-		GUIElementInfo[] guiElements = loadGUIElements(configurationSection, new GUIElementInfo[inventorySize.getSize()]);
+		Deque<GUIElementInfo> guiElements = loadGUIElements(configurationSection, inventorySize.getSize());
 		
 		Deque<GUIVariable> guiVariables = new ArrayDeque<>();
 		guiVariables.addAll(GUIVariables.getInstance().getAllRegisteredVariables());
@@ -156,7 +156,7 @@ public class GUIBuilder<T>
 		{
 			Constructor<T> constructor =  guiTypeClass.getConstructor( String.class, InventorySize.class,
 			                                                           String.class, String.class,
-			                                                           GUISound.class, ItemContainer.class, GUIElementInfo[].class, Deque.class,
+			                                                           GUISound.class, ItemStack.class, Deque.class, Deque.class,
 			                                                           ConfigurationSection.class);
 			
 			return constructor.newInstance(guiTitle, inventorySize,
@@ -166,14 +166,24 @@ public class GUIBuilder<T>
 		}
 		catch(InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e)
 		{
-			BUtil.logInfo("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ". Does it extend GUIContainer.class correctly?");
+			if(e instanceof InvocationTargetException)
+			{
+				BUtil.logInfo("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ((InvocationTargetException) e).getTargetException().getMessage());
+			}
+			else
+			{
+				BUtil.logInfo("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ". Does it extend GUIContainer.class correctly?");
+			}
+			
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	private GUIElementInfo[] loadGUIElements(ConfigurationSection configurationSection, GUIElementInfo[] guiElements)
+	private Deque<GUIElementInfo> loadGUIElements(ConfigurationSection configurationSection, int maxSize)
 	{
+		Deque<GUIElementInfo> guiElements = new ArrayDeque<>(maxSize);
+		
 		if(configurationSection.contains("elements") && configurationSection.isConfigurationSection("elements"))
 		{
 			for(String slotString : configurationSection.getConfigurationSection("elements").getKeys(false))
@@ -181,7 +191,7 @@ public class GUIBuilder<T>
 				if(StringUtils.isNumeric(slotString))
 				{
 					int slot = Integer.parseInt(slotString);
-					if(slot < guiElements.length)
+					if(slot < maxSize)
 					{
 						GUIElement guiElement = loadGUIElement(configurationSection, "elements." + slotString, slot);
 						if(guiElement == GUIElement.DEFAULT_GUI_ELEMENT)
@@ -190,11 +200,11 @@ public class GUIBuilder<T>
 						}
 						
 						//Assume the GUIElement Configuration is valid since the default element was not returned.
-						guiElements[slot] = new GUIElementInfo(guiElement, configurationSection.getConfigurationSection("elements." + slotString), slot);
+						guiElements.add(new GUIElementInfo(guiElement, configurationSection.getConfigurationSection("elements." + slotString), slot));
 					}
 					else
 					{
-						BUtil.logInfo("Slot '" + slotString + "' in " + configurationSection.getCurrentPath() + " " + slotString + " is outside the gui! (" + guiElements.length + ")");
+						BUtil.logInfo("Slot '" + slotString + "' in " + configurationSection.getCurrentPath() + " " + slotString + " is outside the gui! (" + maxSize + ")");
 					}
 				}
 				else

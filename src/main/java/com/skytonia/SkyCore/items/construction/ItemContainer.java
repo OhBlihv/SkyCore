@@ -94,7 +94,8 @@ public class ItemContainer
 		int             amount = (int) getOverriddenValue(overriddenValues, ItemContainerVariable.AMOUNT, this.amount),
 						damage = (int) getOverriddenValue(overriddenValues, ItemContainerVariable.DAMAGE, this.damage);
 		String          displayName = (String) getOverriddenValue(overriddenValues, ItemContainerVariable.DISPLAYNAME, this.displayName);
-		List<String>    lore = (List<String>) getOverriddenValue(overriddenValues, ItemContainerVariable.LORE, new ArrayList<>(this.lore));
+		List<String>    lore = (List<String>) getOverriddenValue(overriddenValues, ItemContainerVariable.LORE,
+		                                                         this.lore == null ? null : new ArrayList<>(this.lore));
 		EnchantStatus   enchantStatus = (EnchantStatus) getOverriddenValue(overriddenValues, ItemContainerVariable.ENCHANTED, this.enchantStatus);
 		Map<Enchantment, Integer> enchantmentMap =
 						(Map<Enchantment, Integer>) getOverriddenValue(overriddenValues, ItemContainerVariable.ENCHANTMENTS, this.enchantmentMap);

@@ -5,6 +5,7 @@ import com.skytonia.SkyCore.gui.config.GUISound;
 import com.skytonia.SkyCore.gui.config.InventorySize;
 import com.skytonia.SkyCore.gui.variables.GUIVariable;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.RunnableShorthand;
 import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,7 +59,7 @@ public class GUIContainer implements Listener
 	
 	public GUIContainer(String guiTitle, InventorySize guiSize,
 	                    String requiredPermission, String noPermissionMessage,
-	                    GUISound openSound, ItemStack fillerItem, GUIBuilder.GUIElementInfo[] guiElementInfos, Deque<GUIVariable> guiVariables,
+	                    GUISound openSound, ItemStack fillerItem, Deque<GUIBuilder.GUIElementInfo> guiElementInfos, Deque<GUIVariable> guiVariables,
 	                    //Include ConfigurationSection used for loading to load gui-specific extras
 	                    ConfigurationSection configurationSection)
 	{
@@ -72,17 +73,17 @@ public class GUIContainer implements Listener
 		this.guiVariables = guiVariables;
 		
 		//Allow subclasses to override the gui element creation process
-		GUIElement[] guiElements = new GUIElement[guiElementInfos.length];
+		GUIElement[] guiElements = new GUIElement[guiSize.getSize()];
 		
-		int i = 0;
 		for(GUIBuilder.GUIElementInfo guiElementInfo : guiElementInfos)
 		{
-			guiElements[i++] = updateGUIEElement(guiElementInfo);
+			guiElements[guiElementInfo.getSlot()] = updateGUIEElement(guiElementInfo);
 		}
 		
 		this.guiElements = guiElements;
 		
-		loadExtras(configurationSection);
+		//Run this once both this and extending classes have initialized.
+		RunnableShorthand.forThis().with(() -> loadExtras(configurationSection)).runNextTick();
 		
 		Plugin registeringPlugin = BUtil.getCallingJavaPlugin();
 		
