@@ -37,6 +37,11 @@ public class RunnableShorthand
 	@Getter
 	private int taskId = -1;
 	
+	public static RunnableBuilder forThis()
+	{
+		return new RunnableBuilder(BUtil.getCallingJavaPlugin());
+	}
+	
 	public static RunnableBuilder forPlugin(Plugin plugin)
 	{
 		return new RunnableBuilder(plugin);
