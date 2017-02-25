@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -94,6 +95,11 @@ public class HubManager implements Listener
 		}, 20L, 300L); //15 Seconds
 	}
 	
+	public Set<String> getAllHubs()
+	{
+		return hubServers.keySet();
+	}
+	
 	public String getHubServer()
 	{
 		List<Map.Entry<String, HubServer>> entrySet = new ArrayList<>(hubServers.entrySet());
@@ -147,17 +153,25 @@ public class HubManager implements Listener
 		{
 			case CHANNEL_INIT:
 			{
-				hubServers.put(hubName, new HubServer());
-				BUtil.logInfo("Registered new Hub Server '" + hubName + "'");
+				if(hubServers.containsKey(hubName))
+				{
+					BUtil.logInfo("Already registered Hub Server '" + hubName + "'");
+					hubServers.get(hubName).receivePing();
+				}
+				else
+				{
+					hubServers.put(hubName, new HubServer());
+					BUtil.logInfo("Registered new Hub Server '" + hubName + "'");
+				}
 				break;
 			}
 			case CHANNEL_INIT_RESTART:
 			{
-				//Re-Register ourselves as a hub server
-				isHub = true;
-				
-				//Alert all servers we're a hub and we're alive!
-				SocketManager.sendMessageTo(null, CHANNEL_INIT, SocketManager.getServerName());
+				if(isHub)
+				{
+					//Respond that we're alive!
+					SocketManager.sendMessageTo(event.getData().replace("|", ""), CHANNEL_INIT, SocketManager.getServerName());
+				}
 				
 				break;
 			}
