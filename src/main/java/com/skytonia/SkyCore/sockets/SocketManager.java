@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.sockets;
 
+import com.google.common.collect.Iterators;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.sockets.client.SocketClient;
 import com.skytonia.SkyCore.sockets.client.SocketClientApp;
@@ -8,13 +9,15 @@ import com.skytonia.SkyCore.sockets.events.BukkitSocketDisconnectEvent;
 import com.skytonia.SkyCore.sockets.events.BukkitSocketHandshakeEvent;
 import com.skytonia.SkyCore.sockets.events.BukkitSocketJSONEvent;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.RunnableShorthand;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.security.KeyPair;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -33,15 +36,14 @@ public class SocketManager implements SocketClientApp
 		return instance;
 	}
 	
+	private final JavaPlugin plugin;
+	
 	@Getter
 	private static SocketClient socketClient;
 	
 	private final KeyPair keys = SocketUtil.RSA.generateKeys();
 	
 	private FlatFile socketConfig;
-	
-	//Any message
-	private final Map<Integer, Runnable> requestWaitMap = new HashMap<>();
 	
 	@Getter
 	private static String serverName;
@@ -52,15 +54,17 @@ public class SocketManager implements SocketClientApp
 	private SocketManager()
 	{
 		socketConfig = SocketFlatFile.getInstance();
+		
+		this.plugin = SkyCore.getPluginInstance();
 	}
 	
-	public void start()
+	public boolean start()
 	{
 		if(socketConfig.getSave().isString("port"))
 		{
 			BUtil.logMessage("WARNING: Sockets Configuration has not been set up!");
 			BUtil.logMessage("Sockets will not function until the config is correctly set up.");
-			return;
+			return false;
 		}
 		
 		serverName = socketConfig.getString("name");
@@ -70,10 +74,13 @@ public class SocketManager implements SocketClientApp
 		
 		socketClient = new SocketClient(this, serverName, hostName, port, keys);
 		
-		Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getPluginInstance(), socketClient);
+		//Bukkit.getScheduler().runTaskAsynchronously(SkyCore.getPluginInstance(), socketClient);
+		socketClient.start();
 		BUtil.logMessage("Started socket client listener on " + hostName + ":" + port + " as '" + serverName + "'.");
 		
 		isConnected = true;
+		
+		return true;
 	}
 	
 	public boolean stop()
@@ -86,7 +93,7 @@ public class SocketManager implements SocketClientApp
 		
 		isConnected = false;
 		
-		IOException exception = socketClient.interrupt();
+		IOException exception = socketClient.interruptClient();
 		if(exception != null)
 		{
 			BUtil.logMessage("Hit exception while disabling Socket Client on port " + socketClient.getPort());
@@ -108,12 +115,17 @@ public class SocketManager implements SocketClientApp
 		}
 		
 		StringBuilder stringData = new StringBuilder();
-		for(String dataLoop : data)
+		for(Iterator<String> dataItr = Iterators.forArray(data);dataItr.hasNext();)
 		{
-			stringData.append(dataLoop).append("|");
+			stringData.append(dataItr.next());
+			
+			if(dataItr.hasNext())
+			{
+				stringData.append("|");
+			}
 		}
 		
-		return stringData.toString().substring(0, stringData.length() - 1);
+		return stringData.toString();
 	}
 	
 	public static void sendMessage(String channel, String... data)
@@ -133,7 +145,15 @@ public class SocketManager implements SocketClientApp
 			throw new IllegalStateException("Not Connected");
 		}
 		
-		socketClient.writeJSON("PASSTHROUGH", stripSplitters(targetServer) + "|" + stripSplitters(channel) + "|" + concatenateData(data));
+		String message = concatenateData(data);
+		if(message.endsWith("|"))
+		{
+			message = message.substring(0, message.length() - 1);
+		}
+		
+		socketClient.writeJSON("PASSTHROUGH", stripSplitters(targetServer) + "|" +
+			                                            stripSplitters(channel) + "|" +
+			                                            message);
 	}
 	
 	private static String stripSplitters(String inputString)
@@ -162,27 +182,33 @@ public class SocketManager implements SocketClientApp
 	@Override
 	public void onConnect(SocketClient client)
 	{
-		BUtil.logMessage("Connected to " + client.getHost() + ":" + client.getPort() + " successfully.");
-		Bukkit.getPluginManager().callEvent(new BukkitSocketConnectEvent(client));
+		RunnableShorthand.forPlugin(plugin).with(() ->
+		{
+			BUtil.logMessage("Connected to " + client.getHost() + ":" + client.getPort() + " successfully.");
+			Bukkit.getPluginManager().callEvent(new BukkitSocketConnectEvent(client));
+		}).ensureASync();
 	}
 	
 	@Override
 	public void onDisconnect(SocketClient client)
 	{
-		BUtil.logMessage("Disconnected from " + client.getHost() + ":" + client.getPort() + ".");
-		Bukkit.getPluginManager().callEvent(new BukkitSocketDisconnectEvent(client));
+		RunnableShorthand.forPlugin(plugin).with(() ->
+		{
+			BUtil.logMessage("Disconnected from " + client.getHost() + ":" + client.getPort() + ".");
+			Bukkit.getPluginManager().callEvent(new BukkitSocketDisconnectEvent(client));
+		}).ensureASync();
 	}
 	
 	@Override
 	public void onHandshake(SocketClient client)
 	{
-		Bukkit.getPluginManager().callEvent(new BukkitSocketHandshakeEvent(client));
+		RunnableShorthand.forPlugin(plugin).with(() -> Bukkit.getPluginManager().callEvent(new BukkitSocketHandshakeEvent(client))).ensureASync();
 	}
 	
 	@Override
 	public void onJSON(SocketClient client, Map<String, String> map)
 	{
-		Bukkit.getPluginManager().callEvent(new BukkitSocketJSONEvent(client, map));
+		RunnableShorthand.forPlugin(plugin).with(() -> Bukkit.getPluginManager().callEvent(new BukkitSocketJSONEvent(client, map))).ensureASync();
 	}
 	
 }

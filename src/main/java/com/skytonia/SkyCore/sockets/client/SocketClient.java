@@ -8,6 +8,8 @@ import lombok.Getter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
@@ -20,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by Chris Brown (OhBlihv) on 28/09/2016.
  */
-public class SocketClient implements Runnable
+public class SocketClient extends Thread
 {
 	
 	@Getter
@@ -40,6 +42,12 @@ public class SocketClient implements Runnable
 	
 	public SocketClient(SocketClientApp app, String name, String host, int port, KeyPair keys)
 	{
+		//Override System.err to ignore errors
+		System.setErr(new PrintStream(new OutputStream() {
+			public void write(int b) {
+			}
+		}));
+		
 		this.host = host;
 		this.port = port;
 		this.keys = keys;
@@ -47,7 +55,28 @@ public class SocketClient implements Runnable
 		this.name = name;
 		enabled.set(true);
 		socket = new Socket();
+		
+		/*new BukkitRunnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				if(isHandshaked())
+				{
+					this.cancel();
+				}
+				else
+				{
+					//Attempt to handshake until shook.
+					handshake();
+				}
+			}
+			
+		}.runTaskTimerAsynchronously(SkyCore.getPluginInstance(), 20L, 20L);*/
 	}
+	
+	private long lastHandshakeAttempt = System.currentTimeMillis() - 6000L; //Ensure we get an initial handshake
 	
 	public void run()
 	{
@@ -55,14 +84,23 @@ public class SocketClient implements Runnable
 		{
 			try
 			{
+				if(socket != null && !socket.isClosed())
+				{
+					socket.close();
+					socket = null;
+					BUtil.logInfo("Removing old socket");
+				}
+				
 				socket = new Socket(host, port);
 				socket.setTcpNoDelay(true);
 				app.onConnect(this);
 				
 				key = null;
 				handshaked.set(false);
+				
 				String keyread = "";
 				String fullmessage = "";
+				
 				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				writer = new PrintWriter(socket.getOutputStream());
 				while(enabled.get() && socket.isConnected() && !socket.isClosed())
@@ -78,7 +116,7 @@ public class SocketClient implements Runnable
 						{
 							if(!read.equals("--end--"))
 							{
-								keyread += read;
+								keyread +=read;
 							}
 							else
 							{
@@ -86,8 +124,9 @@ public class SocketClient implements Runnable
 								{
 									key = SocketUtil.RSA.loadPublicKey(keyread);
 									writer.println(SocketUtil.RSA.savePublicKey(keys.getPublic()));
-									writer.println("--end--");
+									writer.println("--end--"); //Print the end tag unencrypted for efficiency
 									writer.flush();
+									BUtil.logInfo("Sent Public Keys");
 								}
 								catch(GeneralSecurityException e)
 								{
@@ -97,47 +136,56 @@ public class SocketClient implements Runnable
 						}
 						else
 						{
-							String message = SocketUtil.RSA.decrypt(read, keys.getPrivate());
-							if(message != null && !message.isEmpty())
+							if(!read.equals("--end--"))
 							{
-								if(!message.equals("--end--"))
+								fullmessage += read + "\n";
+							}
+							else
+							{
+								String message = "";
+								for(String part : fullmessage.split("[\n]"))
 								{
-									fullmessage += message;
+									message += SocketUtil.RSA.decrypt(part, keys.getPrivate());
 								}
-								else
+								
+								if(!message.isEmpty())
 								{
-									if(fullmessage != null && !fullmessage.isEmpty())
+									Map<String, String> map = null;
+									try
 									{
-										try
+										map = SocketUtil.gson().fromJson(message, Map.class);
+									}
+									catch(JsonSyntaxException e)
+									{
+										e.printStackTrace();
+									}
+									
+									if(map != null)
+									{
+										//BUtil.logInfo("Channel: " + map.get("channel"));
+										if(map.get("channel").equals("SocketAPI"))
 										{
-											@SuppressWarnings("unchecked")
-											Map<String, String> map = SocketUtil.gson().fromJson(fullmessage, Map.class);
-											
-											if(map.get("channel").equals("SocketAPI"))
+											String data = map.get("data");
+											if(data.equals("handshake"))
 											{
-												if(map.get("data").equals("handshake"))
-												{
-													BUtil.logMessage("Attempting handshake with proxy...");
-													handshake();
-												}
-												else if(map.get("data").equals("handshaked"))
-												{
-													BUtil.logMessage("Registered socket listener as '" + name + "'");
-													handshaked.set(true);
-													app.onHandshake(this);
-												}
+												BUtil.logInfo("Replying to Handshake...");
+												handshake();
 											}
-											else
+											else if(data.equals("handshaked"))
 											{
-												app.onJSON(this, map);
+												BUtil.logMessage("Registered socket listener as '" + name + "'");
+												handshaked.set(true);
+												app.onHandshake(this);
 											}
 										}
-										catch(JsonSyntaxException e)
+										else
 										{
+											app.onJSON(this, map);
 										}
 									}
-									fullmessage = "";
 								}
+								
+								fullmessage = "";
 							}
 						}
 					}
@@ -145,9 +193,21 @@ public class SocketClient implements Runnable
 			}
 			catch(IOException e)
 			{
+				BUtil.logInfo("Socket Error. Reopening Socket...");
+				e.printStackTrace();
+				BUtil.logInfo("===================================");
 				if(e.getClass().getSimpleName().equals("SocketException"))
 				{
 					close();
+				}
+				
+				try
+				{
+					sleep(1000);
+				}
+				catch(InterruptedException e2)
+				{
+					e.printStackTrace();
 				}
 			}
 		}
@@ -163,51 +223,65 @@ public class SocketClient implements Runnable
 		return handshaked.get();
 	}
 	
-	private void handshake()
+	public void handshake()
 	{
-		try
+		if(System.currentTimeMillis() - lastHandshakeAttempt > 5000L)
 		{
-			HashMap<String, String> hashmap = new HashMap<>();
-			hashmap.put("channel", "SocketAPI");
-			hashmap.put("data", "handshake");
-			hashmap.put("name", name);
-			String json = SocketUtil.gson().toJson(hashmap);
-			write(json);
-		}
-		catch(NullPointerException e)
-		{
+			lastHandshakeAttempt = System.currentTimeMillis();
+			
+			BUtil.logMessage("Attempting handshake with proxy...");
+			
+			HashMap<String, String> dataMap = new HashMap<>();
+			dataMap.put("channel", "SocketAPI");
+			dataMap.put("data", "handshake");
+			dataMap.put("name", name);
+			write(SocketUtil.gson().toJson(dataMap), true);
 		}
 	}
 	
 	public void writeJSON(String channel, String data)
 	{
-		try
-		{
-			HashMap<String, String> hashmap = new HashMap<>();
-			hashmap.put("channel", channel);
-			hashmap.put("data", data);
-			String json = SocketUtil.gson().toJson(hashmap);
-			write(json);
-		}
-		catch(NullPointerException e)
-		{
-		}
+		HashMap<String, String> map = new HashMap<>();
+		map.put("channel", channel);
+		map.put("data", data);
+		write(SocketUtil.gson().toJson(map));
 	}
 	
 	private void write(String data)
 	{
+		write(data, false);
+	}
+	
+	private void write(String data, boolean force)
+	{
+		if(!force && (!isConnectedAndOpened() || !isHandshaked()))
+		{
+			return; //No Exception Required.
+		}
+		
 		try
 		{
-			String[] split = SocketUtil.split(data, 20);
-			for(String str : split)
+			synchronized(writer)
 			{
-				writer.println(SocketUtil.RSA.encrypt(str, key));
+				String[] split = SocketUtil.split(data, 20);
+				for(String str : split)
+				{
+					writer.println(SocketUtil.RSA.encrypt(str, key));
+				}
+				//writer.println(SocketUtil.RSA.encrypt("--end--", key));
+				writer.println("--end--"); //Print the end tag unencrypted for efficiency
+				writer.flush();
+				
+				//BUtil.logInfo("Wrote " + data);
 			}
-			writer.println(SocketUtil.RSA.encrypt("--end--", key));
-			writer.flush();
 		}
 		catch(NullPointerException e)
 		{
+			//
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -228,7 +302,7 @@ public class SocketClient implements Runnable
 		return null;
 	}
 	
-	public IOException interrupt()
+	public IOException interruptClient()
 	{
 		enabled.set(false);
 		return close();
