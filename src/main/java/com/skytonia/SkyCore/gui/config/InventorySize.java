@@ -26,8 +26,8 @@ public enum InventorySize
 	{
 		this.absoluteSize = absoluteSize;
 		
-		this.minSize = -1;
-		this.maxSize = -1;
+		this.minSize = 0;
+		this.maxSize = 5;
 	}
 	
 	InventorySize(int minSize, int maxSize)
@@ -50,7 +50,7 @@ public enum InventorySize
 	
 	public boolean isWithinRange(int slot)
 	{
-		return slot >= 0 && slot <= maxSize;
+		return slot >= 0 && slot < maxSize;
 	}
 	
 	public boolean matchesSize(int guiSize)
@@ -60,14 +60,24 @@ public enum InventorySize
 	
 	public static InventorySize ofSize(int slots)
 	{
+		return ofSize(slots, false);
+	}
+	
+	public static InventorySize ofSize(int slots, boolean ignoreHopper)
+	{
 		for(InventorySize inventorySize : values())
 		{
+			if(ignoreHopper && inventorySize == HOPPER)
+			{
+				continue;
+			}
+			
 			if(inventorySize.absoluteSize != -1 && inventorySize.absoluteSize == slots)
 			{
 				return inventorySize;
 			}
 			
-			if(inventorySize.minSize >= slots && inventorySize.maxSize <= slots)
+			if(inventorySize.maxSize >= slots && inventorySize.minSize <= slots)
 			{
 				return inventorySize;
 			}
