@@ -2,23 +2,32 @@ package com.skytonia.SkyCore.items.construction;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.items.EnchantStatus;
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.bukkit.Material.AIR;
+import static org.bukkit.Material.DIAMOND_HOE;
 
 /**
  * Created by Chris Brown (OhBlihv) on 26/09/2016.
@@ -52,12 +61,20 @@ public class ItemContainer
 	@Getter
 	private final String skullTexture;
 	
+	@Getter
+	private final Color armorColor;
+	
 	private Object getOverriddenValue(Map<ItemContainerVariable, Object> overriddenValues, ItemContainerVariable itemVariable, Object defaultValue)
 	{
 		Object returningValue;
 		if(itemVariable.isNumber())
 		{
-			returningValue = overriddenValues.getOrDefault(itemVariable, 0);
+			returningValue = overriddenValues.getOrDefault(itemVariable, -1);
+			
+			if(((Number) returningValue).intValue() == -1)
+			{
+				returningValue = defaultValue;
+			}
 		}
 		else
 		{
@@ -178,6 +195,24 @@ public class ItemContainer
 			itemMeta.setLore(lore);
 		}
 		
+		if(armorColor != null && material.name().contains("LEATHER_"))
+		{
+			LeatherArmorMeta leatherMeta = (LeatherArmorMeta) itemMeta;
+			leatherMeta.setColor(armorColor);
+		}
+		
+		if(SkyCore.isSkytonia() && material == DIAMOND_HOE)
+		{
+			itemMeta.spigot().setUnbreakable(true);
+			itemMeta.addItemFlags(
+				ItemFlag.HIDE_ENCHANTS,
+				ItemFlag.HIDE_ATTRIBUTES,
+				ItemFlag.HIDE_UNBREAKABLE,
+				ItemFlag.HIDE_DESTROYS,
+				ItemFlag.HIDE_PLACED_ON,
+				ItemFlag.HIDE_POTION_EFFECTS);
+		}
+		
 		itemStack.setItemMeta(itemMeta);
 		
 		if(enchantmentMap != null)
@@ -185,7 +220,14 @@ public class ItemContainer
 			itemStack.addUnsafeEnchantments(enchantmentMap);
 		}
 		
-		return enchantStatus.alterEnchantmentStatus(itemStack);
+		if(enchantStatus != null)
+		{
+			return enchantStatus.alterEnchantmentStatus(itemStack);
+		}
+		else
+		{
+			return itemStack;
+		}
 	}
 	
 	public int getMaxStackSize()
@@ -247,10 +289,154 @@ public class ItemContainer
 		return original;
 	}
 	
+	public boolean equals(ItemStack itemStack)
+	{
+		return equals(itemStack, null);
+	}
+	
+	public boolean equals(ItemStack itemStack, Set<ItemContainerVariable> ignoredChecks)
+	{
+		if(ignoredChecks == null)
+		{
+			ignoredChecks = EnumSet.noneOf(ItemContainerVariable.class);
+		}
+		
+		if(itemStack == null ||
+			   (!ignoredChecks.contains(ItemContainerVariable.MATERIAL) && itemStack.getType() != material) ||
+			   (!ignoredChecks.contains(ItemContainerVariable.DAMAGE) && itemStack.getDurability() != damage))
+		{
+			return false;
+		}
+		
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		
+		//Expecting a displayname
+		if(!ignoredChecks.contains(ItemContainerVariable.DISPLAYNAME) && displayName != null && !displayName.isEmpty())
+		{
+			if(!itemMeta.hasDisplayName() || !itemMeta.getDisplayName().equals(displayName))
+			{
+				return false;
+			}
+		}
+		
+		//Expecting Lore
+		if(!ignoredChecks.contains(ItemContainerVariable.LORE) && lore != null && !lore.isEmpty())
+		{
+			if(!itemMeta.hasLore() || itemMeta.getLore().isEmpty() || !itemMeta.getLore().equals(lore))
+			{
+				return false;
+			}
+		}
+		
+		if(itemMeta instanceof SkullMeta)
+		{
+			if(owner != null && owner.equals("player"))
+			{
+				return true;
+			}
+			
+			if(skullTexture != null)
+			{
+				//Find our texture
+				GameProfile skullProfile = null;
+				try
+				{
+					Class skullClass = Class.forName("org.bukkit.craftbukkit." + BUtil.getNMSVersion() + ".inventory.CraftMetaSkull");
+					
+					Field profileField = skullClass.getDeclaredField("profile");
+					profileField.setAccessible(true);
+					
+					skullProfile = (GameProfile) profileField.get(itemMeta);
+				}
+				catch(ClassNotFoundException | NoSuchFieldException | IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
+				
+				try
+				{
+					if(skullProfile == null || !skullProfile.getProperties().containsKey("textures") ||
+						   !skullProfile.getProperties().get("textures").iterator().next().getValue().equals(skullTexture))
+					{
+						return false;
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				return ((SkullMeta) itemMeta).getOwner().equals(owner);
+			}
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public String toString()
 	{
 		return material + ":" + damage + " (" + amount + ") \"" + displayName + "\"";
+	}
+	
+	public void saveItem(ConfigurationSection configurationSection)
+	{
+		//Clear this section
+		if(!configurationSection.getKeys(false).isEmpty())
+		{
+			String[] pathSplit = configurationSection.getCurrentPath().split("[.]");
+			
+			ConfigurationSection parentSection = configurationSection.getParent();
+			parentSection.set(pathSplit[pathSplit.length - 1], null);
+			configurationSection = parentSection.createSection(pathSplit[pathSplit.length - 1]);
+		}
+		
+		configurationSection.set("material", material.name());
+		configurationSection.set("damage", damage);
+		configurationSection.set("amount", amount);
+		
+		if(displayName != null)
+		{
+			configurationSection.set("displayname", null);
+		}
+		
+		if(lore != null)
+		{
+			configurationSection.set("lore", lore);
+		}
+		
+		if((enchantmentMap == null || enchantmentMap.isEmpty()) && enchantStatus != null)
+		{
+			configurationSection.set("enchanted", enchantStatus.name());
+		}
+		else if(enchantmentMap != null && !enchantmentMap.isEmpty())
+		{
+			List<String> enchantStringList = new ArrayList<>();
+			for(Map.Entry<Enchantment, Integer> entry : enchantmentMap.entrySet())
+			{
+				enchantStringList.add(entry.getKey().getName() + ":" + entry.getValue());
+			}
+			
+			configurationSection.set("enchanted", enchantStringList);
+		}
+		
+		if(owner != null)
+		{
+			configurationSection.set("owner", owner);
+		}
+		
+		if(skullTexture != null)
+		{
+			configurationSection.set("texture", skullTexture);
+		}
+		
+		if(armorColor != null)
+		{
+			configurationSection.set("color", armorColor.asRGB());
+		}
+		
 	}
 	
 }
