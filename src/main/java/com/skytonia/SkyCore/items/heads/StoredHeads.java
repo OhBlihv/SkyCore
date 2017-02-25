@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Base64;
+
 /**
  * Created by Chris Brown (OhBlihv) on 12/29/2016.
  */
@@ -89,6 +91,11 @@ public class StoredHeads
 			case MAGMA_CUBE:    return MAGMA_CUBE;
 			default: throw new IllegalArgumentException("EntityType -> MobSkull not found '" + entityType + "");
 		}
+	}
+	
+	public static StoredHead getHeadFromURL(String skinURL)
+	{
+		return new StoredHead(Base64.getEncoder().encodeToString(("{textures:{SKIN:{url:\"" + skinURL + "\"}}}").getBytes()));
 	}
 	
 }
