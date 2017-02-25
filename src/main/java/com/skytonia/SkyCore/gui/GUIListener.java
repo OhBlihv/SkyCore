@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.gui;
 
 import com.skytonia.SkyCore.SkyCore;
+import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,12 +25,11 @@ public class GUIListener implements Listener
 		//If the inventory is modified, attempt to cancel all events to avoid players
 		//taking items out of the inventory/gui.
 		//Handle this early (LOWEST) so other plugins can re-enable this event.
-		if(event.getInventory() != null && event.getInventory().getTitle() != null)
+		if(event.getInventory() != null && event.getInventory().getTitle() != null &&
+			   isInventoryModified(event.getInventory().getTitle()))
 		{
-			if(isInventoryModified(event.getInventory().getTitle()))
-			{
-				event.setCancelled(true);
-			}
+			BUtil.logInfo("Blocking: " + event.getInventory().getTitle());
+			event.setCancelled(true);
 		}
 	}
 	
@@ -38,6 +38,7 @@ public class GUIListener implements Listener
 		switch(title)
 		{
 			case "Inventory":
+			case "container.crafting":
 			case "Chest":
 			case "Large Chest":
 			case "Furnace":

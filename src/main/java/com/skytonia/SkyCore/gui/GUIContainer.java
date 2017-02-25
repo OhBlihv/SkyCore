@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
  */
 public class GUIContainer implements Listener
 {
+	
+	private static GUIListener guiListener = null;
 
 	@NonNull
 	protected final Pattern guiTitlePattern;
@@ -63,6 +65,13 @@ public class GUIContainer implements Listener
 	                    //Include ConfigurationSection used for loading to load gui-specific extras
 	                    ConfigurationSection configurationSection)
 	{
+		/*if(guiListener == null)
+		{
+			guiListener = new GUIListener();
+			
+			Bukkit.getPluginManager().registerEvents(guiListener, SkyCore.getPluginInstance());
+		}*/
+		
 		this.guiTitlePattern = Pattern.compile(guiTitle.replaceAll("\\{.*\\}", ".*"));
 		this.guiTitle = guiTitle;
 		this.guiSize = guiSize;
