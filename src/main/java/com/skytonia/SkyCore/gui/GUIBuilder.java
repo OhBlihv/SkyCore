@@ -1,6 +1,5 @@
 package com.skytonia.SkyCore.gui;
 
-import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.gui.actions.ElementAction;
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.config.GUISound;
@@ -9,22 +8,19 @@ import com.skytonia.SkyCore.gui.variables.GUIVariable;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
 import com.skytonia.SkyCore.items.construction.ItemContainer;
 import com.skytonia.SkyCore.items.construction.ItemContainerConstructor;
-import com.skytonia.SkyCore.items.construction.ItemContainerConstructor.ItemContainerBuilder;
 import com.skytonia.SkyCore.items.construction.ItemContainerVariable;
 import com.skytonia.SkyCore.util.BUtil;
-import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -96,6 +92,7 @@ public class GUIBuilder<T>
 					}
 					
 					BUtil.logInfo("Unknown Inventory Size '" + inventoryString + "'. Defaulting to SIX_LINE");
+					BUtil.logInfo("Options: " + Arrays.toString(InventorySize.values()) + " (Or a slot amount, eg '18')");
 					inventorySize = InventorySize.SIX_LINE;
 				}
 			}
@@ -113,7 +110,15 @@ public class GUIBuilder<T>
 			{
 				sound = Sound.valueOf(soundSection.getString("sound"));
 			}
-			catch(IllegalArgumentException | NullPointerException e)
+			catch(IllegalArgumentException e)
+			{
+				//Check if it's ITEM_PICKUP and translate
+				if(soundSection.getString("sound").equals("ITEM_PICKUP"))
+				{
+					sound = Sound.ENTITY_ITEM_PICKUP;
+				}
+			}
+			catch(NullPointerException e)
 			{
 				//Sound stays null and is caught by the next check
 			}
@@ -133,19 +138,19 @@ public class GUIBuilder<T>
 		{
 			fillerItem = ItemContainerConstructor.buildItemContainer(configurationSection.getConfigurationSection("filler")).toItemStack();
 		}
-		else
+		/*else
 		{
 			//If we're SkyCore and not another plugin, use a default filler item based on config
-			Plugin pluginInstance = SkyCore.getPluginInstance();
-			if(pluginInstance != null && pluginInstance.getClass().getSimpleName().equals("SkyCore"))
+			//Plugin pluginInstance = SkyCore.getPluginInstance();
+			/*if(pluginInstance != null && pluginInstance.getClass().getSimpleName().equals("SkyCore"))
 			{
 				fillerItem = new ItemContainerBuilder()
 					             .material(Material.STAINED_GLASS_PANE)
 					             .damage(7)
 					             .displayname("§8" + FlatFile.getInstance().getString("options.server-name"))
 					             .build().toItemStack();
-			}
-		}
+			}*/
+		//}*/
 		
 		Deque<GUIElementInfo> guiElements = loadGUIElements(configurationSection, inventorySize.getSize());
 		
@@ -216,26 +221,26 @@ public class GUIBuilder<T>
 		return guiElements;
 	}
 	
-	private GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot)
+	public static GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot)
 	{
 		return loadGUIElement(baseSection, subSection, slot, EnumSet.allOf(ItemContainerVariable.class), new HashMap<>());
 	}
 	
-	private GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot,
+	public static GUIElement loadGUIElement(ConfigurationSection baseSection, String subSection, int slot,
 		/*ItemContainer Specifics*/         EnumSet<ItemContainerVariable> checkedErrors,
 		                                Map<ItemContainerVariable, Object> overriddenValues)
 	{
 		ConfigurationSection subConfigurationSection = baseSection.getConfigurationSection(subSection);
 		if(subConfigurationSection == null)
 		{
-			BUtil.logError("Error loading GUI Element at slot '" + slot + "' in GUI " + guiTitle + " (" + baseSection.getCurrentPath() + "." + subSection + ")");
+			BUtil.logError("Error loading GUI Element at slot '" + slot + "' in GUI (" + baseSection.getCurrentPath() + "." + subSection + ")");
 			return GUIElement.DEFAULT_GUI_ELEMENT;
 		}
 		
 		return loadGUIElement(subConfigurationSection, slot, checkedErrors, overriddenValues);
 	}
 	
-	private GUIElement loadGUIElement(ConfigurationSection configurationSection, int slot,
+	private static GUIElement loadGUIElement(ConfigurationSection configurationSection, int slot,
 	                                  EnumSet<ItemContainerVariable> checkedErrors,
 	                                  Map<ItemContainerVariable, Object> overriddenValues)
 	{
