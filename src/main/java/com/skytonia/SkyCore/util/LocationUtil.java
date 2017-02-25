@@ -121,14 +121,18 @@ public class LocationUtil
 	
 	public static String serialiseLocation(Location location)
 	{
-		return
+		String locationString =
 			location.getWorld().getName()   + ":" +
 			location.getBlockX()            + ":" +
 			location.getBlockY()            + ":" +
-			location.getBlockZ()            + ":" +
-				((location.getYaw() == 0 && location.getPitch() == 0) ?
-				"" :                                             //If both yaw/pitch are 0, save space by not adding them
-				location.getYaw() + ":" + location.getPitch());  //If one is non-zero, we have to add both per convention.
+			location.getBlockZ();
+		
+		if(location.getYaw() == 0 && location.getPitch() == 0)
+		{
+			return locationString;
+		}
+		
+		return location + ":" + location.getYaw() + ":" + location.getPitch();  //If one is non-zero, we have to add both per convention.
 	}
 	
 }
