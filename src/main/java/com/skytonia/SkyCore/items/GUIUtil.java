@@ -1,12 +1,15 @@
 package com.skytonia.SkyCore.items;
 
+import com.skytonia.SkyCore.items.construction.ItemContainer;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.ReflectionUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -114,10 +117,20 @@ public class GUIUtil
 		}
 	}
 
-	public static ItemStack addEnchantmentEffect(ItemStack item)
+	public static ItemStack addEnchantmentEffect(ItemStack itemStack)
 	{
-		if(!initEnchantmentNMS())
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		
+		itemMeta.addEnchant(Enchantment.MENDING, 1, true);
+		itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
+		
+		itemStack.setItemMeta(itemMeta);
+		
+		return itemStack;
+		
+		/*if(!initEnchantmentNMS())
 		{
+			BUtil.logInfo("Could not initialize NMS");
 			return item; //Return the item without enchantment effects
 		}
 
@@ -139,6 +152,33 @@ public class GUIUtil
 			}
 
 			enchTag = NMS_NBTTagList.newInstance();
+			
+			//TODO: Properly Test this and streamline it?
+			/*try
+			{
+				switch(BUtil.getNMSVersion())
+				{
+					case "v1_9_R2":
+					{
+						BUtil.logInfo(enchTag.toString());
+						net.minecraft.server.v1_9_R2.NBTTagList enchTagList = (net.minecraft.server.v1_9_R2.NBTTagList) enchTag;
+						while(!enchTagList.isEmpty())
+						{
+							enchTagList.remove(0);
+						}
+						((net.minecraft.server.v1_9_R2.NBTTagList) enchTag).add(new net.minecraft.server.v1_9_R2.NBTTagInt(-1));
+						BUtil.logInfo(enchTag.toString());
+						break;
+					}
+					default: break;
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				return item;
+			}*
+			
 			NMS_NBTTagCompound_set.invoke(tag, "ench", enchTag);
 			NMS_ItemStack_setTag.invoke(nmsStack, tag);
 
@@ -148,8 +188,8 @@ public class GUIUtil
 		{
 			e.printStackTrace();
 			BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
-			return item;
-		}
+			return tiem;
+		}*/
 	}
 
 	public static ItemStack removeEnchantmentEffect(ItemStack item)
@@ -263,6 +303,38 @@ public class GUIUtil
 		for(ItemStack item : inventory.all(itemStack.getType()).values())
 		{
 			if(item.equals(comparedItemStack))
+			{
+				count += item.getAmount();
+			}
+		}
+		return count;
+	}
+	
+	public static int countItem(Inventory inventory, Material material, int damage, final int minRange, final int maxRange)
+	{
+		int count = 0;
+		for(int i = minRange;i <= maxRange;i++)
+		{
+			ItemStack item = inventory.getItem(i);
+			if(item == null || item.getType() == Material.AIR)
+			{
+				continue;
+			}
+			
+			if(item.getType() == material && (damage < 0 || item.getDurability() == damage))
+			{
+				count += item.getAmount();
+			}
+		}
+		return count;
+	}
+	
+	public static int countItem(Inventory inventory, ItemContainer itemContainer)
+	{
+		int count = 0;
+		for(ItemStack item : inventory.all(itemContainer.getMaterial()).values())
+		{
+			if(itemContainer.equals(item))
 			{
 				count += item.getAmount();
 			}
