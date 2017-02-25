@@ -76,4 +76,30 @@ public class PluginLoggingTest
 		return negative ? 0 - result : result;
 	}
 	
+	@Test
+	public void gameIdRoundingTest()
+	{
+		int testId = 13;
+		System.out.println("GameId 13 is " + (roundId(testId)) +
+			                   " and assigned to Murder" + ((testId / maxGamesPerInstance) + 1));
+		testId = 7;
+		System.out.println("GameId 7 is " + (roundId(testId)) +
+			                   " and assigned to Murder" + ((testId / maxGamesPerInstance) + 1));
+		testId = 4;
+		System.out.println("GameId 4 is " + (roundId(testId)) +
+			                   " and assigned to Murder" + ((testId / maxGamesPerInstance) + 1));
+	}
+	
+	private final int maxGamesPerInstance = 6;
+	
+	public int roundId(int inflatedGameId)
+	{
+		while(inflatedGameId > maxGamesPerInstance)
+		{
+			inflatedGameId -= maxGamesPerInstance;
+		}
+		
+		return inflatedGameId;
+	}
+	
 }

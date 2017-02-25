@@ -17,14 +17,18 @@
 			<id>md_5-snapshots</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+		<repository>
+			<id>dmulloy2-repo</id>
+			<url>http://repo.dmulloy2.net/content/groups/public/</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>
-		<!-- Spigot/Bukkit Dependency -->
+		<!-- Spigot-API / 1.9 NMS-->
 		<dependency>
-			<groupId>org.github.paperspigot</groupId>
-			<artifactId>paperspigot</artifactId>
-			<version>1.8.8-R0.1-SNAPSHOT</version>
+			<groupId>com.destroystokyo.paper</groupId>
+			<artifactId>paper</artifactId>
+			<version>1.9.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -59,6 +63,14 @@
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 			<version>2.4.5</version>
+		</dependency>
+		
+		<!-- Plugin Dependencies -->
+		<dependency>
+			<groupId>com.comphenix.protocol</groupId>
+			<artifactId>ProtocolLib-API</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- Auto-generated Annotations -->
@@ -120,6 +132,20 @@
 						</goals>
 						<configuration>
 							<minimizeJar>true</minimizeJar>
+							<filters>
+								<filter>
+									<artifact>io.reactivex.rxjava2:rxjava</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+								<filter>
+									<artifact>org.reactivestreams:reactive-streams</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+							</filters>
 							<relocations>
 								<relocation>
 									<pattern>com.zaxxer</pattern>
