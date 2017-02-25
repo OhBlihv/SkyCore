@@ -21,7 +21,6 @@ public class RunnableShorthand
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class RunnableBuilder
 	{
-		
 		private final Plugin assignedPlugin;
 		
 		public RunnableShorthand with(Runnable runnable)
@@ -101,6 +100,11 @@ public class RunnableShorthand
 		scheduler.runTaskLater(assignedPlugin, runnable, delay).getTaskId();
 	}
 	
+	public void runTaskLater(long delay)
+	{
+		runTask(delay);
+	}
+	
 	public void runASync()
 	{
 		runTaskASync(0L);
@@ -113,6 +117,14 @@ public class RunnableShorthand
 	
 	public int runTimerASync(int delay, TimeUnit delayUnit, int timer, TimeUnit timerUnit)
 	{
+		switch(timerUnit)
+		{
+			case MICROSECONDS:
+			case NANOSECONDS:
+			case MILLISECONDS:
+				throw new IllegalArgumentException("Unable to convert from " + timerUnit.name() + " to seconds! Ignoring Task.");
+		}
+		
 		return runTimerASync(delayUnit.toSeconds(delay) * 20L, timerUnit.toSeconds(timer) * 20L);
 	}
 	
