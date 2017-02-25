@@ -1,17 +1,21 @@
 package com.skytonia.SkyCore.items.construction;
 
+import com.mojang.authlib.GameProfile;
 import com.skytonia.SkyCore.items.EnchantStatus;
 import com.skytonia.SkyCore.items.GUIUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -123,13 +127,18 @@ public class ItemContainerConstructor
 			return new ItemContainer(material, damage, amount,
 			                         displayName, lore,
 			                         enchantStatus, enchantments,
-			                         owner, skullTexture);
+			                         owner, skullTexture, null);
 		}
 		
 	}
 	
 	public static ItemContainer fromItemStack(ItemStack itemStack)
 	{
+		if(itemStack == null || itemStack.getType() == AIR)
+		{
+			return null;
+		}
+		
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		
 		String displayname = null;
@@ -152,13 +161,39 @@ public class ItemContainerConstructor
 		}
 		
 		String owner = null;
+		String skullTexture = null;
+		Color armorColor = null;
 		if(itemStack.getType() == SKULL_ITEM)
 		{
-			owner = ((SkullMeta) itemMeta).getOwner();
+			try
+			{
+				Field profileField = itemMeta.getClass().getDeclaredField("profile");
+				profileField.setAccessible(true);
+				GameProfile gameProfile = (GameProfile) profileField.get(itemMeta);
+				
+				if(gameProfile.getProperties().containsKey("textures"))
+				{
+					skullTexture = gameProfile.getProperties().get("textures").iterator().next().getValue();
+				}
+			}
+			catch(IllegalAccessException | NoSuchFieldException e)
+			{
+				e.printStackTrace();
+			}
+			
+			if(skullTexture == null)
+			{
+				owner = ((SkullMeta) itemMeta).getOwner();
+			}
+		}
+		else if(itemStack.getType().name().contains("LEATHER_"))
+		{
+			LeatherArmorMeta leatherMeta = (LeatherArmorMeta) itemMeta;
+			armorColor = leatherMeta.getColor();
 		}
 		
 		return new ItemContainer(itemStack.getType(), itemStack.getDurability(), itemStack.getAmount(), displayname, lore,
-		                         EnchantStatus.NO_CHANGE, enchantmentMap, owner, null);
+		                         EnchantStatus.NO_CHANGE, enchantmentMap, owner, skullTexture, armorColor);
 	}
 	
 	public static ItemContainer buildItemContainer(ConfigurationSection configurationSection)
@@ -216,11 +251,9 @@ public class ItemContainerConstructor
 			}
 		}
 		int damage = overriddenValues.containsKey(ItemContainerVariable.DAMAGE) ?
-			             (int) overriddenValues.get(ItemContainerVariable.DAMAGE) :
-				                                                                      configurationSection.getInt("damage", 0),
+			             (int) overriddenValues.get(ItemContainerVariable.DAMAGE) : configurationSection.getInt("damage", 0),
 			amount = overriddenValues.containsKey(ItemContainerVariable.AMOUNT) ?
-				         (int) overriddenValues.get(ItemContainerVariable.AMOUNT) :
-					                                                                  configurationSection.getInt("amount", 1);
+				         (int) overriddenValues.get(ItemContainerVariable.AMOUNT) : configurationSection.getInt("amount", 1);
 		
 		String displayName = overriddenValues.containsKey(ItemContainerVariable.DISPLAYNAME) ?
 			                     BUtil.translateColours((String) overriddenValues.get(ItemContainerVariable.DISPLAYNAME)) :
@@ -257,9 +290,15 @@ public class ItemContainerConstructor
 			skullTexture = configurationSection.getString("texture");
 		}
 		
+		Color armorColor = null;
+		if(armorColor == null && configurationSection.contains("color"))
+		{
+			armorColor = Color.fromRGB(configurationSection.getInt("color"));
+		}
+		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(isEnchanted), enchantmentMap,
-		                         owner, skullTexture);
+		                         owner, skullTexture, armorColor);
 	}
 	
 	private static final Pattern PATTERN_SEPERATOR = Pattern.compile(":");
@@ -334,7 +373,7 @@ public class ItemContainerConstructor
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(enchanted), enchantmentMap,
-		                         owner, skullTexture);
+		                         owner, skullTexture, null);
 	}
 	
 }
