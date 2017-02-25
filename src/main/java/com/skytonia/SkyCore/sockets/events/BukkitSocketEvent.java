@@ -15,6 +15,8 @@ public abstract class BukkitSocketEvent extends Event
 	
 	public BukkitSocketEvent(SocketClient socketClient)
 	{
+		super(true);
+		
 		this.client = socketClient;
 	}
 	
