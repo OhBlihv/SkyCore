@@ -11,7 +11,7 @@ public class PersistingRunnable
 	
 	private int taskId;
 	private int executionCount = 0,
-		maxExecutions;
+				maxExecutions;
 	
 	public PersistingRunnable(long tickDelay, int executions, Runnable runnable)
 	{

@@ -41,19 +41,19 @@ public class PacketLibrary_1_8_R3 extends PacketLibrary
 	{
 		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
 		
-		//PacketPlayOutTitle timesPacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, persistTime, fadeOut);
-		//playerConnection.sendPacket(timesPacket);
-		//BUtil.logInfo("Sent times packet as " + persistTime + ", " + fadeIn + ", " + fadeOut);
-		
-		if(subTitle != null)
+		//Title is required to send subtitle. Send both when possible.
+		if(title == null)
 		{
-			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle, persistTime, fadeIn, fadeOut);
+			title = "";
 		}
 		
-		if(title != null)
+		if(subTitle == null)
 		{
-			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TITLE, title, persistTime, fadeIn, fadeOut);
+			subTitle = "";
 		}
+		
+		sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle, persistTime, fadeIn, fadeOut);
+		sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TITLE, title, persistTime, fadeIn, fadeOut);
 	}
 	
 	private void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message,

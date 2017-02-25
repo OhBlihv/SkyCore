@@ -29,4 +29,18 @@ public class Persistence
 		persistingRunnables.put(persistingType, new PersistingRunnable(tickDelay, executions, runnable));
 	}
 	
+	public void removeRunnable(PersistingType persistingType)
+	{
+		PersistingRunnable runnable = persistingRunnables.remove(persistingType);
+		if(runnable != null)
+		{
+			runnable.cancelRunnable();
+		}
+	}
+	
+	public boolean isEmpty()
+	{
+		return persistingRunnables.isEmpty();
+	}
+	
 }

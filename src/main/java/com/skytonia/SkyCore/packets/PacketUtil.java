@@ -27,6 +27,20 @@ public class PacketUtil
 		playerPersistence.addOrReplaceRunnable(persistingType, tickDelay, executions, runnable);
 	}
 	
+	public static void cancelPersistingTask(UUID player, Persistence.PersistingType persistingType)
+	{
+		Persistence playerPersistence = persistenceMap.get(player);
+		if(playerPersistence != null)
+		{
+			playerPersistence.removeRunnable(persistingType);
+		}
+		
+		if(playerPersistence.isEmpty())
+		{
+			persistenceMap.remove(player);
+		}
+	}
+	
 	public static void sendActionBar(Player player, String message, int lifespan)
 	{
 		StaticNMS.getPacketLibrary().sendActionBar(player, message, lifespan);
