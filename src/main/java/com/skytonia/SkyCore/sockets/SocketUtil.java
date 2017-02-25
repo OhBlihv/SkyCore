@@ -1,8 +1,7 @@
 package com.skytonia.SkyCore.sockets;
 
 import com.google.gson.Gson;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import com.skytonia.SkyCore.util.BUtil;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,6 +23,7 @@ import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class SocketUtil
 {
@@ -78,17 +78,24 @@ public class SocketUtil
 			SecretKey key = factory.generateSecret(new DESedeKeySpec(pass.getBytes()));
 			Cipher cipher = Cipher.getInstance("DESede");
 			cipher.init(Cipher.DECRYPT_MODE, key);
-			String str = new String(cipher.doFinal(DatatypeConverter.parseBase64Binary(data)));
-			return str;
+			return new String(cipher.doFinal(DatatypeConverter.parseBase64Binary(data)));
 		}
 		catch(Exception e)
 		{
+			//
 		}
 		return null;
 	}
 	
 	public static String[] split(String input, int max)
 	{
+		if(input == null)
+		{
+			BUtil.logInfo("Attempted to split null string");
+			//return new String[] {""};
+			throw new IllegalArgumentException("");
+		}
+		
 		return input.split("(?<=\\G.{" + max + "})");
 	}
 	
@@ -99,9 +106,7 @@ public class SocketUtil
 		{
 			try
 			{
-				KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-				KeyPair keys = generator.generateKeyPair();
-				return keys;
+				return KeyPairGenerator.getInstance("RSA").generateKeyPair();
 			}
 			catch(NoSuchAlgorithmException e)
 			{
@@ -148,7 +153,7 @@ public class SocketUtil
 		
 		public static PrivateKey loadPrivateKey(String key64) throws GeneralSecurityException, IOException
 		{
-			byte[] clear = new BASE64Decoder().decodeBuffer(key64);
+			byte[] clear = Base64.getDecoder().decode(key64);
 			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(clear);
 			KeyFactory fact = KeyFactory.getInstance("RSA");
 			PrivateKey priv = fact.generatePrivate(keySpec);
@@ -158,7 +163,7 @@ public class SocketUtil
 		
 		public static PublicKey loadPublicKey(String stored) throws GeneralSecurityException, IOException
 		{
-			byte[] data = new BASE64Decoder().decodeBuffer(stored);
+			byte[] data = Base64.getDecoder().decode(stored);
 			X509EncodedKeySpec spec = new X509EncodedKeySpec(data);
 			KeyFactory fact = KeyFactory.getInstance("RSA");
 			return fact.generatePublic(spec);
@@ -169,7 +174,7 @@ public class SocketUtil
 			KeyFactory fact = KeyFactory.getInstance("RSA");
 			PKCS8EncodedKeySpec spec = fact.getKeySpec(priv, PKCS8EncodedKeySpec.class);
 			byte[] packed = spec.getEncoded();
-			String key64 = new BASE64Encoder().encode(packed);
+			String key64 = Base64.getEncoder().encodeToString(packed);
 			Arrays.fill(packed, (byte) 0);
 			return key64;
 		}
@@ -178,7 +183,7 @@ public class SocketUtil
 		{
 			KeyFactory fact = KeyFactory.getInstance("RSA");
 			X509EncodedKeySpec spec = fact.getKeySpec(publ, X509EncodedKeySpec.class);
-			return new BASE64Encoder().encode(spec.getEncoded());
+			return Base64.getEncoder().encodeToString(spec.getEncoded());
 		}
 	}
 

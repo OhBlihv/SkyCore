@@ -12,10 +12,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Clock;
 import java.time.Instant;
@@ -23,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -568,7 +566,7 @@ public class BUtil
 			//Package Blacklist
 			if( !thirdPackage.startsWith("org.bukkit") &&       //Bukkit/CraftBukkit
 				!thirdPackage.startsWith("org.spigot") &&       //Spigot
-				!thirdPackage.startsWith("com.destroystokyo*") &&//PaperSpigot
+				!thirdPackage.startsWith("com.destroystokyo") &&//PaperSpigot
 				!thirdPackage.startsWith("co.aikar") &&        //Timings
 				!thirdPackage.startsWith("java") &&             //Java API
 				!thirdPackage.startsWith("sun")) //&&             //Internal Oracle/Sun Libraries
@@ -697,25 +695,14 @@ public class BUtil
 	// UUID Encoding
 	// ------------------------------------------------------------------------------------------------------
 
-	private static final BASE64Encoder base64Encoder = new BASE64Encoder();
-	private static final BASE64Decoder base64Decoder = new BASE64Decoder();
-
 	public static String compressUUID(UUID uuid)
 	{
-		return base64Encoder.encode(toBytes(uuid)).split("=")[0];
+		return Base64.getEncoder().encodeToString(toBytes(uuid)).split("=")[0];
 	}
 
 	public static UUID deCompressUUID(String uuid)
 	{
-		try
-		{
-			return fromBytes(base64Decoder.decodeBuffer(uuid.split(":")[0].concat("==")));
-		}
-		catch(IOException e)
-		{
-			logStackTrace(e);
-		}
-		return null;
+		return fromBytes(Base64.getDecoder().decode(uuid.split(":")[0].concat("==")));
 	}
 
 	public static byte[] toBytes(UUID uuid)
