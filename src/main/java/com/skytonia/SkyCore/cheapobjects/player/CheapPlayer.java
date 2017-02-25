@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.cheapobjects.player;
 
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Achievement;
 import org.bukkit.Bukkit;
@@ -10,27 +11,30 @@ import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
+import org.bukkit.Particle;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.Statistic;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapView;
 import org.bukkit.metadata.MetadataValue;
@@ -42,7 +46,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
-import org.github.paperspigot.Title;
 
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
@@ -945,6 +948,42 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
+	public void setGlowing(boolean b)
+	{
+	
+	}
+	
+	@Override
+	public boolean isGlowing()
+	{
+		return false;
+	}
+	
+	@Override
+	public void setInvulnerable(boolean b)
+	{
+	
+	}
+	
+	@Override
+	public boolean isInvulnerable()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean isSilent()
+	{
+		return false;
+	}
+	
+	@Override
+	public void setSilent(boolean b)
+	{
+	
+	}
+	
+	@Override
 	public boolean isFlying()
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
@@ -1053,9 +1092,135 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
+	public void spawnParticle(Particle particle, Location location, int i)
+	{
+	
+	}
+	
+	@Override
+	public void spawnParticle(Particle particle, double v, double v1, double v2, int i)
+	{
+	
+	}
+	
+	@Override
+	public <T> void spawnParticle(Particle particle, Location location, int i, T t)
+	{
+	
+	}
+	
+	@Override
+	public <T> void spawnParticle(Particle particle, double v, double v1, double v2, int i, T t)
+	{
+	
+	}
+	
+	@Override
+	public void spawnParticle(Particle particle, Location location, int i, double v, double v1, double v2)
+	{
+	
+	}
+	
+	@Override
+	public void spawnParticle(Particle particle, double v, double v1, double v2, int i, double v3, double v4, double v5)
+	{
+	
+	}
+	
+	@Override
+	public <T> void spawnParticle(Particle particle, Location location, int i, double v, double v1, double v2, T t)
+	{
+	
+	}
+	
+	@Override
+	public <T> void spawnParticle(Particle particle, double v, double v1, double v2, int i, double v3, double v4, double v5, T t)
+	{
+	
+	}
+	
+	@Override
+	public void spawnParticle(Particle particle, Location location, int i, double v, double v1, double v2, double v3)
+	{
+	
+	}
+	
+	@Override
+	public void spawnParticle(Particle particle, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6)
+	{
+	
+	}
+	
+	@Override
+	public <T> void spawnParticle(Particle particle, Location location, int i, double v, double v1, double v2, double v3, T t)
+	{
+	
+	}
+	
+	@Override
+	public <T> void spawnParticle(Particle particle, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6, T t)
+	{
+	
+	}
+	
+	@Override
+	public boolean getAffectsSpawning()
+	{
+		return false;
+	}
+	
+	@Override
+	public void setAffectsSpawning(boolean b)
+	{
+	
+	}
+	
+	@Override
+	public int getViewDistance()
+	{
+		return 0;
+	}
+	
+	@Override
+	public void setViewDistance(int i)
+	{
+	
+	}
+	
+	@Override
+	public void setResourcePack(String s, String s1)
+	{
+	
+	}
+	
+	@Override
+	public PlayerResourcePackStatusEvent.Status getResourcePackStatus()
+	{
+		return null;
+	}
+	
+	@Override
+	public String getResourcePackHash()
+	{
+		return null;
+	}
+	
+	@Override
+	public boolean hasResourcePack()
+	{
+		return false;
+	}
+	
+	@Override
 	public Spigot spigot()
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public Location getOrigin()
+	{
+		return null;
 	}
 	
 	@Override
@@ -1074,6 +1239,12 @@ public abstract class CheapPlayer implements Player
 	public Inventory getEnderChest()
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public MainHand getMainHand()
+	{
+		return null;
 	}
 	
 	@Override
@@ -1110,6 +1281,12 @@ public abstract class CheapPlayer implements Player
 	public void openInventory(InventoryView inventory)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public InventoryView openMerchant(Villager villager, boolean b)
+	{
+		return null;
 	}
 	
 	@Override
@@ -1233,24 +1410,6 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
-	public Egg throwEgg()
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
-	public Snowball throwSnowball()
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
-	public Arrow shootArrow()
-	{
-		throw new IllegalArgumentException("Operation not Permitted.");
-	}
-	
-	@Override
 	public int getRemainingAir()
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
@@ -1291,11 +1450,23 @@ public abstract class CheapPlayer implements Player
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
-
+	
+	@Override
+	public int _INVALID_getLastDamage()
+	{
+		return 0;
+	}
+	
 	@Override
 	public void setLastDamage(double damage)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public void _INVALID_setLastDamage(int i)
+	{
+	
 	}
 	
 	@Override
@@ -1407,9 +1578,63 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
+	public boolean isGliding()
+	{
+		return false;
+	}
+	
+	@Override
+	public void setGliding(boolean b)
+	{
+	
+	}
+	
+	@Override
+	public void setAI(boolean b)
+	{
+	
+	}
+	
+	@Override
+	public boolean hasAI()
+	{
+		return false;
+	}
+	
+	@Override
+	public void setCollidable(boolean b)
+	{
+	
+	}
+	
+	@Override
+	public boolean isCollidable()
+	{
+		return false;
+	}
+	
+	@Override
+	public int getArrowsStuck()
+	{
+		return 0;
+	}
+	
+	@Override
+	public void setArrowsStuck(int i)
+	{
+	
+	}
+	
+	@Override
 	public void damage(double amount)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public void _INVALID_damage(int i)
+	{
+	
 	}
 	
 	@Override
@@ -1419,9 +1644,21 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
+	public void _INVALID_damage(int i, Entity entity)
+	{
+	
+	}
+	
+	@Override
 	public double getHealth()
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public int _INVALID_getHealth()
+	{
+		return 0;
 	}
 	
 	@Override
@@ -1431,15 +1668,33 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
+	public void _INVALID_setHealth(int i)
+	{
+	
+	}
+	
+	@Override
 	public double getMaxHealth()
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
 	}
 	
 	@Override
+	public int _INVALID_getMaxHealth()
+	{
+		return 0;
+	}
+	
+	@Override
 	public void setMaxHealth(double health)
 	{
 		throw new IllegalArgumentException("Operation not Permitted.");
+	}
+	
+	@Override
+	public void _INVALID_setMaxHealth(int i)
+	{
+	
 	}
 	
 	@Override
@@ -1587,6 +1842,12 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
+	public void sendMessage(ChatMessageType chatMessageType, BaseComponent... baseComponents)
+	{
+	
+	}
+	
+	@Override
 	public void setPlayerListHeaderFooter(BaseComponent[] baseComponents, BaseComponent[] baseComponents1)
 	{
 	
@@ -1641,13 +1902,13 @@ public abstract class CheapPlayer implements Player
 	}
 	
 	@Override
-	public void sendTitle(Title title)
+	public void sendTitle(com.destroystokyo.paper.Title title)
 	{
 	
 	}
 	
 	@Override
-	public void updateTitle(Title title)
+	public void updateTitle(com.destroystokyo.paper.Title title)
 	{
 	
 	}
@@ -1658,4 +1919,9 @@ public abstract class CheapPlayer implements Player
 	
 	}
 	
+	@Override
+	public AttributeInstance getAttribute(Attribute attribute)
+	{
+		return null;
+	}
 }

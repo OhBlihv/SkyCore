@@ -47,6 +47,7 @@ public class CustomEntityFirework
 		switch(BUtil.getNMSVersion())
 		{
 			case "v1_8_R3":  nmsFirework = new CustomEntityFirework_1_8_R3(location.getWorld()); break;
+			case "v1_9_R2":  nmsFirework = new CustomEntityFirework_1_9_R2(location.getWorld()); break;
 			case "v1_10_R1": nmsFirework = new CustomEntityFirework_1_10_R1(location.getWorld(), tickDuration); break;
 			case "v1_11_R1": nmsFirework = new CustomEntityFirework_1_11_R1(location.getWorld(), tickDuration); break;
 			default:

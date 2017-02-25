@@ -3,18 +3,22 @@ package com.skytonia.SkyCore.util;
 import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_10_R1;
 import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_11_R1;
 import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_8_R3;
+import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_9_R2;
 import com.skytonia.SkyCore.cheapobjects.player.factory.ICheapPlayerFactory;
 import com.skytonia.SkyCore.cosmetics.util.IParticlePacketFactory;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_10_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_11_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_8_R3;
+import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_9_R2;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_10_R1;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_11_R1;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_8_R3;
+import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_9_R2;
 import com.skytonia.SkyCore.packets.PacketLibrary;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_11_R1;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_8_R3;
+import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_9_R2;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
@@ -107,7 +111,7 @@ public class StaticNMS
 				//case "v1_8_R2": particleFactoryInstance = new ParticlePacketFactory_1_8_R2(); break;
 				case "v1_8_R3": particleFactoryInstance = new ParticlePacketFactory_1_8_R3(); break;
 				//case "v1_9_R1": particleFactoryInstance = new ParticlePacketFactory_1_9_R1(); break;
-				//case "v1_9_R2": particleFactoryInstance = new ParticlePacketFactory_1_9_R2(); break;
+				case "v1_9_R2": particleFactoryInstance = new ParticlePacketFactory_1_9_R2(); break;
 				case "v1_10_R1": particleFactoryInstance = new ParticlePacketFactory_1_10_R1(); break;
 				case "v1_11_R1": particleFactoryInstance = new ParticlePacketFactory_1_11_R1(); break;
 				default: //Check if we're running forge
@@ -146,7 +150,7 @@ public class StaticNMS
 				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
 				case "v1_8_R3": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R3(); break;
 				//case "v1_9_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R1(); break;
-				//case "v1_9_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R2(); break;
+				case "v1_9_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R2(); break;
 				case "v1_10_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_10_R1(); break;
 				case "v1_11_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_11_R1(); break;
 				default: //Check if we're running forge
@@ -185,7 +189,7 @@ public class StaticNMS
 				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
 				case "v1_8_R3": guiCreationFactory = new GUICreationFactory_1_8_R3(); break;
 				//case "v1_9_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R1(); break;
-				//case "v1_9_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R2(); break;
+				case "v1_9_R2": guiCreationFactory = new GUICreationFactory_1_9_R2(); break;
 				case "v1_10_R1": guiCreationFactory = new GUICreationFactory_1_10_R1(); break;
 				case "v1_11_R1": guiCreationFactory = new GUICreationFactory_1_11_R1(); break;
 				default: //Check if we're running forge
@@ -223,7 +227,7 @@ public class StaticNMS
 				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
 				case "v1_8_R3": packetLibrary = new PacketLibrary_1_8_R3(); break;
 				//case "v1_9_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R1(); break;
-				//case "v1_9_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R2(); break;
+				case "v1_9_R2": packetLibrary = new PacketLibrary_1_9_R2(); break;
 				//case "v1_10_R1": guiCreationFactory = new GUICreationFactory_1_10_R1(); break;
 				case "v1_11_R1": packetLibrary = new PacketLibrary_1_11_R1(); break;
 				default: //Check if we're running forge
