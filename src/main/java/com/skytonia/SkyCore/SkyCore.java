@@ -47,12 +47,38 @@ public class SkyCore extends JavaPlugin implements Listener
 		}
 	}
 	
+	private static boolean isSkytonia = false;
+	public static boolean isSkytonia()
+	{
+		return isSkytonia;
+	}
+	
 	@Override
 	public void onEnable()
 	{
 		instance = this;
 		
 		getServer().getPluginManager().registerEvents(this, this);
+		BUtil.logInfo("Using Spigot flavour '" + getServer().getName() + "'");
+		if(getServer().getName().equals("SkyPaper"))
+		{
+			BUtil.logInfo("Enabling Skytonia-specific features.");
+			isSkytonia = true;
+			
+			if(getServer().getPluginManager().getPlugin("ProtocolLib") != null)
+			{
+				BUtil.logInfo("Enabling Packet Handling");
+				try
+				{
+					getServer().getPluginManager().registerEvents(new PacketHandling(this), this);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		
+		}
 		
 		//Initialize Addon Registries
 		try
@@ -68,10 +94,13 @@ public class SkyCore extends JavaPlugin implements Listener
 		
 		Bukkit.getScheduler().runTaskLater(this, () ->
 		{
-			SocketManager.getInstance().start();
-			MovementManager.getInstance();  //Register Listeners
-			PlayerCount.getInstance();      //Register Listeners
-		}, 20L); //Allow 1 second after the server has started to start accepting players/messages
+			if(SocketManager.getInstance().start())
+			{
+				MovementManager.getInstance();  //Register Listeners
+				PlayerCount.getInstance();      //Register Listeners
+			}
+			
+		}, 1); //Allow 1 tick after the server has started to start accepting players/messages
 	}
 	
 	@Override
@@ -86,5 +115,35 @@ public class SkyCore extends JavaPlugin implements Listener
 		//Attempt to strip the version number from the plugin name and just retrieve the initial name
 		FlatFile.unregisterFlatFile(event.getPlugin().getName().split("[ ]")[0]);
 	}
+	
+	/*@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	{
+		if(args.length > 0 && args[0].equalsIgnoreCase("start"))
+		{
+			RunnableShorthand.forPlugin(this).with(() ->
+			{
+				SocketClient socketClient = SocketManager.getSocketClient();
+				
+				long startTime = System.currentTimeMillis();
+				
+				int i = 0;
+				while(true)
+				{
+					while(!socketClient.isConnectedAndOpened())
+					{
+						//Thrash
+					}
+					
+					socketClient.writeJSON("PASSTHROUGH", "Data" + (++i));
+					System.out.print(i + " in " + ((System.currentTimeMillis() - startTime) / 1000D) + " seconds.");
+				}
+				
+			}).runASync();
+			BUtil.logInfo("Started Socket Flooder");
+		}
+		
+		return true;
+	}*/
 	
 }
