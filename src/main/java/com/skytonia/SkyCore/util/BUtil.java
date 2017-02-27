@@ -13,6 +13,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.time.Clock;
 import java.time.Instant;
@@ -68,6 +70,16 @@ public class BUtil
 			firework.setFireworkMeta(meta);
 			firework.setVelocity(new Vector(0.00, 0.05, 0.00));
 		}
+	}
+	
+	public static double round(double value, int places)
+	{
+		if (places < 0)
+		{
+			throw new IllegalArgumentException();
+		}
+		
+		return new BigDecimal(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
 	}
 	
 	public static int getPosNegIntFromRange(int range)
