@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -126,7 +127,7 @@ public class SocketClient extends Thread
 									writer.println(SocketUtil.RSA.savePublicKey(keys.getPublic()));
 									writer.println("--end--"); //Print the end tag unencrypted for efficiency
 									writer.flush();
-									BUtil.logInfo("Sent Public Keys");
+									//BUtil.logInfo("Sent Public Keys");
 								}
 								catch(GeneralSecurityException e)
 								{
@@ -193,17 +194,31 @@ public class SocketClient extends Thread
 			}
 			catch(IOException e)
 			{
-				BUtil.logInfo("Socket Error. Reopening Socket...");
-				e.printStackTrace();
+				BUtil.logInfo("Socket Error (" + e.getClass().getSimpleName() + "). Reopening Socket...");
+				
+				System.out.println("> " + e.getMessage());
+				
+				if(e.getStackTrace().length == 0)
+				{
+					BUtil.logInfo("No Stack Trace Provided");
+				}
+				else
+				{
+					for(StackTraceElement element : e.getStackTrace())
+					{
+						System.out.println(" at " + element.toString());
+					}
+				}
+				
 				BUtil.logInfo("===================================");
-				if(e.getClass().getSimpleName().equals("SocketException"))
+				if(e instanceof SocketException)
 				{
 					close();
 				}
 				
 				try
 				{
-					sleep(1000);
+					sleep(5000);
 				}
 				catch(InterruptedException e2)
 				{
