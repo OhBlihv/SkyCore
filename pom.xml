@@ -58,6 +58,13 @@
 			<systemPath>${project.basedir}/../lib/spigot-1.11.jar</systemPath>
 		</dependency>
 		
+		<!-- Redis -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+		
 		<!-- Database -->
 		<dependency>
 			<groupId>com.zaxxer</groupId>

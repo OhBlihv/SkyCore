@@ -4,7 +4,7 @@ import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
 import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.movement.PlayerCount;
-import com.skytonia.SkyCore.sockets.SocketManager;
+import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
@@ -77,7 +77,12 @@ public class SkyCore extends JavaPlugin implements Listener
 					e.printStackTrace();
 				}
 			}
-		
+			
+			//Set up Redis/Jedis
+			RedisManager.getInstance();
+			
+			new PlayerCount(this);   //Start Player Count Updater
+			MovementManager.getInstance();  //Register Listeners
 		}
 		
 		//Initialize Addon Registries
@@ -91,22 +96,12 @@ public class SkyCore extends JavaPlugin implements Listener
 			BUtil.logError("An issue occurred while initializing stored variables. Refer to the stack trace below.");
 			BUtil.logStackTrace(e);
 		}
-		
-		Bukkit.getScheduler().runTaskLater(this, () ->
-		{
-			if(SocketManager.getInstance().start())
-			{
-				MovementManager.getInstance();  //Register Listeners
-				PlayerCount.getInstance();      //Register Listeners
-			}
-			
-		}, 1); //Allow 1 tick after the server has started to start accepting players/messages
 	}
 	
 	@Override
 	public void onDisable()
 	{
-		SocketManager.getInstance().stop();
+		RedisManager.shutdown();
 	}
 	
 	@EventHandler

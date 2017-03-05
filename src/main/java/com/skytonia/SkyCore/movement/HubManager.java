@@ -1,13 +1,10 @@
 package com.skytonia.SkyCore.movement;
 
 import com.skytonia.SkyCore.SkyCore;
-import com.skytonia.SkyCore.sockets.SocketManager;
-import com.skytonia.SkyCore.sockets.events.BukkitSocketHandshakeEvent;
-import com.skytonia.SkyCore.sockets.events.BukkitSocketJSONEvent;
+import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.redis.RedisMessage;
 import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -21,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by Chris Brown (OhBlihv) on 28/09/2016.
  */
-public class HubManager implements Listener
+public class HubManager
 {
 	
 	private class HubServer
@@ -72,7 +69,19 @@ public class HubManager implements Listener
 	
 	private HubManager()
 	{
-		Bukkit.getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
+		RedisManager.registerSubscription(this::onMessage, CHANNEL_INIT, CHANNEL_INIT_RESTART, CHANNEL_PING, CHANNEL_PING_RECV);
+		
+		if(RedisManager.getServerName().toLowerCase().startsWith("hub"))
+		{
+			isHub = true;
+			
+			//Alert all servers we're a hub and we're alive!
+			RedisManager.sendMessageToAll(CHANNEL_INIT, RedisManager.getServerName());
+		}
+		else
+		{
+			RedisManager.sendMessageToAll(CHANNEL_INIT_RESTART, RedisManager.getServerName());
+		}
 		
 		Bukkit.getScheduler().runTaskTimerAsynchronously(SkyCore.getPluginInstance(), () ->
 		{
@@ -82,14 +91,9 @@ public class HubManager implements Listener
 			
 			for(Map.Entry<String, HubServer> entry : hubServers.entrySet())
 			{
-				SocketManager.sendMessageTo(entry.getKey(), CHANNEL_PING);
+				RedisManager.sendMessage(entry.getKey(), CHANNEL_PING, "");
 				
-				entry.getValue().updateTaskId = scheduler.runTaskLaterAsynchronously(plugin, () ->
-				{
-					
-					entry.getValue().setOffline();
-					
-				}, 200L).getTaskId();
+				entry.getValue().updateTaskId = scheduler.runTaskLaterAsynchronously(plugin, () -> entry.getValue().setOffline(), 200L).getTaskId();
 			}
 			
 		}, 20L, 300L); //15 Seconds
@@ -109,7 +113,7 @@ public class HubManager implements Listener
 		for(Map.Entry<String, HubServer> entry : entrySet)
 		{
 			//Avoid sending us to offline hubs and the hub we're on!
-			if(entry.getValue().online && !entry.getKey().equalsIgnoreCase(SocketManager.getServerName()))
+			if(entry.getValue().online && !entry.getKey().equalsIgnoreCase(RedisManager.getServerName()))
 			{
 				return entry.getKey();
 			}
@@ -118,26 +122,9 @@ public class HubManager implements Listener
 		return "hub1";
 	}
 	
-	@EventHandler
-	public void onSocketHandshake(BukkitSocketHandshakeEvent event)
+	public void onMessage(RedisMessage message)
 	{
-		if(SocketManager.getServerName().toLowerCase().startsWith("hub"))
-		{
-			isHub = true;
-			
-			//Alert all servers we're a hub and we're alive!
-			SocketManager.sendMessageTo(null, CHANNEL_INIT, SocketManager.getServerName());
-		}
-		else
-		{
-			SocketManager.sendMessageTo(null, CHANNEL_INIT_RESTART, SocketManager.getServerName());
-		}
-	}
-	
-	@EventHandler
-	public void onSocketJSONMessage(BukkitSocketJSONEvent event)
-	{
-		String channel = event.getChannel();
+		String channel = message.getChannel();
 		
 		if(!channel.equals(CHANNEL_INIT) &&
 			   !channel.equals(CHANNEL_INIT_RESTART) &&
@@ -147,7 +134,7 @@ public class HubManager implements Listener
 			return;
 		}
 		
-		String hubName = event.getData().replace("|", "");
+		String hubName = message.getMessage().replace("|", "");
 		
 		switch(channel)
 		{
@@ -170,7 +157,7 @@ public class HubManager implements Listener
 				if(isHub)
 				{
 					//Respond that we're alive!
-					SocketManager.sendMessageTo(event.getData().replace("|", ""), CHANNEL_INIT, SocketManager.getServerName());
+					RedisManager.sendMessage(message.getMessage(), CHANNEL_INIT, RedisManager.getServerName());
 				}
 				
 				break;
@@ -182,7 +169,7 @@ public class HubManager implements Listener
 					return;
 				}
 				
-				SocketManager.sendMessageTo(hubName, CHANNEL_PING_RECV, SocketManager.getServerName());
+				RedisManager.sendMessage(hubName, CHANNEL_PING_RECV, RedisManager.getServerName());
 				break;
 			}
 			case CHANNEL_PING_RECV:

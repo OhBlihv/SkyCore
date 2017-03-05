@@ -3,17 +3,17 @@ package com.skytonia.SkyCore.movement;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.movement.events.PlayerChangeServerEvent;
 import com.skytonia.SkyCore.movement.events.PlayerEnterServerEvent;
-import com.skytonia.SkyCore.sockets.SocketManager;
-import com.skytonia.SkyCore.sockets.events.BukkitSocketJSONEvent;
+import com.skytonia.SkyCore.movement.events.PlayerServerChangeRequestEvent;
+import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.redis.RedisMessage;
 import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Created by Chris Brown (OhBlihv) on 28/09/2016.
  */
-public class MovementManager implements Listener
+public class MovementManager
 {
 	
 	private static MovementManager instance = null;
@@ -90,12 +90,11 @@ public class MovementManager implements Listener
 	
 	private MovementManager()
 	{
-		SocketManager.getInstance();
 		HubManager.getInstance();
 		
 		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
 		
-		Bukkit.getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
+		RedisManager.registerSubscription(this::onMessage, CHANNEL_MOVE_PLAYER_REPLY, CHANNEL_MOVE_PLAYER_REQ);
 	}
 	
 	public static void requestMove(String server, Player player) throws IllegalArgumentException
@@ -120,6 +119,11 @@ public class MovementManager implements Listener
 			movementAction = DEFAULT_MOVEMENT_ACTION;
 		}
 		
+		if(movementMap.containsKey(player.getName()))
+		{
+			return null;
+		}
+		
 		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, server);
 		Bukkit.getPluginManager().callEvent(event);
 		
@@ -142,7 +146,7 @@ public class MovementManager implements Listener
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
-		SocketManager.getSocketClient().writeJSON(CHANNEL_MOVE_PLAYER_REQ, server + SPLITTER + player.getName());
+		RedisManager.sendMessage(CHANNEL_MOVE_PLAYER_REQ, server, player.getName());
 		
 		return server;
 	}
@@ -185,20 +189,18 @@ public class MovementManager implements Listener
 		movementInfo.processFailure();
 	}
 	
-	@EventHandler
-	public void onPlayerReceived(BukkitSocketJSONEvent event)
+	public void onMessage(RedisMessage message)
 	{
-		String channel = event.getChannel();
-		
-		if( !channel.equals(CHANNEL_MOVE_PLAYER_REQ) &&
-			!channel.equals(CHANNEL_MOVE_PLAYER_REPLY))
+		String channel = message.getChannel();
+		if( !channel.endsWith(CHANNEL_MOVE_PLAYER_REQ) &&
+			!channel.endsWith(CHANNEL_MOVE_PLAYER_REPLY))
 		{
 			return;
 		}
 		
-		String[] splitData = event.getData().split("[" + SPLITTER + "]");
+		String[] splitData = message.getMessage().split("[" + SPLITTER + "]");
 		
-		if(event.getChannel().equals(CHANNEL_MOVE_PLAYER_REQ))
+		if(channel.endsWith(CHANNEL_MOVE_PLAYER_REQ))
 		{
 			String  serverName = splitData[0],
 					playerName = splitData[1];
@@ -217,15 +219,34 @@ public class MovementManager implements Listener
 				response = "FULL";
 			}
 			
-			//BUtil.logMessage("Responding to " + playerName + "'s request with '" + response + "'");
-			event.getClient().writeJSON(CHANNEL_MOVE_PLAYER_REPLY, serverName + SPLITTER + playerName + SPLITTER + response);
+			PlayerServerChangeRequestEvent requestEvent = new PlayerServerChangeRequestEvent(playerName, response, !response.isEmpty());
+			Bukkit.getPluginManager().callEvent(requestEvent);
+			if(requestEvent.isCancelled())
+			{
+				response = requestEvent.getCancelReason();
+			}
+			else
+			{
+				response = ""; //Reset the response
+			}
 			
-			//Ensure the player can join once their request has been accepted
-			incomingPlayers.add(playerName);
+			String data = serverName + SPLITTER + playerName;
+			if(!response.isEmpty())
+			{
+				data += SPLITTER + response;
+			}
 			
-			Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(playerName));
+			RedisManager.sendMessage(message.getServer(), CHANNEL_MOVE_PLAYER_REPLY, data);
+			
+			if(!requestEvent.isCancelled())
+			{
+				//Ensure the player can join once their request has been accepted
+				incomingPlayers.add(playerName);
+				
+				Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(playerName));
+			}
 		}
-		else if(event.getChannel().equals(CHANNEL_MOVE_PLAYER_REPLY))
+		else if(channel.equals(CHANNEL_MOVE_PLAYER_REPLY))
 		{
 			String  targetServer = splitData[0],
 					playerName   = splitData[1];
@@ -234,7 +255,7 @@ public class MovementManager implements Listener
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 				if(offlinePlayer == null || !offlinePlayer.isOnline())
 				{
-					BUtil.logError("Attempted to move " + playerName + " to " + targetServer + ", yet the player was not online.");
+					//BUtil.logError("Attempted to move " + playerName + " to " + targetServer + ", yet the player was not online.");
 					return;
 				}
 				
@@ -249,16 +270,6 @@ public class MovementManager implements Listener
 			
 			if(response != null && !response.isEmpty())
 			{
-				if(response.equals("FULL"))
-				{
-					//Check our player's permissions to see if they have server-full permissions
-					if(player.hasPermission("serverfull.bypass"))
-					{
-						onSuccessfulTransfer(player);
-						return;
-					}
-				}
-				
 				BUtil.logMessage("Received Failed Reply for " + playerName + " to " + targetServer + " (" + response + ")");
 				onFailTransfer(player, response);
 				
@@ -277,22 +288,18 @@ public class MovementManager implements Listener
 			//Attempt to get our player on!
 			if(incomingPlayers.contains(event.getName()))
 			{
-				//BUtil.logMessage("Expected " + event.getName() + ". Allowing...");
 				event.allow();
 			}
-			/*else
-			{
-				BUtil.logMessage("Did not expect " + event.getName() + ". Ignoring...");
-			}*/
 		}
 	}
 	
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event)
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerLogin(PlayerLoginEvent event)
 	{
 		//Once the player has arrived, clear them from incoming players.
 		if(incomingPlayers.contains(event.getPlayer().getName()))
 		{
+			event.allow();
 			incomingPlayers.remove(event.getPlayer().getName());
 		}
 	}

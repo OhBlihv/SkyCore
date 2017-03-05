@@ -145,4 +145,84 @@ public class UtilTest
 		System.out.println((byte) ((65 * (1D / 256D)) * 100));
 	}
 	
+	@Test
+	public void murderNameDisplayTest()
+	{
+		System.out.println("Displayname of Murder1 Id:" + 1 + " = " + getDisplayGameId("Murder1", "1"));
+		System.out.println("Displayname of Murder1 Id:" + 5 + " = " + getDisplayGameId("Murder1", "5"));
+		System.out.println("Displayname of Murder2 Id:" + 1 + " = " + getDisplayGameId("Murder2", "1"));
+		System.out.println("Displayname of Murder2 Id:" + 5 + " = " + getDisplayGameId("Murder2", "5"));
+	}
+	
+	private static final int maxGamesPerInstance = 5;
+	
+	public int getDisplayGameId(String serverInstance, String gameId)
+	{
+		int instanceNumber = Integer.parseInt(serverInstance.substring(serverInstance.length() - 1, serverInstance.length())) - 1;
+		
+		//Assume 5 games per server
+		//Get starting number
+		int displayId = (instanceNumber * maxGamesPerInstance) + Integer.parseInt(gameId) + 1;
+		/*if(instanceNumber > 0)
+		{
+			displayId -= 1; //Lazy fix for skipping #7 and #13
+		}*/
+		
+		//BUtil.logInfo("I: " + serverInstance + " G: " + gameId + " = " + displayId);
+		
+		return displayId;
+	}
+	
+	@Test
+	public void userGUISlotTest()
+	{
+		testUsersGUIWithUserCount(19, 1);
+		testUsersGUIWithUserCount(21, 1);
+		testUsersGUIWithUserCount(30, 1);
+		testUsersGUIWithUserCount(50, 2);
+	}
+	
+	public void testUsersGUIWithUserCount(int users, int page)
+	{
+		System.out.println("=============================");
+		System.out.println("Users: " + users + " Page: " + page);
+		//Max of 21 players per page
+		int slot = 10,
+			userNum = 0;
+		
+		while(userNum < users)
+		{
+			//Lower end of range, keep looping til we find the start of this page.
+			if(++userNum < (page - 1) * 21)
+			{
+				continue;
+			}
+			//Past our rage. Break.
+			else if(userNum >= page * 21)
+			{
+				System.out.println("Breaking. Hit limit for page " + page + " at user " + userNum + " and slot " + slot);
+				break;
+			}
+			
+			System.out.println("Setting user " + userNum + " at slot " + slot);
+			
+			slot = getSafeSlot(++slot);
+		}
+		
+		System.out.println("=============================");
+	}
+	
+	public int getSafeSlot(int slot)
+	{
+		switch(slot)
+		{
+			case 8: slot = 10; break;
+			case 17: slot = 19; break;
+			case 26: slot = 28; break;
+			case 35: slot = 37; break;
+		}
+		
+		return slot;
+	}
+	
 }
