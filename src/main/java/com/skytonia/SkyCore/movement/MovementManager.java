@@ -146,7 +146,7 @@ public class MovementManager
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
-		RedisManager.sendMessage(CHANNEL_MOVE_PLAYER_REQ, server, player.getName());
+		RedisManager.sendMessage(server, CHANNEL_MOVE_PLAYER_REQ, player.getName());
 		
 		return server;
 	}
