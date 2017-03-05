@@ -33,7 +33,20 @@ public class PlayerCount
 	{
 		try(Jedis jedis =  RedisManager.getConnection())
 		{
-			return Integer.parseInt(jedis.get(server + PLAYER_COUNT_KEY));
+			String playerCountString = jedis.get(server + PLAYER_COUNT_KEY);
+			if(playerCountString != null && !playerCountString.isEmpty())
+			{
+				try
+				{
+					return Integer.parseInt(playerCountString);
+				}
+				catch(NumberFormatException e)
+				{
+					//
+				}
+			}
+			
+			return 0;
 		}
 	}
 	
