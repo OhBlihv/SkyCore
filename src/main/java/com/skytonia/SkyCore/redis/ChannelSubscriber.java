@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.redis;
 
 import lombok.Getter;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.List;
@@ -19,12 +20,12 @@ public class ChannelSubscriber
 	
 	private final Thread subscriptionThread;
 	
-	public ChannelSubscriber(List<String> channels, ChannelSubscription channelSubscription)
+	public ChannelSubscriber(Jedis jedis, List<String> channels, ChannelSubscription channelSubscription)
 	{
-		this(channels, channelSubscription, null);
+		this(jedis, channels, channelSubscription, null);
 	}
 	
-	public ChannelSubscriber(List<String> channels, ChannelSubscription channelSubscription, Thread subscriptionThread)
+	public ChannelSubscriber(Jedis jedis, List<String> channels, ChannelSubscription channelSubscription, Thread subscriptionThread)
 	{
 		this.channels = channels;
 		
@@ -39,7 +40,7 @@ public class ChannelSubscriber
 		
 		if(subscriptionThread == null)
 		{
-			subscriptionThread = new Thread(() -> subscription.subscribe(channels.toArray(new String[channels.size()])));
+			subscriptionThread = new Thread(() -> jedis.subscribe(subscription, channels.toArray(new String[channels.size()])));
 		}
 		
 		this.subscriptionThread = subscriptionThread;

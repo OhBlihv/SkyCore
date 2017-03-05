@@ -22,8 +22,21 @@ public class RedisMessage
 		this.channel = channel;
 		
 		int splitLoc = data.indexOf('_');
-		this.server = data.substring(0, splitLoc);
-		this.message = data.substring(splitLoc + 1, data.length());
+		if(splitLoc >= 0)
+		{
+			this.server = data.substring(0, splitLoc);
+			this.message = data.substring(splitLoc + 1, data.length());
+		}
+		else
+		{
+			this.server = null;
+			this.message = data;
+		}
+	}
+	
+	public boolean hasServer()
+	{
+		return server != null && !server.isEmpty();
 	}
 	
 }

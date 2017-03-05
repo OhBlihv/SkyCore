@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.redis;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -25,6 +26,8 @@ public class RedisManager
 		return instance;
 	}
 	
+	private static final String CHANNEL_REGISTRATION = "SkyCore_Init";
+	
 	@Getter
 	private static String serverName;
 	
@@ -42,7 +45,9 @@ public class RedisManager
 		poolConfig.setMinIdle(8);
 		poolConfig.setMaxTotal(128); //Lower?
 		
-		jedisPool = new JedisPool(poolConfig, "localhost", 6379, 5000, "password");
+		jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
+		
+		sendMessage(CHANNEL_REGISTRATION, serverName + "|" + Bukkit.getIp() + ":" + Bukkit.getPort());
 	}
 	
 	public static void shutdown()
@@ -62,7 +67,7 @@ public class RedisManager
 	
 	public static void registerSubscription(ChannelSubscription subscriber, boolean prefixWithServerName, String... channels)
 	{
-		ChannelSubscriber channelSubscriber = new ChannelSubscriber(Arrays.asList(channels), subscriber);
+		ChannelSubscriber channelSubscriber = new ChannelSubscriber(getConnection(), Arrays.asList(channels), subscriber);
 		
 		for(String channel : channels)
 		{

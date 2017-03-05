@@ -138,21 +138,6 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
-							<filters>
-								<filter>
-									<artifact>io.reactivex.rxjava2:rxjava</artifact>
-									<includes>
-										<include>**</include>
-									</includes>
-								</filter>
-								<filter>
-									<artifact>org.reactivestreams:reactive-streams</artifact>
-									<includes>
-										<include>**</include>
-									</includes>
-								</filter>
-							</filters>
 							<relocations>
 								<relocation>
 									<pattern>com.zaxxer</pattern>
