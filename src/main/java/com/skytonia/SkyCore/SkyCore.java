@@ -109,6 +109,8 @@ public class SkyCore extends JavaPlugin implements Listener
 	@Override
 	public void onDisable()
 	{
+		PlayerCount.updatePlayerCount(0); //Show we're offline
+		
 		RedisManager.shutdown();
 	}
 	

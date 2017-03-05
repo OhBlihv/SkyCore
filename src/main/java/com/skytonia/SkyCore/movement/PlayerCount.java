@@ -23,9 +23,14 @@ public class PlayerCount
 	
 	public static void updatePlayerCount()
 	{
+		updatePlayerCount(Bukkit.getOnlinePlayers().size());
+	}
+	
+	public static void updatePlayerCount(int players)
+	{
 		try(Jedis jedis =  RedisManager.getConnection())
 		{
-			jedis.set(RedisManager.getServerName() + PLAYER_COUNT_KEY, String.valueOf(Bukkit.getOnlinePlayers().size()));
+			jedis.set(RedisManager.getServerName() + PLAYER_COUNT_KEY, String.valueOf(players));
 		}
 	}
 	
