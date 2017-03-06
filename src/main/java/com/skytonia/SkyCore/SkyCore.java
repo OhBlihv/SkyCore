@@ -81,8 +81,6 @@ public class SkyCore extends JavaPlugin implements Listener
 			//Set up Redis/Jedis
 			try
 			{
-				RedisManager.getInstance();
-				
 				new PlayerCount(this);   //Start Player Count Updater
 				MovementManager.getInstance();  //Register Listeners
 			}

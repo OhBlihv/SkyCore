@@ -16,16 +16,6 @@ import java.util.Map;
 public class RedisManager
 {
 	
-	private static RedisManager instance = null;
-	public static RedisManager getInstance()
-	{
-		if(instance == null)
-		{
-			instance = new RedisManager();
-		}
-		return instance;
-	}
-	
 	private static final String CHANNEL_REGISTRATION = "SkyCore_Init";
 	
 	@Getter
@@ -35,7 +25,7 @@ public class RedisManager
 	
 	private static JedisPool jedisPool;
 	
-	private RedisManager()
+	static
 	{
 		RedisFlatFile redisFlatFile = RedisFlatFile.getInstance();
 		
