@@ -4,6 +4,7 @@ import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -107,7 +108,30 @@ public class EventUtil
 					catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
 					{
 						//getWorld Not Found
-						e.printStackTrace();
+					}
+				}
+				
+				//Block-Based events
+				if(eventWorld == null)
+				{
+					Method blockMethod;
+					try
+					{
+						try
+						{
+							blockMethod = event.getClass().getMethod("getBlock");
+						}
+						catch(NoSuchMethodException e)
+						{
+							//Some events have their player method at 'getEntity'
+							blockMethod = event.getClass().getMethod("getSource");
+						}
+						
+						eventWorld = ((Block) blockMethod.invoke(event)).getWorld();
+					}
+					catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
+					{
+						//getWorld Not Found
 					}
 				}
 				
