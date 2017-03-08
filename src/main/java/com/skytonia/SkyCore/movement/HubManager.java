@@ -69,29 +69,36 @@ public class HubManager
 	
 	private HubManager()
 	{
-		RedisManager.registerSubscription(this::onMessage, CHANNEL_INIT, CHANNEL_INIT_RESTART, CHANNEL_PING, CHANNEL_PING_RECV);
-		
 		if(RedisManager.getServerName().toLowerCase().startsWith("hub"))
 		{
 			isHub = true;
+			
+			RedisManager.registerSubscription(this::onMessage, false,
+			                                  CHANNEL_INIT_RESTART,
+			                                  RedisManager.getServerName() + ">" + CHANNEL_INIT_RESTART);
 			
 			//Alert all servers we're a hub and we're alive!
 			RedisManager.sendMessageToAll(CHANNEL_INIT, RedisManager.getServerName());
 		}
 		else
 		{
+			RedisManager.registerSubscription(this::onMessage, false,
+			                                  CHANNEL_INIT,
+			                                  RedisManager.getServerName() + ">" + CHANNEL_INIT);
+			
 			RedisManager.sendMessageToAll(CHANNEL_INIT_RESTART, RedisManager.getServerName());
 		}
 		
+		RedisManager.registerSubscription(this::onMessage, true, CHANNEL_PING, CHANNEL_PING_RECV);
+		
 		Bukkit.getScheduler().runTaskTimerAsynchronously(SkyCore.getPluginInstance(), () ->
 		{
-			
 			BukkitScheduler scheduler = Bukkit.getScheduler();
 			Plugin plugin = SkyCore.getPluginInstance();
 			
 			for(Map.Entry<String, HubServer> entry : hubServers.entrySet())
 			{
-				RedisManager.sendMessage(entry.getKey(), CHANNEL_PING, "");
+				RedisManager.sendMessage(entry.getKey(), CHANNEL_PING, RedisManager.getServerName());
 				
 				entry.getValue().updateTaskId = scheduler.runTaskLaterAsynchronously(plugin, () -> entry.getValue().setOffline(), 200L).getTaskId();
 			}
@@ -125,8 +132,7 @@ public class HubManager
 	public void onMessage(RedisMessage message)
 	{
 		String channel = message.getChannel();
-		
-		if(!channel.equals(CHANNEL_INIT) &&
+		if(    !channel.equals(CHANNEL_INIT) &&
 			   !channel.equals(CHANNEL_INIT_RESTART) &&
 			   !channel.equals(CHANNEL_PING) &&
 			   !channel.equals(CHANNEL_PING_RECV))
@@ -134,15 +140,22 @@ public class HubManager
 			return;
 		}
 		
-		String hubName = message.getMessage().replace("|", "");
+		String[] messageSplit = message.getMessage().split("[|]");
 		
 		switch(channel)
 		{
 			case CHANNEL_INIT:
 			{
+				String hubName = messageSplit[0];
+				//Don't register the current server
+				if(hubName.equals(RedisManager.getServerName()))
+				{
+					return;
+				}
+				
 				if(hubServers.containsKey(hubName))
 				{
-					BUtil.logInfo("Already registered Hub Server '" + hubName + "'");
+					//BUtil.logInfo("Already registered Hub Server '" + hubName + "'");
 					hubServers.get(hubName).receivePing();
 				}
 				else
@@ -169,11 +182,15 @@ public class HubManager
 					return;
 				}
 				
-				RedisManager.sendMessage(hubName, CHANNEL_PING_RECV, RedisManager.getServerName());
+				String targetServer = messageSplit[0];
+				
+				RedisManager.sendMessage(targetServer, CHANNEL_PING_RECV, RedisManager.getServerName());
 				break;
 			}
 			case CHANNEL_PING_RECV:
 			{
+				String hubName = messageSplit[0];
+				
 				HubServer hubServer = hubServers.get(hubName);
 				if(hubServer == null)
 				{

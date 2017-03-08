@@ -51,6 +51,8 @@ public class MovementManager
 				case "BANNED": formattedResponse = "§c§l(!) §cYou are banned from this server!"; break;
 				case "TIMEOUT": formattedResponse = "§c§l(!) §cFailed to connect to... " + BUtil.capitaliseFirst(server); break;
 				case "OFFLINE": formattedResponse = "§c§l(!) §cThis server is currently offline."; break;
+				case "DONATOR": formattedResponse = "§c§l(!) §cThis server is reserved for Donators."; break;
+				case "FULL": formattedResponse = "§c§l(!) §cThis server is currently full."; break;
 			}
 			
 			player.sendMessage(formattedResponse);
@@ -146,7 +148,7 @@ public class MovementManager
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
-		RedisManager.sendMessage(server, CHANNEL_MOVE_PLAYER_REQ, player.getName());
+		RedisManager.sendMessage(server, CHANNEL_MOVE_PLAYER_REQ, RedisManager.getServerName() + SPLITTER + player.getName());
 		
 		return server;
 	}
@@ -192,8 +194,8 @@ public class MovementManager
 	public void onMessage(RedisMessage message)
 	{
 		String channel = message.getChannel();
-		if( !channel.endsWith(CHANNEL_MOVE_PLAYER_REQ) &&
-			!channel.endsWith(CHANNEL_MOVE_PLAYER_REPLY))
+		if( !channel.equals(CHANNEL_MOVE_PLAYER_REQ) &&
+			!channel.equals(CHANNEL_MOVE_PLAYER_REPLY))
 		{
 			return;
 		}
@@ -236,7 +238,7 @@ public class MovementManager
 				data += SPLITTER + response;
 			}
 			
-			RedisManager.sendMessage(message.getServer(), CHANNEL_MOVE_PLAYER_REPLY, data);
+			RedisManager.sendMessage(serverName, CHANNEL_MOVE_PLAYER_REPLY, data);
 			
 			if(!requestEvent.isCancelled())
 			{

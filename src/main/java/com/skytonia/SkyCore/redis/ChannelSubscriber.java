@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.redis;
 
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -34,13 +35,25 @@ public class ChannelSubscriber
 			@Override
 			public void onMessage(String channel, String message)
 			{
-				channelSubscription.onMessage(new RedisMessage(channel, message));
+				try
+				{
+					channelSubscription.onMessage(new RedisMessage(channel, message));
+				}
+				catch(Throwable e)
+				{
+					BUtil.logInfo("Unable to handle message on channel '" + channel + "' with '" + message + "'");
+					e.printStackTrace();
+				}
 			}
 		};
 		
 		if(subscriptionThread == null)
 		{
-			subscriptionThread = new Thread(() -> jedis.subscribe(subscription, channels.toArray(new String[channels.size()])));
+			subscriptionThread = new Thread(() ->
+			{
+				jedis.subscribe(subscription, channels.toArray(new String[channels.size()]));
+				jedis.close();
+			});
 		}
 		
 		this.subscriptionThread = subscriptionThread;
