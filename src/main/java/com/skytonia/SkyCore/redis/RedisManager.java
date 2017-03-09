@@ -43,6 +43,12 @@ public class RedisManager
 	
 	public static void shutdown()
 	{
+		for(ChannelSubscriber subscriber : subscriptionMap.values())
+		{
+			subscriber.cancel();
+		}
+		subscriptionMap.clear();
+		
 		jedisPool.destroy();
 	}
 	
