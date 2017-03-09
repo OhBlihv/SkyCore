@@ -90,29 +90,29 @@ public class RunnableShorthand
 		return scheduler.runTaskTimer(assignedPlugin, runnable, delay, timer).getTaskId();
 	}
 	
-	public void runNextTick()
+	public int runNextTick()
 	{
-		runTask(1L);
+		return runTask(1L);
 	}
 	
-	public void runTask(long delay)
+	public int runTask(long delay)
 	{
-		scheduler.runTaskLater(assignedPlugin, runnable, delay).getTaskId();
+		return scheduler.runTaskLater(assignedPlugin, runnable, delay).getTaskId();
 	}
 	
-	public void runTaskLater(long delay)
+	public int runTaskLater(long delay)
 	{
-		runTask(delay);
+		return runTask(delay);
 	}
 	
-	public void runASync()
+	public int runASync()
 	{
-		runTaskASync(0L);
+		return runTaskASync(0L);
 	}
 	
-	public void runTaskASync(long delay)
+	public int runTaskASync(long delay)
 	{
-		scheduler.runTaskLaterAsynchronously(assignedPlugin, runnable, delay);
+		return scheduler.runTaskLaterAsynchronously(assignedPlugin, runnable, delay).getTaskId();
 	}
 	
 	public int runTimerASync(int delay, TimeUnit delayUnit, int timer, TimeUnit timerUnit)
