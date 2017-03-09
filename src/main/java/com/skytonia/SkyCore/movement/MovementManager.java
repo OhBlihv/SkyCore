@@ -96,7 +96,7 @@ public class MovementManager
 		
 		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
 		
-		RedisManager.registerSubscription(this::onMessage, CHANNEL_MOVE_PLAYER_REPLY, CHANNEL_MOVE_PLAYER_REQ);
+		RedisManager.registerSubscription(this::onMessage, CHANNEL_MOVE_PLAYER_REQ, CHANNEL_MOVE_PLAYER_REPLY);
 	}
 	
 	public static void requestMove(String server, Player player) throws IllegalArgumentException
@@ -257,7 +257,7 @@ public class MovementManager
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 				if(offlinePlayer == null || !offlinePlayer.isOnline())
 				{
-					//BUtil.logError("Attempted to move " + playerName + " to " + targetServer + ", yet the player was not online.");
+					BUtil.logError("Attempted to move " + playerName + " to " + targetServer + ", yet the player was not online.");
 					return;
 				}
 				
@@ -269,6 +269,8 @@ public class MovementManager
 			{
 				response = splitData[2];
 			}
+			
+			BUtil.logInfo("Received reply - " + playerName + " WITH " + response);
 			
 			if(response != null && !response.isEmpty())
 			{

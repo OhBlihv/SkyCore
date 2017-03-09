@@ -122,6 +122,11 @@ public class HubManager
 			//Avoid sending us to offline hubs and the hub we're on!
 			if(entry.getValue().online && !entry.getKey().equalsIgnoreCase(RedisManager.getServerName()))
 			{
+				if(entry.getKey().contains("beta") && !RedisManager.getServerName().contains("beta"))
+				{
+					continue;
+				}
+				
 				return entry.getKey();
 			}
 		}
