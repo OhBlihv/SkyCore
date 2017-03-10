@@ -9,6 +9,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.InvocationTargetException;
@@ -255,7 +256,32 @@ public class GUIUtil
 	
 	public static int countEmpty(Inventory inventory)
 	{
-		return countEmpty(inventory.getContents());
+		int emptySlots = 0;
+		
+		//CraftInventoryView inventoryView = new CraftInventoryView(null, inventory, null);
+		
+		boolean hardLimit = inventory instanceof PlayerInventory;
+		
+		//InventoryType.SlotType slotType;
+		ItemStack itemStack;
+		for(int slot = 0;slot < inventory.getSize();slot++)
+		{
+			if(hardLimit && slot > 35)
+			{
+				break;
+			}
+			
+			//slotType = CraftInventoryView.getSlotType(inventoryView, slot);
+			
+			if(//( slotType == InventoryType.SlotType.QUICKBAR ||
+			   //  slotType == InventoryType.SlotType.CONTAINER) &&
+				 ((itemStack = inventory.getItem(slot)) == null || itemStack.getType() == AIR))
+			{
+				emptySlots++;
+			}
+		}
+		
+		return emptySlots;
 	}
 	
 	public static int countEmpty(ItemStack[] itemStacks)
@@ -263,7 +289,7 @@ public class GUIUtil
 		int count = 0;
 		for(ItemStack item : itemStacks)
 		{
-			if(item == null)
+			if(item == null || item.getType() == AIR)
 			{
 				count++;
 			}
