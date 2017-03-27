@@ -180,6 +180,7 @@ public class UtilTest
 		testUsersGUIWithUserCount(21, 1);
 		testUsersGUIWithUserCount(30, 1);
 		testUsersGUIWithUserCount(50, 2);
+		testUsersGUIWithUserCount(75, 2);
 	}
 	
 	public void testUsersGUIWithUserCount(int users, int page)
@@ -190,6 +191,7 @@ public class UtilTest
 		int slot = 10,
 			userNum = 0;
 		
+		boolean hasPrinted = false;
 		while(userNum < users)
 		{
 			//Lower end of range, keep looping til we find the start of this page.
@@ -204,7 +206,13 @@ public class UtilTest
 				break;
 			}
 			
-			System.out.println("Setting user " + userNum + " at slot " + slot);
+			if(!hasPrinted)
+			{
+				System.out.println("Starting at user " + userNum + " and slot " + slot);
+				hasPrinted = true;
+			}
+			
+			//System.out.println("Setting user " + userNum + " at slot " + slot);
 			
 			slot = getSafeSlot(++slot);
 		}

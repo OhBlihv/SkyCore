@@ -20,17 +20,26 @@ public class RedisMessage
 	public RedisMessage(String channel, String data)
 	{
 		//BUtil.logInfo("Received message on '" + channel + "'='" + data + "'");
+		String tempChannel;
+		
 		int splitLoc = channel.indexOf('>');
 		if(splitLoc >= 0)
 		{
 			this.server = channel.substring(0, splitLoc);
-			this.channel = channel.substring(splitLoc + 1, channel.length());
+			tempChannel = channel.substring(splitLoc + 1, channel.length());
 		}
 		else
 		{
 			this.server = null;
-			this.channel = channel;
+			tempChannel = channel;
 		}
+		
+		if(RedisManager.isBeta() && tempChannel.startsWith("beta_"))
+		{
+			tempChannel = tempChannel.substring(5);
+		}
+		
+		this.channel = tempChannel;
 		
 		this.message = data;
 	}

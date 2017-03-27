@@ -2,6 +2,7 @@ package com.skytonia.SkyCore.redis;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.skytonia.SkyCore.movement.MovementManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
@@ -22,6 +23,9 @@ public class RedisManager
 	@Getter
 	private static String serverName;
 	
+	@Getter
+	private static boolean isBeta = false;
+	
 	private static final Multimap<String, ChannelSubscriber> subscriptionMap = MultimapBuilder.hashKeys().arrayListValues().build();
 	
 	private static JedisPool jedisPool;
@@ -31,6 +35,7 @@ public class RedisManager
 		RedisFlatFile redisFlatFile = RedisFlatFile.getInstance();
 		
 		serverName = redisFlatFile.getString("server-name");
+		isBeta = serverName.contains("beta");
 		
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		poolConfig.setMinIdle(8);
@@ -38,7 +43,12 @@ public class RedisManager
 		
 		jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
 		
-		sendMessage(CHANNEL_REGISTRATION, serverName + "|" + Bukkit.getIp() + ":" + Bukkit.getPort());
+		//Handle this manually to avoid server/beta case handling
+		try(Jedis jedis = jedisPool.getResource())
+		{
+			//Server channel format: '<server>_<channel>'
+			jedis.publish(CHANNEL_REGISTRATION, serverName + "|" + Bukkit.getIp() + ":" + Bukkit.getPort());
+		}
 	}
 	
 	public static void shutdown()
@@ -67,10 +77,27 @@ public class RedisManager
 		List<String> channelList = new ArrayList<>();
 		for(String channel : channels)
 		{
+			if(isBeta &&
+				   !channel.equals(MovementManager.CHANNEL_MOVE_PLAYER_REQ) &&
+				   !channel.equals(MovementManager.CHANNEL_MOVE_PLAYER_REPLY))
+			{
+				int serverPrefixIdx = channel.indexOf('>');
+				if(serverPrefixIdx != -1)
+				{
+					channel = channel.substring(0, serverPrefixIdx + 1) + "beta_" + channel.substring(serverPrefixIdx + 1);
+				}
+				else
+				{
+					channel = "beta_" + channel;
+				}
+			}
+			
 			if(prefixWithServerName)
 			{
 				channel = serverName + ">" + channel;
 			}
+			
+			//BUtil.logInfo("Registering listener on '" + channel + "'");
 			
 			channelList.add(channel);
 		}
@@ -92,6 +119,13 @@ public class RedisManager
 	{
 		try(Jedis jedis = jedisPool.getResource())
 		{
+			if(isBeta &&
+				   !channel.equals(MovementManager.CHANNEL_MOVE_PLAYER_REQ) &&
+				   !channel.equals(MovementManager.CHANNEL_MOVE_PLAYER_REPLY))
+			{
+				channel = "beta_" + channel;
+			}
+			
 			if(server != null)
 			{
 				channel = server + ">" + channel;

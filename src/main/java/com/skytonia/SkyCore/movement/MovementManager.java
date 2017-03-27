@@ -62,7 +62,7 @@ public class MovementManager
 	
 	private static final String SPLITTER = "|";
 	
-	private static final String
+	public static final String
 			//SocketAPI (Bungee) Channels
 			/*
 			 *  Initial request from a Bukkit server to send a player to another server
@@ -202,7 +202,7 @@ public class MovementManager
 		
 		String[] splitData = message.getMessage().split("[" + SPLITTER + "]");
 		
-		if(channel.endsWith(CHANNEL_MOVE_PLAYER_REQ))
+		if(channel.equals(CHANNEL_MOVE_PLAYER_REQ))
 		{
 			String  serverName = splitData[0],
 					playerName = splitData[1];
