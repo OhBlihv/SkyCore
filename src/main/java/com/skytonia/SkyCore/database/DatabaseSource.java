@@ -200,13 +200,21 @@ public class DatabaseSource
 				}
 			}
 			
-			if(queryType == QueryType.QUERY)
+			try
 			{
-				resultSet = statement.executeQuery();
+				if(queryType == QueryType.QUERY)
+				{
+					resultSet = statement.executeQuery();
+				}
+				else //if(queryType == QueryType.EXECUTE)
+				{
+					statement.execute();
+				}
 			}
-			else //if(queryType == QueryType.EXECUTE)
+			catch(SQLException e)
 			{
-				statement.execute();
+				BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+				e.printStackTrace();
 			}
 			
 			if(resultAction != null && resultSet != null && resultSet.next())
