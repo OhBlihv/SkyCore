@@ -533,25 +533,41 @@ public class GUIUtil
 		return verticalSlots;
 	}
 	
-	public static boolean canAddItem(Inventory inv, ItemStack item)
+	public static boolean canAddItem(Inventory inventory, ItemStack itemStack)
 	{
-		for(ItemStack itemLoop : inv)
+		return getAvailableSlots(inventory, itemStack) > itemStack.getAmount();
+	}
+	
+	public static int getAvailableSlots(Inventory inventory, ItemStack itemStack)
+	{
+		int emptySlots = countEmpty(inventory);
+		if(emptySlots > 0)
 		{
-			if(itemLoop == null)
+			return emptySlots * itemStack.getMaxStackSize();
+		}
+		
+		int amountToAdd = itemStack.getAmount();
+		
+		for(ItemStack itemLoop : inventory)
+		{
+			if(itemLoop != null)
 			{
-				return true;
-			}
-			
-			if(itemLoop.isSimilar(item))
-			{
-				if((itemLoop.getAmount() + item.getAmount()) < itemLoop.getMaxStackSize())
+				if(itemLoop.isSimilar(itemStack))
 				{
-					return true;
+					if(itemLoop.getAmount() < itemLoop.getMaxStackSize())
+					{
+						amountToAdd -= (itemLoop.getMaxStackSize() - itemLoop.getAmount());
+					}
+				}
+				
+				if(amountToAdd <= 0)
+				{
+					return itemStack.getAmount();
 				}
 			}
 		}
 		
-		return false;
+		return -1;
 	}
 
 	public static final ItemStack BLANK_ITEM = new ItemStack(AIR, 0);
