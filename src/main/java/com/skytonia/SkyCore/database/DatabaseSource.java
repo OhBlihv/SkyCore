@@ -50,7 +50,7 @@ public class DatabaseSource
 		config.setUsername(username);
 		config.setPassword(password);
 		
-		config.setConnectionTimeout(10000); //Start at 10s for timeout
+		config.setConnectionTimeout(5000); //Start at 5s for timeout
 		
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "250");
