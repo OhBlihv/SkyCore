@@ -164,7 +164,7 @@ public class GUIContainer implements Listener
 	public boolean updateInventory(Player player)
 	{
 		Inventory inventory = player.getOpenInventory().getTopInventory();
-		if(inventory == null || guiSize.matchesSize(inventory.getSize()))
+		if(inventory == null || !guiSize.matchesSize(inventory.getSize()))
 		{
 			return false;
 		}
