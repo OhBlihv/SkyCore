@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.util;
 
+import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.firework.FireworkType;
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
@@ -246,21 +247,24 @@ public class BUtil
 	
 	public static void teleportPlayer(Entity entity, Location location, PlayerTeleportEvent.TeleportCause cause)
 	{
-		if(entity instanceof Player)
+		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
-			try
+			if(entity instanceof Player)
 			{
-				org.phantomapi.util.P.tp((Player) entity, location);
+				try
+				{
+					org.phantomapi.util.P.tp((Player) entity, location);
+				}
+				catch(Throwable e)
+				{
+					entity.teleport(location, cause);
+				}
 			}
-			catch(Throwable e)
+			else
 			{
 				entity.teleport(location, cause);
 			}
-		}
-		else
-		{
-			entity.teleport(location, cause);
-		}
+		}).ensureSync();
 	}
 	
 	// ------------------------------------------------------------------------------------------------------
