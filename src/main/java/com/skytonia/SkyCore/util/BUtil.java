@@ -6,8 +6,10 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -237,15 +239,27 @@ public class BUtil
 	// Bukkit Assistance
 	// ------------------------------------------------------------------------------------------------------
 	
-	public static void teleportPlayer(Player player, Location location)
+	public static void teleportPlayer(Entity entity, Location location)
 	{
-		try
+		teleportPlayer(entity, location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+	}
+	
+	public static void teleportPlayer(Entity entity, Location location, PlayerTeleportEvent.TeleportCause cause)
+	{
+		if(entity instanceof Player)
 		{
-			org.phantomapi.util.P.tp(player, location);
+			try
+			{
+				org.phantomapi.util.P.tp((Player) entity, location);
+			}
+			catch(Throwable e)
+			{
+				entity.teleport(location, cause);
+			}
 		}
-		catch(Throwable e)
+		else
 		{
-			player.teleport(location);
+			entity.teleport(location, cause);
 		}
 	}
 	
