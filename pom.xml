@@ -80,6 +80,14 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.phantomapi</groupId>
+			<artifactId>Phantom</artifactId>
+			<version>M7</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../lib/Phantom-M7.jar</systemPath>
+		</dependency>
+		
 		<!-- Auto-generated Annotations -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
