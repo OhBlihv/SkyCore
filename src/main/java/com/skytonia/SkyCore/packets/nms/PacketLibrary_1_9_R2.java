@@ -29,11 +29,6 @@ public class PacketLibrary_1_9_R2 extends PacketLibrary
 	
 	public void sendActionBar(Player player, String message, int lifespan)
 	{
-		if(message.length() > 32)
-		{
-			message = message.substring(0, 32) + "~";
-		}
-		
 		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
 		PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(new ChatComponentText(message), (byte) 2);
 		
@@ -51,18 +46,10 @@ public class PacketLibrary_1_9_R2 extends PacketLibrary
 		{
 			title = "";
 		}
-		else if(title.length() > 32)
-		{
-			title = title.substring(0, 32) + "~";
-		}
 		
 		if(subTitle == null)
 		{
 			subTitle = "";
-		}
-		else if(subTitle.length() > 32)
-		{
-			subTitle = subTitle.substring(0, 32) + "~";
 		}
 		
 		sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle, persistTime, fadeIn, fadeOut);
