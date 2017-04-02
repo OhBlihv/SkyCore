@@ -1,6 +1,6 @@
 package com.skytonia.SkyCore.util;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.regex.Pattern;
 
 /**
  * Created by Chris Brown (OhBlihv) on 3/31/2017.
@@ -150,13 +150,18 @@ public class TextUtil
 	
 	private static final int CENTER_PX = 154;
 	
-	public static String center(String message)
+	//Does not check for BOLD
+	private static final Pattern COLOUR_CODE_PATTERN = Pattern.compile("[&|§][a-km-rA-KM-R0-9]");
+	
+	public static String center(final String message)
 	{
-		message = ChatColor.translateAlternateColorCodes('&', message);
+		//message = ChatColor.translateAlternateColorCodes('&', message);
+		String strippedMessage = COLOUR_CODE_PATTERN.matcher(message).replaceAll("");
+		
 		int messagePxSize = 0;
 		boolean previousCode = false;
 		boolean isBold = false;
-		char[] var4 = message.toCharArray();
+		char[] var4 = strippedMessage.toCharArray();
 		int toCompensate = var4.length;
 		
 		int spaceLength;
