@@ -1,7 +1,6 @@
 package com.skytonia.SkyCore.cosmetics.util;
 
 import com.skytonia.SkyCore.SkyCore;
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacket.ParticlePacket;
 import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Setter;
@@ -601,21 +600,6 @@ public enum ParticleEffect
 		return false;
 	}
 	
-	private static boolean isLongDistanceCheapPlayer(Location location, Collection<CheapPlayer> players)
-	{
-		String world = location.getWorld().getName();
-		for(CheapPlayer player : players)
-		{
-			Location playerLocation = player.getPlayer().getLocation();
-			if(!world.equals(playerLocation.getWorld().getName()) || playerLocation.distanceSquared(location) < 65536)
-			{
-				continue;
-			}
-			return true;
-		}
-		return false;
-	}
-	
 	/**
 	 * Determine if the data type for a particle effect is correct
 	 *
@@ -706,25 +690,6 @@ public enum ParticleEffect
 		}
 		
 		StaticNMS.getParticleFactoryInstance().getParticlePacket(this, offsetX, offsetY, offsetZ, speed, amount, isLongDistance(center, players), null).sendTo(center, players);
-	}
-	
-	public void displayToCheapPlayer(float offsetX, float offsetY, float offsetZ, float speed, int amount, Location center, Collection<CheapPlayer> players) throws ParticleVersionException, ParticleDataException, IllegalArgumentException
-	{
-		if(!isSupported())
-		{
-			throw new ParticleVersionException("This particle effect is not supported by your server version");
-		}
-		if(hasProperty(ParticleProperty.REQUIRES_DATA))
-		{
-			throw new ParticleDataException("This particle effect requires additional data");
-		}
-		if(hasProperty(ParticleProperty.REQUIRES_WATER) && !isWater(center))
-		{
-			throw new IllegalArgumentException("There is no water at the center location");
-		}
-		
-		StaticNMS.getParticleFactoryInstance().getParticlePacket(this, offsetX, offsetY, offsetZ, speed, amount,
-		                                                              isLongDistanceCheapPlayer(center, players), null).sendToCheapPlayer(center, players);
 	}
 	
 	/**
@@ -890,25 +855,6 @@ public enum ParticleEffect
 		}
 		
 		StaticNMS.getParticleFactoryInstance().getParticlePacket(this, color, isLongDistance(center, players)).sendTo(center, players);
-	}
-	
-	public void displayToCheapPlayer(ParticleColor color, Location center, Collection<CheapPlayer> players) throws ParticleVersionException, ParticleColorException
-	{
-		if(!isSupported())
-		{
-			throw new ParticleVersionException("This particle effect is not supported by your server version");
-		}
-		if(!hasProperty(ParticleProperty.COLORABLE))
-		{
-			throw new ParticleColorException("This particle effect is not colorable");
-		}
-		if(!isColorCorrect(this, color))
-		{
-			throw new ParticleColorException("The particle color type is incorrect");
-		}
-		
-		StaticNMS.getParticleFactoryInstance().getParticlePacket(this, color,
-		                                                         isLongDistanceCheapPlayer(center, players)).sendToCheapPlayer(center, players);
 	}
 	
 	/**

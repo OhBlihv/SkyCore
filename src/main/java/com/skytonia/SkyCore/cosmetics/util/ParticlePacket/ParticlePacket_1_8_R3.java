@@ -1,10 +1,8 @@
 package com.skytonia.SkyCore.cosmetics.util.ParticlePacket;
 
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
 import com.skytonia.SkyCore.cosmetics.util.ParticleEffect;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -76,14 +74,6 @@ public class ParticlePacket_1_8_R3 extends ParticlePacket
 		
 		//PlayerConnection is only used once per packet, so retrieving it here is a non-issue
 		((CraftPlayer) player).getHandle().playerConnection.sendPacket(particlePacket);
-	}
-	
-	@Override
-	public void sendToCheapPlayer(Location center, CheapPlayer player) throws PacketInstantiationException, PacketSendingException
-	{
-		initialize(center);
-		
-		((PlayerConnection) player.getPlayerConnection()).sendPacket(particlePacket);
 	}
 	
 }

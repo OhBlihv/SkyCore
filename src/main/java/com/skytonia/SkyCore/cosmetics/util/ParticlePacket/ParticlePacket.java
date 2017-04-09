@@ -1,6 +1,5 @@
 package com.skytonia.SkyCore.cosmetics.util.ParticlePacket;
 
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
 import com.skytonia.SkyCore.cosmetics.util.ParticleEffect;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -144,17 +143,6 @@ public abstract class ParticlePacket
 	public abstract void sendTo(Location center, Player player) throws PacketInstantiationException, PacketSendingException;
 	
 	/**
-	 * Sends the packet to a single player and caches it
-	 *
-	 * @param center Center location of the effect
-	 * @param player Receiver of the packet
-	 * @throws PacketInstantiationException If instantion fails due to an unknown error
-	 * @throws PacketSendingException       If sending fails due to an unknown error
-	 * @see #initializePacket(Location)
-	 */
-	public abstract void sendToCheapPlayer(Location center, CheapPlayer player) throws PacketInstantiationException, PacketSendingException;
-	
-	/**
 	 * Sends the packet to all players in the list
 	 *
 	 * @param center  Center location of the effect
@@ -172,27 +160,6 @@ public abstract class ParticlePacket
 		for(Player player : players)
 		{
 			sendTo(center, player);
-		}
-	}
-	
-	/**
-	 * Sends the packet to all players in the list
-	 *
-	 * @param center  Center location of the effect
-	 * @param players Receivers of the packet
-	 * @throws IllegalArgumentException If the player list is empty
-	 * @see #sendTo(Location center, Player player)
-	 */
-	public void sendToCheapPlayer(Location center, Collection<CheapPlayer> players) throws IllegalArgumentException
-	{
-		if(players.isEmpty())
-		{
-			throw new IllegalArgumentException("The player list is empty");
-		}
-		
-		for(CheapPlayer player : players)
-		{
-			sendToCheapPlayer(center, player);
 		}
 	}
 	

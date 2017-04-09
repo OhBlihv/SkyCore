@@ -1,9 +1,6 @@
 package com.skytonia.SkyCore.cosmetics.objects;
 
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
-import com.skytonia.SkyCore.cheapobjects.player.factory.ICheapPlayerFactory;
 import com.skytonia.SkyCore.cosmetics.CosmeticThread;
-import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class ActiveCosmetic
 {
 	
-	private final CopyOnWriteArraySet<CheapPlayer> nearbyPlayers = new CopyOnWriteArraySet<>();
+	private final CopyOnWriteArraySet<Player> nearbyPlayers = new CopyOnWriteArraySet<>();
 	
 	@Getter
 	final BaseCosmetic cosmetic;
@@ -87,7 +84,7 @@ public class ActiveCosmetic
 		//Add the player to their own nearby players list to ensure they can view their own cosmetic
 		if(activatingPlayer != null)
 		{
-			this.nearbyPlayers.add(StaticNMS.getCheapPlayerFactoryInstance().getCheapPlayer(activatingPlayer));
+			this.nearbyPlayers.add(activatingPlayer);
 		}
 		
 		//Trigger a nearby players update early
@@ -141,7 +138,6 @@ public class ActiveCosmetic
 	
 	public void updateNearbyPlayers()
 	{
-		ICheapPlayerFactory cheapPlayerFactory = StaticNMS.getCheapPlayerFactoryInstance();
 		Location cosmeticLocation = getLocation();
 		
 		for(Player player : Bukkit.getOnlinePlayers())
@@ -161,15 +157,14 @@ public class ActiveCosmetic
 			}
 			
 			//Create this for insertion and contains checks
-			CheapPlayer cheapPlayer = cheapPlayerFactory.getCheapPlayer(player);
 			if(inRange)
 			{
-				nearbyPlayers.add(cheapPlayer);
+				nearbyPlayers.add(player);
 			}
 			//Remove the player if
-			else if(nearbyPlayers.contains(cheapPlayer))
+			else if(nearbyPlayers.contains(player))
 			{
-				nearbyPlayers.remove(cheapPlayer);
+				nearbyPlayers.remove(player);
 			}
 		}
 	}
