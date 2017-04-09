@@ -60,6 +60,8 @@ public class CosmeticThread extends Thread
 		
 		while(isRunning)
 		{
+			lastStartTick = System.currentTimeMillis();
+			
 			if(cosmeticSet.isEmpty())
 			{
 				if(startEmptyTick == 0)
@@ -80,7 +82,6 @@ public class CosmeticThread extends Thread
 			}
 			
 			startEmptyTick = 0;
-			lastStartTick = System.currentTimeMillis();
 			
 			Deque<ActiveCosmetic> cosmeticsToRemove = new ArrayDeque<>();
 
