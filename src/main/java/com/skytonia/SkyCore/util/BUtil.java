@@ -249,7 +249,7 @@ public class BUtil
 	{
 		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
-			if(entity instanceof Player)
+			/*if(entity instanceof Player)
 			{
 				try
 				{
@@ -263,7 +263,8 @@ public class BUtil
 			else
 			{
 				entity.teleport(location, cause);
-			}
+			}*/
+			entity.teleport(location, cause);
 		}).ensureSync();
 	}
 	
