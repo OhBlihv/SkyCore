@@ -3,7 +3,6 @@ package com.skytonia.SkyCore.cosmetics.objects;
 import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
 import com.skytonia.SkyCore.cheapobjects.player.factory.ICheapPlayerFactory;
 import com.skytonia.SkyCore.cosmetics.CosmeticThread;
-import com.skytonia.SkyCore.cosmetics.objects.options.CosmeticOptionStorage;
 import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -24,8 +23,6 @@ public class ActiveCosmetic
 	@Getter
 	final BaseCosmetic cosmetic;
 	
-	final CosmeticOptionStorage cosmeticOptions;
-	
 	@Getter
 	private final Player activatingPlayer;
 	private final Location staticLocation;
@@ -40,36 +37,35 @@ public class ActiveCosmetic
 	
 	public final int updateRate;
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, int viewDistance)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Player activatingPlayer, int viewDistance)
 	{
-		this(cosmetic, cosmeticOptions, activatingPlayer, viewDistance, 0L);
+		this(cosmetic, activatingPlayer, viewDistance, 0L);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Player activatingPlayer, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, activatingPlayer, null, null, viewDistance, endAtTick);
+		this(cosmetic, activatingPlayer, null, null, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Location staticLocation, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Location staticLocation, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, null, staticLocation, null, viewDistance, endAtTick);
+		this(cosmetic, null, staticLocation, null, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Player activatingPlayer, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, activatingPlayer, null, expiryAction, viewDistance, endAtTick);
+		this(cosmetic, activatingPlayer, null, expiryAction, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Location staticLocation, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Location staticLocation, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, null, staticLocation, expiryAction, viewDistance, endAtTick);
+		this(cosmetic, null, staticLocation, expiryAction, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions,
+	public ActiveCosmetic(BaseCosmetic cosmetic,
 	                      Player activatingPlayer, Location staticLocation, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
 	{
 		this.cosmetic = cosmetic;
-		this.cosmeticOptions = cosmeticOptions;
 		
 		this.activatingPlayer = activatingPlayer;
 		this.staticLocation = staticLocation;
