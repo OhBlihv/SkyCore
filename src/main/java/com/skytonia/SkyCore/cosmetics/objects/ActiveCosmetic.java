@@ -84,7 +84,7 @@ public class ActiveCosmetic
 		//Add the player to their own nearby players list to ensure they can view their own cosmetic
 		if(activatingPlayer != null)
 		{
-			this.nearbyPlayers.add(activatingPlayer);
+			addNearbyPlayer(activatingPlayer);
 		}
 		
 		//Trigger a nearby players update early
@@ -109,6 +109,8 @@ public class ActiveCosmetic
 		{
 			expiryAction.expire(this);
 		}
+		
+		cosmetic.removeCosmetic();
 	}
 	
 	public void remove()
@@ -159,13 +161,29 @@ public class ActiveCosmetic
 			//Create this for insertion and contains checks
 			if(inRange)
 			{
-				nearbyPlayers.add(player);
+				addNearbyPlayer(player);
 			}
 			//Remove the player if
 			else if(nearbyPlayers.contains(player))
 			{
-				nearbyPlayers.remove(player);
+				removeNearbyPlayer(player);
 			}
+		}
+	}
+	
+	public void addNearbyPlayer(Player player)
+	{
+		if(cosmetic.showToNearbyPlayer(player))
+		{
+			nearbyPlayers.add(player);
+		}
+	}
+	
+	public void removeNearbyPlayer(Player player)
+	{
+		if(cosmetic.removeFromNearbyPlayer(player))
+		{
+			nearbyPlayers.remove(player);
 		}
 	}
 	

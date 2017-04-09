@@ -56,7 +56,7 @@ public class ParticlePacket_1_10_R1 extends ParticlePacket
 			                                                (float) center.getX(),                          //b) X
 			                                                (float) center.getY(),                          //c) Y
 			                                                (float) center.getZ(),                          //d) Z
-			                                                offsetX,                                        //e) X Offset
+			                                                offsetX,                                        //updateNav) X Offset
 			                                                offsetY,                                        //f) Y Offset
 			                                                offsetZ,                                        //g) Z Offset
 			                                                speed,                                          //h) Particle Speed
