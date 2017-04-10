@@ -1,21 +1,22 @@
-package com.skytonia.SkyCore.cosmetics.pets.entities;
+package com.skytonia.SkyCore.cosmetics.pets.fakeentities;
 
 import com.comphenix.packetwrapper.AbstractPacket;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityTeleport;
 import com.comphenix.packetwrapper.WrapperPlayServerMount;
-import com.comphenix.packetwrapper.WrapperPlayServerRelEntityMoveLook;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntityLiving;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
-import net.minecraft.server.MathHelper;
-import net.minecraft.server.v1_9_R2.Entity;
-import net.minecraft.server.v1_9_R2.EntityLiving;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.util.NumberConversions;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -25,6 +26,13 @@ import java.util.UUID;
  */
 public class FakeEntity
 {
+	
+	//Movement Static Fields
+	
+	private static final double MOVEMENT_SPEED = 1.2D;
+	private static final double MIN_DISTANCE = 1.0D;
+	
+	//
 	
 	private final EntityType entityType;
 	
@@ -41,9 +49,16 @@ public class FakeEntity
 	@Getter
 	private double  currentX = 0,
 					currentY = 0,
-					currentZ = 0,
-					currentYaw = 0,
+					currentZ = 0;
+	
+	@Getter
+	@Setter
+	private double  currentYaw = 0,
 					currentPitch = 0;
+	
+	private double  targetX = 0,
+					targetY = 0,
+					targetZ = 0;
 	
 	public FakeEntity(EntityType entityType, Location location)
 	{
@@ -54,12 +69,19 @@ public class FakeEntity
 		
 		this.entityType = entityType;
 		
-		updateCurrentLocation(location);
+		//Make sure this entity appears where it should immediately
+		teleport(location.getX(), location.getY(), location.getZ());
+		updateTargetLocation(location);
 	}
 	
 	public WrappedDataWatcher getMetadata()
 	{
-		return PetUtil.getDefaultWatcher(currentWorld, entityType);
+		WrappedDataWatcher metadata = PetUtil.getDefaultWatcher(currentWorld, entityType);
+		
+		metadata.setObject(2, "Example Name");
+		metadata.setObject(3, Boolean.TRUE);
+		
+		return metadata;
 	}
 	
 	public AbstractPacket getSpawnPacket()
@@ -71,7 +93,7 @@ public class FakeEntity
 		
 		AbstractPacket abstractPacket;
 		
-		if(EntityLiving.class.isAssignableFrom(entityType.getEntityClass()))
+		if(LivingEntity.class.isAssignableFrom(entityType.getEntityClass()))
 		{
 			WrapperPlayServerSpawnEntityLiving packet = new WrapperPlayServerSpawnEntityLiving();
 			
@@ -124,7 +146,7 @@ public class FakeEntity
 	
 	public AbstractPacket getDestroyPacket()
 	{
-		if(EntityLiving.class.isAssignableFrom(entityType.getEntityClass()) ||
+		/*if(EntityLiving.class.isAssignableFrom(entityType.getEntityClass()) ||
 			   Entity.class.isAssignableFrom(entityType.getEntityClass()))
 		{
 			WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
@@ -136,7 +158,13 @@ public class FakeEntity
 		else
 		{
 			throw new IllegalArgumentException("Unsupported Entity Type '" + entityType + "' of class " + entityType.getEntityClass().getSimpleName());
-		}
+		}*/
+		
+		WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
+		
+		packet.setEntityIds(new int[] {entityId});
+		
+		return packet;
 	}
 	
 	public Location getLocation()
@@ -149,34 +177,84 @@ public class FakeEntity
 		return currentWorld;
 	}
 	
-	protected void updateCurrentLocation(Location location)
+	public void updateTargetLocation(Location location)
 	{
-		updateCurrentLocation(location.getWorld(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+		updateTargetLocation(location.getWorld(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 	}
 	
-	protected void updateCurrentLocation(World world, double x, double y, double z, float yaw, float pitch)
+	public void updateTargetLocation(World world, double x, double y, double z, float yaw, float pitch)
 	{
 		currentWorld = world;
 		
+		//Ignore target requests if they're too close
+		if(Math.sqrt(NumberConversions.square(currentX - x) +
+			         NumberConversions.square(currentY - y) +
+			         NumberConversions.square(currentZ - z)) > MIN_DISTANCE)
+		{
+			targetX = x;
+			targetY = y;
+			targetZ = z;
+		}
+		
+		currentYaw = yaw;
+		currentPitch = pitch;
+		
+		updateCurrentLocation();
+	}
+	
+	public void updateCurrentLocation()
+	{
+		//TODO: Make this more advanced. Currently goes directly to the target
+		currentX = getMovementOnPlane(currentX, targetX);
+		currentY = getMovementOnPlane(currentY, targetY);
+		currentZ = getMovementOnPlane(currentZ, targetZ);
+	}
+	
+	public void teleport(double x, double y, double z)
+	{
 		currentX = x;
 		currentY = y;
 		currentZ = z;
 		
-		currentYaw = yaw;
-		currentPitch = pitch;
+		targetX = currentX;
+		targetY = currentY;
+		targetZ = currentZ;
+	}
+	
+	private double getMovementOnPlane(double currentLoc, double targetLoc)
+	{
+		double expectedMovementSpeed = currentLoc - targetLoc;
+		if(expectedMovementSpeed > MOVEMENT_SPEED)
+		{
+			expectedMovementSpeed = MOVEMENT_SPEED;
+		}
+		else if(expectedMovementSpeed < (0 - MOVEMENT_SPEED))
+		{
+			expectedMovementSpeed = 0 - MOVEMENT_SPEED;
+		}
+		
+		return expectedMovementSpeed;
 	}
 	
 	private static final long MAX_MOVE_PACKET_DISTANCE = 32768L;
 	private static final long MIN_MOVE_PACKET_DISTANCE = 0 - MAX_MOVE_PACKET_DISTANCE;
 	
-	public AbstractPacket moveEntity(double x, double y, double z, float yaw, float pitch)
+	public AbstractPacket moveEntity(final double x, final double y, final double z, float yaw, float pitch)
 	{
 		AbstractPacket abstractPacket = null;
 		
 		//Correct move distance numbers for packets
-		double  deltaX = MathHelper.d((currentX - x) * 4096.0D),
-				deltaY = MathHelper.d((currentY - y) * 4096.0D),
-				deltaZ = MathHelper.d((currentZ - z) * 4096.0D);
+		/*double  deltaX = (currentX - x),
+				deltaY = (currentY - y),
+				deltaZ = (currentZ - z);
+		
+		BUtil.logInfo("DeltaX=" + deltaX + " DeltaZ=" + deltaZ);
+		
+		if(deltaX == 0.0D && deltaY == 0.0D && deltaZ == 0.0D)
+		{
+			BUtil.logInfo("Nothing.");
+			return null;
+		}
 		
 		//Entity Relative Move
 		if (    deltaX >= MIN_MOVE_PACKET_DISTANCE && deltaX < MAX_MOVE_PACKET_DISTANCE &&
@@ -192,18 +270,20 @@ public class FakeEntity
 			packet.setDy(deltaY);
 			packet.setDz(deltaZ);
 			
-			packet.setOnGround(true);
+			packet.setOnGround(false);
 			packet.setYaw((float) currentYaw);
 			packet.setPitch((float) currentPitch);
 			
 			abstractPacket = packet;
-		}
+			BUtil.logInfo("Movement.");
+		}*/
 			
-		updateCurrentLocation(this.currentWorld, x, y, z, yaw, pitch);
+		updateTargetLocation(this.currentWorld, x, y, z, yaw, pitch);
 		
 		//Process teleport after we've updated the location for all
 		if(abstractPacket == null)
 		{
+			BUtil.logInfo("Teleporting.");
 			abstractPacket = getTeleportPacket();
 		}
 		

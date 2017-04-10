@@ -1,4 +1,4 @@
-package com.skytonia.SkyCore.cosmetics.pets.entities;
+package com.skytonia.SkyCore.cosmetics.pets.fakeentities;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import org.bukkit.Location;

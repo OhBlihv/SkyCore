@@ -1,6 +1,7 @@
-package com.skytonia.SkyCore.cosmetics.pets.entities;
+package com.skytonia.SkyCore.cosmetics.pets.fakeentities;
 
-import com.skytonia.SkyCore.cosmetics.pets.entities.pathfinders.FakePathfinderGoal;
+import com.comphenix.packetwrapper.AbstractPacket;
+import com.skytonia.SkyCore.cosmetics.pets.fakeentities.pathfinders.FakePathfinderGoal;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -26,12 +27,9 @@ public class FakeLivingEntity extends FakeEntity
 		updateNavigation();
 	}
 	
-	public void updateNavigation()
+	public AbstractPacket updateNavigation()
 	{
-		if(pathfinderGoal.a() && pathfinderGoal.b())
-		{
-			pathfinderGoal.updateNav();
-		}
+		return pathfinderGoal.updateNav();
 	}
 	
 	

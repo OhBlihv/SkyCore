@@ -2,6 +2,7 @@ package com.skytonia.SkyCore.cosmetics.objects;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -16,6 +17,11 @@ public abstract class BaseCosmetic implements ICosmetic
 	
 	@Getter
 	private final int updateRate;
+	
+	public Location getLocation()
+	{
+		return null;
+	}
 	
 	public boolean showToNearbyPlayer(Player player)
 	{

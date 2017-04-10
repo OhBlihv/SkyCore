@@ -1,12 +1,15 @@
 package com.skytonia.SkyCore.cosmetics.pets;
 
+import com.comphenix.packetwrapper.AbstractPacket;
+import com.skytonia.SkyCore.cosmetics.objects.ActiveCosmetic;
 import com.skytonia.SkyCore.cosmetics.objects.BaseCosmetic;
-import com.skytonia.SkyCore.cosmetics.pets.entities.FakeEntity;
-import com.skytonia.SkyCore.cosmetics.pets.entities.FakeLivingEntity;
-import com.skytonia.SkyCore.cosmetics.pets.entities.FakeZombie;
-import com.skytonia.SkyCore.cosmetics.pets.entities.pathfinders.FakePathfinderGoalFollowOwner;
+import com.skytonia.SkyCore.cosmetics.pets.fakeentities.FakeEntity;
+import com.skytonia.SkyCore.cosmetics.pets.fakeentities.FakeLivingEntity;
+import com.skytonia.SkyCore.cosmetics.pets.fakeentities.FakeZombie;
+import com.skytonia.SkyCore.util.BUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -22,6 +25,10 @@ public class MiniPet extends BaseCosmetic
 	private static final String COSMETIC_PREFIX = "PET_";
 	
 	//
+	
+	@Setter
+	@Getter
+	private ActiveCosmetic attachedCosmetic;
 	
 	private final Player attachedPlayer;
 	
@@ -39,11 +46,15 @@ public class MiniPet extends BaseCosmetic
 		this.petConfiguration = petConfiguration;
 		
 		petEntity = new FakeZombie(EntityType.ZOMBIE, attachedPlayer.getLocation(), false);
-		petEntity.setPathfinderGoal(new FakePathfinderGoalFollowOwner(petEntity, ((CraftPlayer) attachedPlayer).getHandle(),
-		                                                              2.0F, Integer.MAX_VALUE)); //TODO: Remove max range?
 		
 		snowBallOne = new FakeEntity(EntityType.SNOWBALL, attachedPlayer.getLocation());
 		snowBallTwo = new FakeEntity(EntityType.SNOWBALL, attachedPlayer.getLocation());
+	}
+	
+	@Override
+	public Location getLocation()
+	{
+		return petEntity.getLocation();
 	}
 	
 	@Override
@@ -55,7 +66,26 @@ public class MiniPet extends BaseCosmetic
 	@Override
 	public void onTick(long tick, Location location, Collection<Player> nearbyPlayers)
 	{
-		petEntity.getPathfinderGoal().updateNav();
+		//Force teleport the pet to the correct location eventually
+		if(tick % 500 == 0)
+		{
+			AbstractPacket teleportPacket = petEntity.getTeleportPacket();
+			for(Player player : nearbyPlayers)
+			{
+				teleportPacket.sendPacket(player);
+			}
+		}
+		else
+		{
+			AbstractPacket movePacket = petEntity.updateNavigation();
+			if(movePacket != null)
+			{
+				for(Player player : nearbyPlayers)
+				{
+					movePacket.sendPacket(player);
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -67,6 +97,8 @@ public class MiniPet extends BaseCosmetic
 	@Override
 	public boolean showToNearbyPlayer(Player player)
 	{
+		BUtil.logInfo(player.getName() + " is in range. Spawning...");
+		
 		petEntity.getSpawnPacket().sendPacket(player);
 		snowBallOne.getSpawnPacket().sendPacket(player);
 		snowBallTwo.getSpawnPacket().sendPacket(player);
@@ -80,6 +112,8 @@ public class MiniPet extends BaseCosmetic
 	@Override
 	public boolean removeFromNearbyPlayer(Player player)
 	{
+		BUtil.logInfo(player.getName() + " is out of range. Destroying...");
+		
 		petEntity.getDestroyPacket().sendPacket(player);
 		snowBallOne.getDestroyPacket().sendPacket(player);
 		snowBallTwo.getDestroyPacket().sendPacket(player);

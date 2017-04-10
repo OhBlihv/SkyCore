@@ -93,14 +93,20 @@ public class ActiveCosmetic
 	
 	private Location getLocation()
 	{
-		if(activatingPlayer == null)
+		Location location = cosmetic.getLocation();
+		if(location == null)
 		{
-			return staticLocation;
+			if(activatingPlayer == null)
+			{
+				location = staticLocation;
+			}
+			else
+			{
+				location = activatingPlayer.getLocation();
+			}
 		}
-		else
-		{
-			return activatingPlayer.getLocation();
-		}
+		
+		return location;
 	}
 	
 	public void onRemove()
@@ -141,19 +147,17 @@ public class ActiveCosmetic
 	public void updateNearbyPlayers()
 	{
 		Location cosmeticLocation = getLocation();
-		
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
-			if(player == null || player == activatingPlayer)
+			if(player == null)
 			{
 				continue;
 			}
 			
 			boolean inRange = true;
 			
-			Location playerLocation = player.getLocation();
-			
-			if(!player.isOnline() || cosmeticLocation.getWorld() != playerLocation.getWorld() || getDistance(cosmeticLocation, playerLocation) > viewDistance)
+			Location playerLocation;
+			if(!player.isOnline() || (playerLocation = player.getLocation()).getWorld() != cosmeticLocation.getWorld() || getDistance(playerLocation, cosmeticLocation) > viewDistance)
 			{
 				inRange = false;
 			}
@@ -173,7 +177,7 @@ public class ActiveCosmetic
 	
 	public void addNearbyPlayer(Player player)
 	{
-		if(cosmetic.showToNearbyPlayer(player))
+		if(!nearbyPlayers.contains(player) && cosmetic.showToNearbyPlayer(player))
 		{
 			nearbyPlayers.add(player);
 		}
@@ -181,9 +185,9 @@ public class ActiveCosmetic
 	
 	public void removeNearbyPlayer(Player player)
 	{
-		if(cosmetic.removeFromNearbyPlayer(player))
+		if(nearbyPlayers.remove(player))
 		{
-			nearbyPlayers.remove(player);
+			cosmetic.removeFromNearbyPlayer(player);
 		}
 	}
 	

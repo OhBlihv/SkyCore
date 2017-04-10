@@ -39,7 +39,7 @@ public class PetUtil
 		int tempId;
 		try
 		{
-			Field field = Entity.class.getDeclaredField("entityCount");
+			Field field = net.minecraft.server.v1_9_R2.Entity.class.getDeclaredField("entityCount");
 			field.setAccessible(true);
 			
 			tempId = field.getInt(null);
