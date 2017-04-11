@@ -84,8 +84,8 @@ public class TagController implements Listener
 						continue;
 					}
 					
-					//TODO: Configuration for Distance (5)
-					if(playerLoop.getLocation().distance(playerLocation) < 5)
+					//TODO: Configuration for Distance (20)
+					if(playerLoop.getLocation().distance(playerLocation) < 20)
 					{
 						taggedPlayer.addNearbyPlayer(playerLoop);
 					}
@@ -98,7 +98,7 @@ public class TagController implements Listener
 				
 				taggedPlayer.update();
 			}
-		}).runTimer(20, 20);
+		}).runTimer(10, 10);
 	}
 	
 	
