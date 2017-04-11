@@ -11,6 +11,7 @@ import com.skytonia.SkyCore.items.heads.StoredHeads;
 import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.movement.PlayerCount;
 import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.titles.TagController;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
@@ -110,6 +111,8 @@ public class SkyCore extends JavaPlugin implements Listener
 			BUtil.logError("An issue occurred while initializing stored variables. Refer to the stack trace below.");
 			BUtil.logStackTrace(e);
 		}
+		
+		TagController.getInstance(); //Enable Tags
 		
 		//Dodgy Temp-Command Section
 		EventUtil.registerEvent(EventPriority.NORMAL, false, PlayerCommandPreprocessEvent.class)

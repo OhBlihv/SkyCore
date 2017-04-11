@@ -6,16 +6,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 /**
  * Created by Chris Brown (OhBlihv) on 4/10/2017.
  */
-public class TagController
+public class TagController implements Listener
 {
 	
 	private static TagController instance = null;
@@ -32,6 +34,8 @@ public class TagController
 	
 	TagController()
 	{
+		SkyCore.getPluginInstance().getServer().getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
+		
 		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
 			for(Player player : Bukkit.getOnlinePlayers())
@@ -47,7 +51,7 @@ public class TagController
 				{
 					taggedPlayer.setLine(1, "§7Hours: §f" + 420);
 					
-					taggedPlayer.setLine(2, "aaaa");
+					/*taggedPlayer.setLine(2, "aaaa");
 					taggedPlayer.setLine(3, "aaaa");
 					taggedPlayer.setLine(4, "aaaa");
 					
@@ -64,7 +68,7 @@ public class TagController
 					if(new Random().nextInt(10) < 1)
 					{
 						taggedPlayer.removeLine(2);
-					}
+					}*/
 				}
 				catch(Throwable e)
 				{
@@ -95,6 +99,13 @@ public class TagController
 				taggedPlayer.update();
 			}
 		}).runTimer(20, 20);
+	}
+	
+	
+	@EventHandler
+	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
+	{
+		playerTagMap.get(event.getPlayer().getUniqueId()).setSneaking(!event.getPlayer().isSneaking());
 	}
 	
 }

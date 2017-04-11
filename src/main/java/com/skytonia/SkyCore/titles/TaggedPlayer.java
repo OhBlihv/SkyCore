@@ -5,6 +5,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
 import com.comphenix.packetwrapper.WrapperPlayServerMount;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
@@ -23,6 +24,10 @@ import java.util.UUID;
 public class TaggedPlayer
 {
 	
+	private static final int SNEAKING_FLAG = 0x02;
+	
+	private boolean sneaking = false;
+	
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
 	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new HashMap<>();
@@ -35,6 +40,14 @@ public class TaggedPlayer
 		this.player = player;
 		
 		setLine(0, "§e[YOUTUBE] " + player.getName());
+	}
+	
+	public void setSneaking(boolean sneaking)
+	{
+		this.sneaking = sneaking;
+		
+		setAllNearbyDirty(DirtyPlayerType.UPDATE);
+		update(); //Force an update to ensure the sneaking lines up with their actual sneak status
 	}
 	
 	public TagLine getLine(int lineNum)
@@ -173,7 +186,23 @@ public class TaggedPlayer
 				WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
 				
 				metadataPacket.setEntityID(tagLine.getTagId());
-				metadataPacket.setMetadata(tagLine.getMetadata().getWatchableObjects());
+				
+				{
+					List<WrappedWatchableObject> metadataObjects = tagLine.getMetadata().getWatchableObjects();
+					
+					WrappedWatchableObject entityFlags = metadataObjects.get(0);
+					
+					if(sneaking)
+					{
+						entityFlags.setValue((byte) SNEAKING_FLAG);
+					}
+					else
+					{
+						entityFlags.setValue((byte) 0);
+					}
+					
+					metadataPacket.setMetadata(metadataObjects);
+				}
 				
 				updatePackets.add(metadataPacket);
 				
