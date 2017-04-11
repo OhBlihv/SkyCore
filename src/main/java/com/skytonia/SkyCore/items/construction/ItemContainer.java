@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.bukkit.Material.AIR;
-import static org.bukkit.Material.DIAMOND_HOE;
+import static org.bukkit.Material.DIAMOND_PICKAXE;
 
 /**
  * Created by Chris Brown (OhBlihv) on 26/09/2016.
@@ -201,7 +201,7 @@ public class ItemContainer
 			leatherMeta.setColor(armorColor);
 		}
 		
-		if(SkyCore.isSkytonia() && material == DIAMOND_HOE)
+		if(SkyCore.isSkytonia() && material == DIAMOND_PICKAXE)
 		{
 			itemMeta.spigot().setUnbreakable(true);
 			itemMeta.addItemFlags(
