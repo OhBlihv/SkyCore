@@ -238,6 +238,10 @@ public class TaggedPlayer
 		for(ComparisonPlayer nearbyPlayer : nearbyPlayers.values())
 		{
 			Player nearbyBukkitPlayer = nearbyPlayer.getPlayer();
+			if(!nearbyBukkitPlayer.isOnline())
+			{
+				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
+			}
 			
 			switch(nearbyPlayer.getDirtyPlayerType())
 			{
