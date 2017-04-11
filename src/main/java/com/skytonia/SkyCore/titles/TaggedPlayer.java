@@ -7,9 +7,9 @@ import com.comphenix.packetwrapper.WrapperPlayServerMount;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
-import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import org.bukkit.entity.Player;
 
@@ -36,6 +36,10 @@ public class TaggedPlayer
 	
 	@Getter
 	private final EntityPlayer player;
+	
+	@Getter
+	@Setter
+	private boolean online = true;
 	
 	public TaggedPlayer(EntityPlayer player)
 	{
@@ -159,12 +163,12 @@ public class TaggedPlayer
 		}
 	}
 	
-	public void update()
+	public boolean update()
 	{
 		//Avoid updating if there are no players that require it
 		if(nearbyPlayers.isEmpty() || playerTags.isEmpty())
 		{
-			return;
+			return true;
 		}
 		
 		//Spawn Packets
@@ -273,7 +277,7 @@ public class TaggedPlayer
 		for(ComparisonPlayer nearbyPlayer : nearbyPlayers.values())
 		{
 			Player nearbyBukkitPlayer = nearbyPlayer.getPlayer();
-			if(!nearbyBukkitPlayer.isOnline())
+			if(!isOnline() || !nearbyBukkitPlayer.isOnline())
 			{
 				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
 			}
@@ -318,13 +322,7 @@ public class TaggedPlayer
 		
 		nearbyPlayers.keySet().removeAll(playersToRemove);
 		
-		for(UUID playerToRemove : playersToRemove)
-		{
-			if(nearbyPlayers.containsKey(playerToRemove))
-			{
-				BUtil.logInfo(playerToRemove + " not removed from nearby players map");
-			}
-		}
+		return isOnline();
 	}
 	
 }

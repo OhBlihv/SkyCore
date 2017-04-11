@@ -13,9 +13,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Chris Brown (OhBlihv) on 4/10/2017.
@@ -33,7 +35,7 @@ public class TagController implements Listener
 		return instance;
 	}
 	
-	private final Map<UUID, TaggedPlayer> playerTagMap = new HashMap<>();
+	private final Map<UUID, TaggedPlayer> playerTagMap = new ConcurrentHashMap<>();
 	
 	TagController()
 	{
@@ -48,39 +50,12 @@ public class TagController implements Listener
 			for(Player player : Bukkit.getOnlinePlayers())
 			{
 				TaggedPlayer taggedPlayer = playerTagMap.get(player.getUniqueId());
-				if(taggedPlayer == null)
+				//Handle reconnecting players as well as new players
+				if(taggedPlayer == null || !taggedPlayer.isOnline())
 				{
 					taggedPlayer = new TaggedPlayer(((CraftPlayer) player).getHandle());
 					playerTagMap.put(player.getUniqueId(), taggedPlayer);
 				}
-				
-				/*try
-				{
-					taggedPlayer.setLine(1, "§7Hours: §f" + 420);
-					
-					/*taggedPlayer.setLine(2, "aaaa");
-					taggedPlayer.setLine(3, "aaaa");
-					taggedPlayer.setLine(4, "aaaa");
-					
-					if(new Random().nextInt(10) < 1)
-					{
-						taggedPlayer.setLine(5, "b");
-					}
-					
-					if(new Random().nextInt(10) < 1)
-					{
-						taggedPlayer.setLine(3, "b");
-					}
-					
-					if(new Random().nextInt(10) < 1)
-					{
-						taggedPlayer.removeLine(2);
-					}
-				}
-				catch(Throwable e)
-				{
-					//
-				}*/
 				
 				Location playerLocation = player.getLocation();
 				for(Player playerLoop : Bukkit.getOnlinePlayers())
@@ -102,14 +77,19 @@ public class TagController implements Listener
 						taggedPlayer.removeNearbyPlayer(playerLoop);
 					}
 				}
-				
-				taggedPlayer.update();
-				
-				if(!taggedPlayer.getPlayer().getBukkitEntity().isOnline())
+			}
+			
+			List<UUID> toRemove = new ArrayList<>();
+			for(Map.Entry<UUID, TaggedPlayer> entry : playerTagMap.entrySet())
+			{
+				if(!entry.getValue().update())
 				{
-					playerTagMap.remove(taggedPlayer.getPlayer().getUniqueID());
+					toRemove.add(entry.getKey());
 				}
 			}
+			
+			playerTagMap.entrySet().removeAll(toRemove);
+			
 		}).runTimerASync(10, 10);
 	}
 	
@@ -122,7 +102,7 @@ public class TagController implements Listener
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
-		playerTagMap.get(event.getPlayer().getUniqueId()).setAllNearbyDirty(DirtyPlayerType.REMOVE);
+		playerTagMap.get(event.getPlayer().getUniqueId()).setOnline(false);
 	}
 	
 }
