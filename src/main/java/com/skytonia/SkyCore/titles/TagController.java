@@ -47,7 +47,7 @@ public class TagController implements Listener
 					playerTagMap.put(player.getUniqueId(), taggedPlayer);
 				}
 				
-				try
+				/*try
 				{
 					taggedPlayer.setLine(1, "§7Hours: §f" + 420);
 					
@@ -68,12 +68,12 @@ public class TagController implements Listener
 					if(new Random().nextInt(10) < 1)
 					{
 						taggedPlayer.removeLine(2);
-					}*/
+					}
 				}
 				catch(Throwable e)
 				{
 					//
-				}
+				}*/
 				
 				Location playerLocation = player.getLocation();
 				for(Player playerLoop : Bukkit.getOnlinePlayers())
@@ -98,7 +98,7 @@ public class TagController implements Listener
 				
 				taggedPlayer.update();
 			}
-		}).runTimer(10, 10);
+		}).runTimerASync(10, 10);
 	}
 	
 	

@@ -41,8 +41,7 @@ public class TagLine
 		metadata = PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.AREA_EFFECT_CLOUD);
 		
 		//Entity
-		metadata.setObject(2, text);
-		metadata.setObject(3, true);
+		setText(text);
 		
 		//AreaEffectCloud
 		metadata.setObject(5, 0F);
@@ -52,6 +51,12 @@ public class TagLine
 	public void setText(String text)
 	{
 		metadata.setObject(2, text);
+		metadata.setObject(3, text != null && !text.isEmpty());
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "Id=" + tagId + ",Text=" + text;
+	}
 }

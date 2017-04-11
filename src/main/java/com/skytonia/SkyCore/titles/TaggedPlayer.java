@@ -8,6 +8,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import org.bukkit.entity.Player;
@@ -39,7 +40,27 @@ public class TaggedPlayer
 	{
 		this.player = player;
 		
-		setLine(0, "§e[YOUTUBE] " + player.getName());
+		setLine(0, "");
+		
+		//TODO: Update this at a regular interval?
+		//TODO: Remove after testing
+		String prefix;
+		try
+		{
+			prefix = SkyPerms.getInstance().getPermissionManager().getPermissionUser(player.getUniqueID()).getPrefix() + " ";
+		}
+		catch(NoClassDefFoundError e)
+		{
+			//Ignore
+			prefix = null;
+		}
+		
+		if(prefix == null || prefix.isEmpty())
+		{
+			prefix = "§7" + " ";
+		}
+		
+		setLine(1, prefix + player.getName());
 	}
 	
 	public void setSneaking(boolean sneaking)

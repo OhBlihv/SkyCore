@@ -80,6 +80,14 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<!-- Permissions -->
+		<dependency>
+			<groupId>com.skytonia</groupId>
+			<artifactId>SkyPerms</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		<!-- Auto-generated Annotations -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

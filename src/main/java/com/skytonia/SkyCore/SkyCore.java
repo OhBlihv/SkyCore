@@ -118,7 +118,7 @@ public class SkyCore extends JavaPlugin implements Listener
 		EventUtil.registerEvent(EventPriority.NORMAL, false, PlayerCommandPreprocessEvent.class)
 			.action((event) ->
 		{
-			if(event.getMessage().startsWith("/pettest"))
+			if(event.getMessage().startsWith("/pettest") && event.getPlayer().isOp())
 			{
 				event.getPlayer().sendMessage("§e§l(!) §eAttempting to spawn in Pet...");
 				
