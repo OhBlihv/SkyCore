@@ -25,7 +25,8 @@ import java.util.UUID;
 public class TaggedPlayer
 {
 	
-	private static final int SNEAKING_FLAG = 0x02;
+	private static final int    SNEAKING_FLAG = 0x02,
+								INVISIBILITY_FLAG = 0x20;
 	
 	private boolean sneaking = false;
 	
@@ -47,7 +48,7 @@ public class TaggedPlayer
 		String prefix;
 		try
 		{
-			prefix = SkyPerms.getInstance().getPermissionManager().getPermissionUser(player.getUniqueID()).getPrefix() + " ";
+			prefix = SkyPerms.getInstance().getPermissionManager().getPermissionUser(player.getUniqueID()).getPrefix();
 		}
 		catch(NoClassDefFoundError e)
 		{
@@ -55,9 +56,13 @@ public class TaggedPlayer
 			prefix = null;
 		}
 		
-		if(prefix == null || prefix.isEmpty())
+		if(prefix == null || prefix.isEmpty() || prefix.equals("null"))
 		{
-			prefix = "§7" + " ";
+			prefix = "§7";
+		}
+		else
+		{
+			prefix += " ";
 		}
 		
 		setLine(1, prefix + player.getName());
@@ -197,7 +202,16 @@ public class TaggedPlayer
 				WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
 				
 				spawnPacket.setEntityID(tagLine.getTagId());
-				spawnPacket.setType(3);
+				
+				int entityTypeId = tagLine.getLineEntity().getTypeId();
+				switch(tagLine.getLineEntity())
+				{
+					case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
+					case SNOWBALL: entityTypeId = 61; break;
+				}
+				
+				spawnPacket.setType(entityTypeId);
+				
 				spawnPacket.setX(player.locX);
 				spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
 				spawnPacket.setZ(player.locZ);

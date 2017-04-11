@@ -28,6 +28,9 @@ public class TagLine
 	@Getter
 	private final WrappedDataWatcher metadata;
 	
+	@Getter
+	private EntityType lineEntity = EntityType.AREA_EFFECT_CLOUD;
+	
 	//Used to mark for deletion or other reason
 	@Getter
 	@Setter
@@ -40,19 +43,40 @@ public class TagLine
 		
 		metadata = PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.AREA_EFFECT_CLOUD);
 		
-		//Entity
-		setText(text);
+		this.lineEntity = EntityType.AREA_EFFECT_CLOUD;
 		
 		//AreaEffectCloud
 		metadata.setObject(5, 0F);
 		metadata.setObject(8, EnumWrappers.Particle.SUSPENDED.getId());
+		
+		setText(text);
 	}
 	
 	public void setText(String text)
 	{
+		/*if(text == null || text.isEmpty())
+		{
+			setNewMetadata(EntityType.SNOWBALL);
+		}
+		else
+		{
+			setNewMetadata(EntityType.AREA_EFFECT_CLOUD);
+			
+			//AreaEffectCloud
+			metadata.setObject(5, 0F);
+			metadata.setObject(8, EnumWrappers.Particle.SUSPENDED.getId());
+		}*/
+		
 		metadata.setObject(2, text);
 		metadata.setObject(3, text != null && !text.isEmpty());
 	}
+	
+	/*private void setNewMetadata(EntityType entityType)
+	{
+		metadata = PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), entityType);
+		
+		this.lineEntity = entityType;
+	}*/
 	
 	@Override
 	public String toString()

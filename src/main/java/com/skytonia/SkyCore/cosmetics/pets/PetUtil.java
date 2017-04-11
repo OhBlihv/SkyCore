@@ -18,6 +18,11 @@ public class PetUtil
 	
 	private static final Map<EntityType, WrappedDataWatcher> watcherCache = new HashMap<>();
 	
+	public static WrappedDataWatcher getDefaultWatcherDirect(EntityType entityType)
+	{
+		return watcherCache.get(entityType);
+	}
+	
 	public static WrappedDataWatcher getDefaultWatcher(World world, EntityType type)
 	{
 		WrappedDataWatcher watcher = watcherCache.get(type);

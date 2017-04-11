@@ -1,13 +1,16 @@
 package com.skytonia.SkyCore.titles;
 
 import com.skytonia.SkyCore.SkyCore;
+import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import java.util.HashMap;
@@ -34,6 +37,10 @@ public class TagController implements Listener
 	
 	TagController()
 	{
+		//Pre-Register our DataWatchers on the main thread
+		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.AREA_EFFECT_CLOUD);
+		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.SNOWBALL);
+		
 		SkyCore.getPluginInstance().getServer().getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
 		
 		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
@@ -97,15 +104,25 @@ public class TagController implements Listener
 				}
 				
 				taggedPlayer.update();
+				
+				if(!taggedPlayer.getPlayer().getBukkitEntity().isOnline())
+				{
+					playerTagMap.remove(taggedPlayer.getPlayer().getUniqueID());
+				}
 			}
 		}).runTimerASync(10, 10);
 	}
-	
 	
 	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
 	{
 		playerTagMap.get(event.getPlayer().getUniqueId()).setSneaking(!event.getPlayer().isSneaking());
+	}
+	
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent event)
+	{
+		playerTagMap.get(event.getPlayer().getUniqueId()).setAllNearbyDirty(DirtyPlayerType.REMOVE);
 	}
 	
 }
