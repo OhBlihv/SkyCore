@@ -205,6 +205,7 @@ public class TaggedPlayer
 			//Ensure the spacer gets destroyed if not used
 			tagIds.add(spacerLine.getTagId());
 		}
+		visibleTags.addAll(playerTags);
 		
 		for(TagLine tagLine : visibleTags)
 		{
