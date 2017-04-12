@@ -7,6 +7,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerMount;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
+import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class TaggedPlayer
 	
 	private boolean sneaking = false;
 	
+	private TagLine spacerLine = new TagLine(PetUtil.getNextEntityId(), "");
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
 	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new HashMap<>();
@@ -44,8 +46,6 @@ public class TaggedPlayer
 	public TaggedPlayer(EntityPlayer player)
 	{
 		this.player = player;
-		
-		setLine(0, "");
 		
 		//TODO: Update this at a regular interval?
 		//TODO: Remove after testing
@@ -64,12 +64,20 @@ public class TaggedPlayer
 		{
 			prefix = "§7";
 		}
-		else
+		
+		setLine(0, prefix + player.getName());
+	}
+	
+	public double getHatHeight()
+	{
+		//TODO: Read off worn hat
+		if(RedisManager.getServerName().contains("hub"))
 		{
-			prefix += " ";
+			//Hubs contain rabbit ears for now
+			return 1;
 		}
 		
-		setLine(1, prefix + player.getName());
+		return 0;
 	}
 	
 	public void setSneaking(boolean sneaking)
@@ -187,7 +195,18 @@ public class TaggedPlayer
 		final double amx = 0.375, amv = -0.161;
 		
 		int lastVehicleId = player.getId();
-		for(TagLine tagLine : playerTags)
+		List<TagLine> visibleTags = new ArrayList<>();
+		if(getHatHeight() > 0)
+		{
+			visibleTags.add(spacerLine);
+		}
+		else
+		{
+			//Ensure the spacer gets destroyed if not used
+			tagIds.add(spacerLine.getTagId());
+		}
+		
+		for(TagLine tagLine : visibleTags)
 		{
 			if(tagLine.getDirtyPlayerType() == DirtyPlayerType.REMOVE)
 			{
