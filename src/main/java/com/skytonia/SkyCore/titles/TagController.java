@@ -42,6 +42,7 @@ public class TagController implements Listener
 		//Pre-Register our DataWatchers on the main thread
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.AREA_EFFECT_CLOUD);
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.SNOWBALL);
+		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.RABBIT);
 		
 		SkyCore.getPluginInstance().getServer().getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
 		

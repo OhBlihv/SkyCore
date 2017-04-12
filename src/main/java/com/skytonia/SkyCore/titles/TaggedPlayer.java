@@ -5,7 +5,8 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
 import com.comphenix.packetwrapper.WrapperPlayServerMount;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntityLiving;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyPerms.SkyPerms;
@@ -66,6 +67,7 @@ public class TaggedPlayer
 		}
 		
 		setLine(0, prefix + player.getName());
+		setLine(1, "\u00A7cExample Line");
 	}
 	
 	public double getHatHeight()
@@ -190,7 +192,8 @@ public class TaggedPlayer
 		
 		List<TagLine> tagsToRemove = new ArrayList<>();
 		
-		int lineHeight = 3;
+		int lineHeight = 3,
+			contentLineNum = 0;
 		//Thanks to cyberpwn for the following values
 		final double amx = 0.375, amv = -0.161;
 		
@@ -207,6 +210,7 @@ public class TaggedPlayer
 		}
 		visibleTags.addAll(playerTags);
 		
+		List<Integer> lastPassengers = new ArrayList<>();
 		for(TagLine tagLine : visibleTags)
 		{
 			if(tagLine.getDirtyPlayerType() == DirtyPlayerType.REMOVE)
@@ -223,59 +227,104 @@ public class TaggedPlayer
 			}
 			else
 			{
-				WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
-				
-				spawnPacket.setEntityID(tagLine.getTagId());
-				
-				int entityTypeId = tagLine.getLineEntity().getTypeId();
-				switch(tagLine.getLineEntity())
+				if(tagLine.getLineEntity().isAlive())
 				{
-					case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
-					case SNOWBALL: entityTypeId = 61; break;
-				}
-				
-				spawnPacket.setType(entityTypeId);
-				
-				spawnPacket.setX(player.locX);
-				spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
-				spawnPacket.setZ(player.locZ);
-				
-				spawnPackets.add(spawnPacket);
-				
-				WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
-				
-				metadataPacket.setEntityID(tagLine.getTagId());
-				
-				{
-					List<WrappedWatchableObject> metadataObjects = tagLine.getMetadata().getWatchableObjects();
+					WrapperPlayServerSpawnEntityLiving spawnPacket = new WrapperPlayServerSpawnEntityLiving();
 					
-					WrappedWatchableObject entityFlags = metadataObjects.get(0);
+					spawnPacket.setEntityID(tagLine.getTagId());
+					
+					spawnPacket.setType(tagLine.getLineEntity());
+					
+					spawnPacket.setX(player.locX);
+					spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
+					spawnPacket.setZ(player.locZ);
+					
+					WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
+					
+					metadataPacket.setEntityID(tagLine.getTagId());
+					
+					WrappedDataWatcher metadata = tagLine.getMetadata();
 					
 					if(sneaking)
 					{
-						entityFlags.setValue((byte) SNEAKING_FLAG);
+						metadata.setObject(0, (byte) SNEAKING_FLAG);
 					}
 					else
 					{
-						entityFlags.setValue((byte) 0);
+						metadata.setObject(0, (byte) 0);
 					}
 					
-					metadataPacket.setMetadata(metadataObjects);
+					//Set Baby Rabbit
+					metadata.setObject(11, contentLineNum == 0);
+					
+					metadataPacket.setMetadata(metadata.getWatchableObjects());
+					spawnPacket.setMetadata(metadata);
+					
+					spawnPackets.add(spawnPacket);
+					
+					updatePackets.add(metadataPacket);
+					
+					contentLineNum++;
+				}
+				else
+				{
+					WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
+					
+					spawnPacket.setEntityID(tagLine.getTagId());
+				
+					int entityTypeId = tagLine.getLineEntity().getTypeId();
+					switch(tagLine.getLineEntity())
+					{
+						case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
+						case SNOWBALL: entityTypeId = 61; break;
+					}
+					
+					spawnPacket.setType(entityTypeId);
+					
+					spawnPacket.setX(player.locX);
+					spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
+					spawnPacket.setZ(player.locZ);
+					
+					spawnPackets.add(spawnPacket);
+					
+					WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
+					
+					metadataPacket.setEntityID(tagLine.getTagId());
+					
+					WrappedDataWatcher metadata = tagLine.getMetadata();
+					
+					if(sneaking)
+					{
+						metadata.setObject(0, (byte) SNEAKING_FLAG);
+					}
+					else
+					{
+						metadata.setObject(0, (byte) 0);
+					}
+					
+					metadataPacket.setMetadata(metadata.getWatchableObjects());
+					
+					updatePackets.add(metadataPacket);
 				}
 				
-				updatePackets.add(metadataPacket);
-				
-				WrapperPlayServerMount mountPacket = new WrapperPlayServerMount();
-				
-				mountPacket.setEntityID(lastVehicleId);
-				mountPacket.setPassengerIds(new int[] {tagLine.getTagId()});
-				
-				spawnPackets.add(mountPacket);
-				
-				lastVehicleId = tagLine.getTagId();
+				if(!tagLine.getLineEntity().isAlive())
+				{
+					spawnPackets.add(getMountPacket(lastVehicleId, lastPassengers));
+					
+					lastVehicleId = tagLine.getTagId();
+				}
+				else
+				{
+					lastPassengers.add(tagLine.getTagId());
+				}
 			}
 			
 			tagIds.add(tagLine.getTagId());
+		}
+		
+		if(!lastPassengers.isEmpty())
+		{
+			spawnPackets.add(getMountPacket(lastVehicleId, lastPassengers));
 		}
 		
 		playerTags.removeAll(tagsToRemove);
@@ -343,6 +392,26 @@ public class TaggedPlayer
 		nearbyPlayers.keySet().removeAll(playersToRemove);
 		
 		return isOnline();
+	}
+	
+	public AbstractPacket getMountPacket(int lastVehicleId, List<Integer> passengerIds)
+	{
+		WrapperPlayServerMount mountPacket = new WrapperPlayServerMount();
+		
+		mountPacket.setEntityID(lastVehicleId);
+		
+		int[] passengerArr = new int[passengerIds.size()];
+		int i = 0;
+		for(int passengerId : passengerIds)
+		{
+			passengerArr[i++] = passengerId;
+		}
+		
+		mountPacket.setPassengerIds(passengerArr);
+		
+		passengerIds.clear();
+		
+		return mountPacket;
 	}
 	
 }
