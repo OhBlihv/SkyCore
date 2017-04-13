@@ -5,16 +5,17 @@ import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R2.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +36,7 @@ public class TagController implements Listener
 		return instance;
 	}
 	
-	private final Map<UUID, TaggedPlayer> playerTagMap = new ConcurrentHashMap<>();
+	private final Map<UUID, TaggedPlayer> entityTagMap = new ConcurrentHashMap<>();
 	
 	TagController()
 	{
@@ -50,66 +51,78 @@ public class TagController implements Listener
 		{
 			for(Player player : Bukkit.getOnlinePlayers())
 			{
-				TaggedPlayer taggedPlayer = getPlayerTag(player);
-				
-				Location playerLocation = player.getLocation();
-				for(Player playerLoop : Bukkit.getOnlinePlayers())
-				{
-					//Ignore host player
-					if(playerLoop == player)
-					{
-						continue;
-					}
-					
-					//TODO: Configuration for Distance (20)
-					if(playerLoop.getLocation().distance(playerLocation) < 20)
-					{
-						taggedPlayer.addNearbyPlayer(playerLoop);
-					}
-					else
-					{
-						//TODO: loop through already nearby players and check their distance?
-						taggedPlayer.removeNearbyPlayer(playerLoop);
-					}
-				}
+				//Enforce all players have their tags
+				getPlayerTag(player);
 			}
 			
-			List<UUID> toRemove = new ArrayList<>();
-			for(Map.Entry<UUID, TaggedPlayer> entry : playerTagMap.entrySet())
+			for(Iterator<TaggedPlayer> tagItr = entityTagMap.values().iterator();tagItr.hasNext();)
 			{
-				if(!entry.getValue().update())
+				TaggedPlayer taggedPlayer = tagItr.next();
+				
+				updateNearbyPlayers(taggedPlayer);
+				
+				if(!taggedPlayer.update())
 				{
-					toRemove.add(entry.getKey());
+					tagItr.remove();
 				}
 			}
-			
-			playerTagMap.keySet().removeAll(toRemove);
 			
 		}).runTimerASync(10, 10);
+	}
+	
+	private void updateNearbyPlayers(TaggedPlayer taggedPlayer)
+	{
+		Entity entity = taggedPlayer.getEntity().getBukkitEntity();
+		Location entityLocation = entity.getLocation();
+		
+		for(Player playerLoop : Bukkit.getOnlinePlayers())
+		{
+			//Ignore host player
+			if(playerLoop == entity)
+			{
+				continue;
+			}
+			
+			//TODO: Configuration for Distance (20)
+			if(playerLoop.getLocation().distance(entityLocation) < 20)
+			{
+				taggedPlayer.addNearbyPlayer(playerLoop);
+			}
+			else
+			{
+				//TODO: loop through already nearby players and check their distance?
+				taggedPlayer.removeNearbyPlayer(playerLoop);
+			}
+		}
 	}
 	
 	//
 	
 	public void setPlayerTagStatus(Player player, boolean hidden)
 	{
-		TaggedPlayer taggedPlayer = getPlayerTag(player);
-		
-		if(hidden != taggedPlayer.isHideTags())
+		getPlayerTag(player).setHideTags(hidden);
+	}
+	
+	public TaggedPlayer getTagForEntity(Entity entity)
+	{
+		TaggedPlayer taggedPlayer = entityTagMap.get(entity.getUniqueId());
+		if(taggedPlayer == null)
 		{
-			taggedPlayer.setHideTags(hidden);
-			
-			taggedPlayer.setAllNearbyDirty(DirtyPlayerType.ADD);
+			taggedPlayer = new TaggedPlayer(((CraftEntity) entity).getHandle());
+			entityTagMap.put(entity.getUniqueId(), taggedPlayer);
 		}
+		
+		return taggedPlayer;
 	}
 	
 	public TaggedPlayer getPlayerTag(Player player)
 	{
-		TaggedPlayer taggedPlayer = playerTagMap.get(player.getUniqueId());
+		TaggedPlayer taggedPlayer = entityTagMap.get(player.getUniqueId());
 		//Handle reconnecting players as well as new players
 		if(taggedPlayer == null || !taggedPlayer.isOnline())
 		{
-			taggedPlayer = new TaggedPlayer(((CraftPlayer) player).getHandle());
-			playerTagMap.put(player.getUniqueId(), taggedPlayer);
+			taggedPlayer = new TaggedPlayer(((CraftEntity) player).getHandle());
+			entityTagMap.put(player.getUniqueId(), taggedPlayer);
 		}
 		
 		return taggedPlayer;
@@ -120,13 +133,26 @@ public class TagController implements Listener
 	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
 	{
-		playerTagMap.get(event.getPlayer().getUniqueId()).setSneaking(!event.getPlayer().isSneaking());
+		entityTagMap.get(event.getPlayer().getUniqueId()).setSneaking(!event.getPlayer().isSneaking());
 	}
 	
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
-		playerTagMap.get(event.getPlayer().getUniqueId()).setOnline(false);
+		entityTagMap.get(event.getPlayer().getUniqueId()).setOnline(false);
+	}
+	
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent event)
+	{
+		if(!entityTagMap.isEmpty() && event.getEntityType() != EntityType.PLAYER)
+		{
+			TaggedPlayer taggedPlayer = entityTagMap.get(event.getEntity().getUniqueId());
+			if(taggedPlayer != null)
+			{
+				taggedPlayer.setOnline(false);
+			}
+		}
 	}
 	
 }

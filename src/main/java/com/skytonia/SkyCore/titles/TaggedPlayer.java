@@ -11,7 +11,7 @@ import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
-import lombok.Setter;
+import net.minecraft.server.v1_9_R2.Entity;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import org.bukkit.entity.Player;
 
@@ -33,7 +33,6 @@ public class TaggedPlayer
 	private boolean sneaking = false;
 	
 	@Getter
-	@Setter
 	private boolean hideTags = false;
 	
 	private TagLine spacerLine = new TagLine(PetUtil.getNextEntityId(), "");
@@ -42,44 +41,55 @@ public class TaggedPlayer
 	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new HashMap<>();
 	
 	@Getter
-	private final EntityPlayer player;
+	private final Entity entity;
 	
 	@Getter
 	private boolean online = true;
 	
-	public TaggedPlayer(EntityPlayer player)
+	public TaggedPlayer(Entity player)
 	{
-		this.player = player;
+		this.entity = player;
 		
-		//TODO: Update this at a regular interval?
-		//TODO: Remove after testing
-		String prefix;
-		try
+		if(entity instanceof EntityPlayer)
 		{
-			prefix = SkyPerms.getInstance().getPermissionManager().getPermissionUser(player.getUniqueID()).getPrefix();
+			//TODO: Update this at a regular interval?
+			//TODO: Remove after testing
+			String prefix;
+			try
+			{
+				prefix = SkyPerms.getInstance().getPermissionManager().getPermissionUser(player.getUniqueID()).getPrefix();
+			}
+			catch(NoClassDefFoundError e)
+			{
+				//Ignore
+				prefix = null;
+			}
+			
+			if(prefix == null || prefix.isEmpty() || prefix.equals("null"))
+			{
+				prefix = "§7";
+			}
+			
+			setLine(0, prefix + player.getName());
 		}
-		catch(NoClassDefFoundError e)
-		{
-			//Ignore
-			prefix = null;
-		}
-		
-		if(prefix == null || prefix.isEmpty() || prefix.equals("null"))
-		{
-			prefix = "§7";
-		}
-		
-		setLine(0, prefix + player.getName());
+	}
+	
+	public UUID getUUID()
+	{
+		return entity.getUniqueID();
 	}
 	
 	public double getHatHeight()
 	{
-		//TODO: Read off worn hat
-		String serverName = RedisManager.getServerName().toLowerCase();
-		if(serverName.startsWith("hub") || serverName.startsWith("murder"))
+		if(entity instanceof EntityPlayer)
 		{
-			//Hubs contain rabbit ears for now
-			return 1;
+			//TODO: Read off worn hat
+			String serverName = RedisManager.getServerName().toLowerCase();
+			if(serverName.startsWith("hub") || serverName.startsWith("murder"))
+			{
+				//Hubs contain rabbit ears for now
+				return 1;
+			}
 		}
 		
 		return 0;
@@ -91,6 +101,15 @@ public class TaggedPlayer
 		
 		setAllNearbyDirty(DirtyPlayerType.UPDATE);
 		update(); //Force an update to ensure the sneaking lines up with their actual sneak status
+	}
+	
+	public void setHideTags(boolean hideTags)
+	{
+		if(hideTags != isHideTags())
+		{
+			this.hideTags = hideTags;
+			setAllNearbyDirty(DirtyPlayerType.ADD);
+		}
 	}
 	
 	public void setOnline(boolean online)
@@ -211,7 +230,7 @@ public class TaggedPlayer
 		//Thanks to cyberpwn for the following values
 		final double amx = 0.375, amv = -0.161;
 		
-		int lastVehicleId = player.getId();
+		int lastVehicleId = entity.getId();
 		List<TagLine> visibleTags = new ArrayList<>();
 		if(getHatHeight() > 0)
 		{
@@ -251,9 +270,9 @@ public class TaggedPlayer
 						
 						spawnPacket.setType(tagLine.getLineEntity());
 						
-						spawnPacket.setX(player.locX);
-						spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
-						spawnPacket.setZ(player.locZ);
+						spawnPacket.setX(entity.locX);
+						spawnPacket.setY(entity.locY + ((++lineHeight * amx) + amv));
+						spawnPacket.setZ(entity.locZ);
 						
 						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
 						
@@ -297,9 +316,9 @@ public class TaggedPlayer
 						
 						spawnPacket.setType(entityTypeId);
 						
-						spawnPacket.setX(player.locX);
-						spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
-						spawnPacket.setZ(player.locZ);
+						spawnPacket.setX(entity.locX);
+						spawnPacket.setY(entity.locY + ((++lineHeight * amx) + amv));
+						spawnPacket.setZ(entity.locZ);
 						
 						spawnPackets.add(spawnPacket);
 						
