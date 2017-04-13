@@ -89,7 +89,7 @@ public class TagController implements Listener
 				}
 			}
 			
-			playerTagMap.entrySet().removeAll(toRemove);
+			playerTagMap.keySet().removeAll(toRemove);
 			
 		}).runTimerASync(10, 10);
 	}
