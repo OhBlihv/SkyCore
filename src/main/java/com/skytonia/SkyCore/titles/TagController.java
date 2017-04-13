@@ -50,13 +50,7 @@ public class TagController implements Listener
 		{
 			for(Player player : Bukkit.getOnlinePlayers())
 			{
-				TaggedPlayer taggedPlayer = playerTagMap.get(player.getUniqueId());
-				//Handle reconnecting players as well as new players
-				if(taggedPlayer == null || !taggedPlayer.isOnline())
-				{
-					taggedPlayer = new TaggedPlayer(((CraftPlayer) player).getHandle());
-					playerTagMap.put(player.getUniqueId(), taggedPlayer);
-				}
+				TaggedPlayer taggedPlayer = getPlayerTag(player);
 				
 				Location playerLocation = player.getLocation();
 				for(Player playerLoop : Bukkit.getOnlinePlayers())
@@ -101,9 +95,17 @@ public class TagController implements Listener
 		playerTagMap.get(playerUUID).setHideTags(hidden);
 	}
 	
-	public TaggedPlayer getPlayerTag(UUID playerUUID)
+	public TaggedPlayer getPlayerTag(Player player)
 	{
-		return playerTagMap.get(playerUUID);
+		TaggedPlayer taggedPlayer = playerTagMap.get(player.getUniqueId());
+		//Handle reconnecting players as well as new players
+		if(taggedPlayer == null || !taggedPlayer.isOnline())
+		{
+			taggedPlayer = new TaggedPlayer(((CraftPlayer) player).getHandle());
+			playerTagMap.put(player.getUniqueId(), taggedPlayer);
+		}
+		
+		return taggedPlayer;
 	}
 	
 	//
