@@ -84,7 +84,7 @@ public class TagController implements Listener
 			}
 			
 			//TODO: Configuration for Distance (20)
-			if(playerLoop.getLocation().distance(entityLocation) < 20)
+			if(entityLocation.getWorld() == playerLoop.getWorld() && playerLoop.getLocation().distance(entityLocation) < 20)
 			{
 				taggedPlayer.addNearbyPlayer(playerLoop);
 			}
