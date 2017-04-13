@@ -94,6 +94,20 @@ public class TagController implements Listener
 		}).runTimerASync(10, 10);
 	}
 	
+	//
+	
+	public void setPlayerTagStatus(UUID playerUUID, boolean hidden)
+	{
+		playerTagMap.get(playerUUID).setHideTags(hidden);
+	}
+	
+	public TaggedPlayer getPlayerTag(UUID playerUUID)
+	{
+		return playerTagMap.get(playerUUID);
+	}
+	
+	//
+	
 	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
 	{
