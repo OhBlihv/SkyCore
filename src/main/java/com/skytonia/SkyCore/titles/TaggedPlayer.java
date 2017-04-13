@@ -75,7 +75,8 @@ public class TaggedPlayer
 	public double getHatHeight()
 	{
 		//TODO: Read off worn hat
-		if(RedisManager.getServerName().contains("hub"))
+		String serverName = RedisManager.getServerName().toLowerCase();
+		if(serverName.startsWith("hub") || serverName.startsWith("murder"))
 		{
 			//Hubs contain rabbit ears for now
 			return 1;
