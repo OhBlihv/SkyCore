@@ -1,9 +1,8 @@
 package com.skytonia.SkyCore;
 
-import com.skytonia.SkyCore.cosmetics.CosmeticThread;
-import com.skytonia.SkyCore.cosmetics.objects.ActiveCosmetic;
 import com.skytonia.SkyCore.cosmetics.pets.MiniPet;
-import com.skytonia.SkyCore.cosmetics.pets.PetConfiguration;
+import com.skytonia.SkyCore.cosmetics.pets.configuration.PetConfiguration;
+import com.skytonia.SkyCore.cosmetics.pets.configuration.PlayerPetConfiguration;
 import com.skytonia.SkyCore.events.EventUtil;
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
@@ -123,16 +122,19 @@ public class SkyCore extends JavaPlugin implements Listener
 				event.getPlayer().sendMessage("§e§l(!) §eAttempting to spawn in Pet...");
 				
 				MiniPet miniPet = new MiniPet(event.getPlayer(),
-				                              new PetConfiguration(
-					                                                  "Example-Pet",
-					                                                  StoredHeads.PIG.asItemContainer(),
-					                                                  "Example Pet"));
-					
-				ActiveCosmetic activeCosmetic = new ActiveCosmetic(miniPet, event.getPlayer(), 10);
+				                              new PlayerPetConfiguration(
+				                              	new PetConfiguration(
+				                              		"Example-Pet",
+					                                StoredHeads.PIG.asItemContainer(),
+					                                "§cExample Pet",
+					                                1.5D
+				                                ),
+				                                null,
+				                                false
+				                              )
+				);
 				
-				CosmeticThread.getInstance().addCosmetic(activeCosmetic);
-				
-				miniPet.setAttachedCosmetic(activeCosmetic);
+				miniPet.setPetName("\u00A7cExample Name #1");
 				
 				event.getPlayer().sendMessage("§e§l(!) §eSpawned in example pet.");
 				event.setCancelled(true);
