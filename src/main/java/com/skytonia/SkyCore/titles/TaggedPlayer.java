@@ -45,7 +45,6 @@ public class TaggedPlayer
 	private final EntityPlayer player;
 	
 	@Getter
-	@Setter
 	private boolean online = true;
 	
 	public TaggedPlayer(EntityPlayer player)
@@ -91,6 +90,17 @@ public class TaggedPlayer
 		
 		setAllNearbyDirty(DirtyPlayerType.UPDATE);
 		update(); //Force an update to ensure the sneaking lines up with their actual sneak status
+	}
+	
+	public void setOnline(boolean online)
+	{
+		this.online = online;
+		
+		if(!online)
+		{
+			setAllNearbyDirty(DirtyPlayerType.REMOVE);
+			update(); //Force an update to avoid the tags hovering for ~0.5 seconds
+		}
 	}
 	
 	public TagLine getLine(int lineNum)
