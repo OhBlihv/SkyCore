@@ -39,7 +39,7 @@ public class PacketHandling implements Listener
 					}
 				}
 				
-				//packet.setNameTagVisibility("never");
+				packet.setNameTagVisibility("never");
 			}
 			
 		});
@@ -57,9 +57,9 @@ public class PacketHandling implements Listener
 			gameProfiles.add(getProfileFrom("Erictoigaroar"));
 			gameProfiles.add(getProfileFrom("mmadoe"));
 		}
-		catch(Throwable e)
+		catch(Throwable updateNav)
 		{
-			e.printStackTrace();
+			updateNav.printStackTrace();
 		}
 		
 		//April Fools
@@ -155,9 +155,9 @@ public class PacketHandling implements Listener
 			Method method = getFillMethod(sessionService);
 			method.invoke(sessionService, handle, true);
 		}
-		catch (IllegalAccessException | InvocationTargetException e)
+		catch (IllegalAccessException | InvocationTargetException updateNav)
 		{
-			e.printStackTrace();
+			updateNav.printStackTrace();
 			return null;
 		}
 		profile = WrappedGameProfile.fromHandle(handle);
@@ -206,7 +206,7 @@ public class PacketHandling implements Listener
 		{
 			team = scoreboard.registerNewTeam("Dinnerbone");
 		}
-		catch(Throwable e)
+		catch(Throwable updateNav)
 		{
 			team = scoreboard.getTeam("Dinnerbone");
 		}

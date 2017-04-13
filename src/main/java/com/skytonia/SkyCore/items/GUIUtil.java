@@ -174,9 +174,9 @@ public class GUIUtil
 					default: break;
 				}
 			}
-			catch(Exception e)
+			catch(Exception updateNav)
 			{
-				e.printStackTrace();
+				updateNav.printStackTrace();
 				return item;
 			}*
 			
@@ -185,9 +185,9 @@ public class GUIUtil
 
 			return (ItemStack) CRAFT_ItemStack_asCraftMirror.invoke(null, nmsStack);
 		}
-		catch(ClassCastException | IllegalAccessException | InvocationTargetException | InstantiationException e)
+		catch(ClassCastException | IllegalAccessException | InvocationTargetException | InstantiationException updateNav)
 		{
-			e.printStackTrace();
+			updateNav.printStackTrace();
 			BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
 			return tiem;
 		}*/

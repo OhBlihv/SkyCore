@@ -80,12 +80,12 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<!-- Permissions -->
 		<dependency>
-			<groupId>org.phantomapi</groupId>
-			<artifactId>Phantom</artifactId>
-			<version>M7</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/../lib/Phantom-M7.jar</systemPath>
+			<groupId>com.skytonia</groupId>
+			<artifactId>SkyPerms</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- Auto-generated Annotations -->

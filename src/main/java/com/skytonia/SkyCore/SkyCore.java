@@ -1,16 +1,24 @@
 package com.skytonia.SkyCore;
 
+import com.skytonia.SkyCore.cosmetics.pets.MiniPet;
+import com.skytonia.SkyCore.cosmetics.pets.configuration.PetConfiguration;
+import com.skytonia.SkyCore.cosmetics.pets.configuration.PlayerPetConfiguration;
+import com.skytonia.SkyCore.events.EventUtil;
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
+import com.skytonia.SkyCore.items.heads.StoredHeads;
 import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.movement.PlayerCount;
 import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.titles.TagController;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -102,6 +110,36 @@ public class SkyCore extends JavaPlugin implements Listener
 			BUtil.logError("An issue occurred while initializing stored variables. Refer to the stack trace below.");
 			BUtil.logStackTrace(e);
 		}
+		
+		TagController.getInstance(); //Enable Tags
+		
+		//Dodgy Temp-Command Section
+		EventUtil.registerEvent(EventPriority.NORMAL, false, PlayerCommandPreprocessEvent.class)
+			.action((event) ->
+		{
+			if(event.getMessage().startsWith("/pettest") && event.getPlayer().isOp())
+			{
+				event.getPlayer().sendMessage("§e§l(!) §eAttempting to spawn in Pet...");
+				
+				MiniPet miniPet = new MiniPet(event.getPlayer(),
+				                              new PlayerPetConfiguration(
+				                              	new PetConfiguration(
+				                              		"Example-Pet",
+					                                StoredHeads.PIG.asItemContainer(),
+					                                "§cExample Pet",
+					                                1.5D
+				                                ),
+				                                null,
+				                                false
+				                              )
+				);
+				
+				miniPet.setPetName("\u00A7cExample Name #1");
+				
+				event.getPlayer().sendMessage("§e§l(!) §eSpawned in example pet.");
+				event.setCancelled(true);
+			}
+		});
 	}
 	
 	@Override

@@ -1,7 +1,10 @@
 package com.skytonia.SkyCore.items.heads;
 
 import com.skytonia.SkyCore.items.HeadUtil;
+import com.skytonia.SkyCore.items.construction.ItemContainer;
+import com.skytonia.SkyCore.items.construction.ItemContainerConstructor;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,6 +21,14 @@ public class StoredHeads
 	{
 		
 		private final String skullTexture;
+		
+		public ItemContainer asItemContainer()
+		{
+			return new ItemContainerConstructor.ItemContainerBuilder()
+				       .material(Material.SKULL_ITEM)
+					   .damage(3)
+				       .skullTexture(skullTexture).build();
+		}
 		
 		public ItemStack buildHead()
 		{

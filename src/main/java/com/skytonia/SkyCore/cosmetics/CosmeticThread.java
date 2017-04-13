@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.cosmetics;
 
 import com.skytonia.SkyCore.cosmetics.objects.ActiveCosmetic;
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +37,7 @@ public class CosmeticThread extends Thread
 	@Getter
 	private long currentTick = 1L;
 	private long startEmptyTick = 0L; //Ticks since we've had nothing to process
+	private long lastStartTick = 0L;
 
 	//Cosmetics
 	@Getter
@@ -58,6 +60,8 @@ public class CosmeticThread extends Thread
 		
 		while(isRunning)
 		{
+			lastStartTick = System.currentTimeMillis();
+			
 			if(cosmeticSet.isEmpty())
 			{
 				if(startEmptyTick == 0)
@@ -134,8 +138,15 @@ public class CosmeticThread extends Thread
 	{
 		try
 		{
-			//TODO: Target a 50ms wait, but aim to consistently start displaying cosmetics every 50ms
-			sleep(WAIT_MILLIS);
+			long sleepTime = WAIT_MILLIS - (System.currentTimeMillis() - lastStartTick);
+			if(sleepTime <= 0)
+			{
+				BUtil.logInfo("Target Sleep Time <= 0! Expect Performance Drop on Cosmetics (Value=" + sleepTime + ")");
+			}
+			else
+			{
+				sleep(sleepTime);
+			}
 		}
 		catch(InterruptedException e)
 		{
@@ -181,6 +192,7 @@ public class CosmeticThread extends Thread
 	public void removeCosmetic(ActiveCosmetic activeCosmetic)
 	{
 		cosmeticSet.remove(activeCosmetic);
+		activeCosmetic.onRemove();
 	}
 	
 }

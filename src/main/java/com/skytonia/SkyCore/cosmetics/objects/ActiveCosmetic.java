@@ -1,10 +1,6 @@
 package com.skytonia.SkyCore.cosmetics.objects;
 
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
-import com.skytonia.SkyCore.cheapobjects.player.factory.ICheapPlayerFactory;
 import com.skytonia.SkyCore.cosmetics.CosmeticThread;
-import com.skytonia.SkyCore.cosmetics.objects.options.CosmeticOptionStorage;
-import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,12 +15,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class ActiveCosmetic
 {
 	
-	private final CopyOnWriteArraySet<CheapPlayer> nearbyPlayers = new CopyOnWriteArraySet<>();
+	private final CopyOnWriteArraySet<Player> nearbyPlayers = new CopyOnWriteArraySet<>();
 	
 	@Getter
 	final BaseCosmetic cosmetic;
-	
-	final CosmeticOptionStorage cosmeticOptions;
 	
 	@Getter
 	private final Player activatingPlayer;
@@ -40,36 +34,35 @@ public class ActiveCosmetic
 	
 	public final int updateRate;
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, int viewDistance)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Player activatingPlayer, int viewDistance)
 	{
-		this(cosmetic, cosmeticOptions, activatingPlayer, viewDistance, 0L);
+		this(cosmetic, activatingPlayer, viewDistance, 0L);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Player activatingPlayer, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, activatingPlayer, null, null, viewDistance, endAtTick);
+		this(cosmetic, activatingPlayer, null, null, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Location staticLocation, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Location staticLocation, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, null, staticLocation, null, viewDistance, endAtTick);
+		this(cosmetic, null, staticLocation, null, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Player activatingPlayer, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Player activatingPlayer, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, activatingPlayer, null, expiryAction, viewDistance, endAtTick);
+		this(cosmetic, activatingPlayer, null, expiryAction, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions, Location staticLocation, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
+	public ActiveCosmetic(BaseCosmetic cosmetic, Location staticLocation, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
 	{
-		this(cosmetic, cosmeticOptions, null, staticLocation, expiryAction, viewDistance, endAtTick);
+		this(cosmetic, null, staticLocation, expiryAction, viewDistance, endAtTick);
 	}
 	
-	public ActiveCosmetic(BaseCosmetic cosmetic, CosmeticOptionStorage cosmeticOptions,
+	public ActiveCosmetic(BaseCosmetic cosmetic,
 	                      Player activatingPlayer, Location staticLocation, CosmeticExpiry expiryAction, int viewDistance, long endAtTick)
 	{
 		this.cosmetic = cosmetic;
-		this.cosmeticOptions = cosmeticOptions;
 		
 		this.activatingPlayer = activatingPlayer;
 		this.staticLocation = staticLocation;
@@ -91,7 +84,7 @@ public class ActiveCosmetic
 		//Add the player to their own nearby players list to ensure they can view their own cosmetic
 		if(activatingPlayer != null)
 		{
-			this.nearbyPlayers.add(StaticNMS.getCheapPlayerFactoryInstance().getCheapPlayer(activatingPlayer));
+			addNearbyPlayer(activatingPlayer);
 		}
 		
 		//Trigger a nearby players update early
@@ -100,14 +93,20 @@ public class ActiveCosmetic
 	
 	private Location getLocation()
 	{
-		if(activatingPlayer == null)
+		Location location = cosmetic.getLocation();
+		if(location == null)
 		{
-			return staticLocation;
+			if(activatingPlayer == null)
+			{
+				location = staticLocation;
+			}
+			else
+			{
+				location = activatingPlayer.getLocation();
+			}
 		}
-		else
-		{
-			return activatingPlayer.getLocation();
-		}
+		
+		return location;
 	}
 	
 	public void onRemove()
@@ -116,6 +115,8 @@ public class ActiveCosmetic
 		{
 			expiryAction.expire(this);
 		}
+		
+		cosmetic.removeCosmetic();
 	}
 	
 	public void remove()
@@ -145,36 +146,48 @@ public class ActiveCosmetic
 	
 	public void updateNearbyPlayers()
 	{
-		ICheapPlayerFactory cheapPlayerFactory = StaticNMS.getCheapPlayerFactoryInstance();
 		Location cosmeticLocation = getLocation();
-		
 		for(Player player : Bukkit.getOnlinePlayers())
 		{
-			if(player == null || player == activatingPlayer)
+			if(player == null)
 			{
 				continue;
 			}
 			
 			boolean inRange = true;
 			
-			Location playerLocation = player.getLocation();
-			
-			if(!player.isOnline() || cosmeticLocation.getWorld() != playerLocation.getWorld() || getDistance(cosmeticLocation, playerLocation) > viewDistance)
+			Location playerLocation;
+			if(!player.isOnline() || (playerLocation = player.getLocation()).getWorld() != cosmeticLocation.getWorld() || getDistance(playerLocation, cosmeticLocation) > viewDistance)
 			{
 				inRange = false;
 			}
 			
 			//Create this for insertion and contains checks
-			CheapPlayer cheapPlayer = cheapPlayerFactory.getCheapPlayer(player);
 			if(inRange)
 			{
-				nearbyPlayers.add(cheapPlayer);
+				addNearbyPlayer(player);
 			}
 			//Remove the player if
-			else if(nearbyPlayers.contains(cheapPlayer))
+			else if(nearbyPlayers.contains(player))
 			{
-				nearbyPlayers.remove(cheapPlayer);
+				removeNearbyPlayer(player);
 			}
+		}
+	}
+	
+	public void addNearbyPlayer(Player player)
+	{
+		if(!nearbyPlayers.contains(player) && cosmetic.showToNearbyPlayer(player))
+		{
+			nearbyPlayers.add(player);
+		}
+	}
+	
+	public void removeNearbyPlayer(Player player)
+	{
+		if(nearbyPlayers.remove(player))
+		{
+			cosmetic.removeFromNearbyPlayer(player);
 		}
 	}
 	

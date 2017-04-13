@@ -1,10 +1,5 @@
 package com.skytonia.SkyCore.util;
 
-import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_10_R1;
-import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_11_R1;
-import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_8_R3;
-import com.skytonia.SkyCore.cheapobjects.player.factory.CheapPlayerFactory_1_9_R2;
-import com.skytonia.SkyCore.cheapobjects.player.factory.ICheapPlayerFactory;
 import com.skytonia.SkyCore.cosmetics.util.IParticlePacketFactory;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_10_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_11_R1;
@@ -132,45 +127,6 @@ public class StaticNMS
 		}
 		
 		return particleFactoryInstance;
-	}
-	
-	private static ICheapPlayerFactory cheapPlayerFactoryInstance = null;
-	public static ICheapPlayerFactory getCheapPlayerFactoryInstance() throws IllegalArgumentException
-	{
-		if(cheapPlayerFactoryInstance == null)
-		{
-			switch(BUtil.getNMSVersion())
-			{
-				//TODO: Convert to Factory
-				//case "v1_7_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R1(); break;
-				//case "v1_7_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R2(); break;
-				//case "v1_7_R3": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R3(); break;
-				//case "v1_7_R4": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R4(); break;
-				//case "v1_8_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R1(); break;
-				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
-				case "v1_8_R3": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R3(); break;
-				//case "v1_9_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R1(); break;
-				case "v1_9_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R2(); break;
-				case "v1_10_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_10_R1(); break;
-				case "v1_11_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_11_R1(); break;
-				default: //Check if we're running forge
-				{
-					/*if(isForge)
-					{
-						//Cauldron is 1.7.10 -> v1_7_R4
-						cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R4();
-						break;
-					}*/
-					
-					if(cheapPlayerFactoryInstance == null)
-					{
-						throw new IllegalArgumentException("This server version is not supported '" + serverName + "'");
-					}
-				}
-			}
-		}
-		
-		return cheapPlayerFactoryInstance;
 	}
 	
 	private static GUICreationFactory guiCreationFactory = null;

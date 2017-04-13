@@ -1,7 +1,7 @@
 package com.skytonia.SkyCore.cosmetics.objects;
 
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
@@ -13,7 +13,7 @@ public interface ICosmetic
 	
 	void onTick(long tick, Location location);
 	
-	void onTick(long tick, Location location, Collection<CheapPlayer> nearbyPlayers);
+	void onTick(long tick, Location location, Collection<Player> nearbyPlayers);
 	
 	@Override
 	boolean equals(Object object);

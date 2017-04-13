@@ -1,8 +1,9 @@
 package com.skytonia.SkyCore.cosmetics.objects;
 
-import com.skytonia.SkyCore.cosmetics.objects.options.CosmeticModifier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 /**
  * Created by Chris Brown (OhBlihv) on 6/08/2016.
@@ -17,6 +18,21 @@ public abstract class BaseCosmetic implements ICosmetic
 	@Getter
 	private final int updateRate;
 	
-	public abstract boolean supportsModifier(CosmeticModifier cosmeticModifier);
+	public Location getLocation()
+	{
+		return null;
+	}
+	
+	public boolean showToNearbyPlayer(Player player)
+	{
+		return true;
+	}
+	
+	public boolean removeFromNearbyPlayer(Player player)
+	{
+		return true;
+	}
+	
+	public abstract void removeCosmetic();
 	
 }

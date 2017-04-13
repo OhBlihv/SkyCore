@@ -95,7 +95,7 @@ public class UUIDFetcher implements Callable<Map<String, UUID>>
 			
 			//try {
 			array = (JSONArray) jsonParser.parse(new InputStreamReader(connection.getInputStream()));
-			/*} catch (final Exception e) {
+			/*} catch (final Exception updateNav) {
 				util.logError("Could not fetch UUID of player '"
 						+ names.get(i) + "'!");
 				continue;

@@ -1,10 +1,8 @@
 package com.skytonia.SkyCore.cosmetics.util.ParticlePacket;
 
-import com.skytonia.SkyCore.cheapobjects.player.CheapPlayer;
 import com.skytonia.SkyCore.cosmetics.util.ParticleEffect;
 import net.minecraft.server.v1_9_R2.EnumParticle;
 import net.minecraft.server.v1_9_R2.PacketPlayOutWorldParticles;
-import net.minecraft.server.v1_9_R2.PlayerConnection;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -58,7 +56,7 @@ public class ParticlePacket_1_9_R2 extends ParticlePacket
 			                                                (float) center.getX(),                          //b) X
 			                                                (float) center.getY(),                          //c) Y
 			                                                (float) center.getZ(),                          //d) Z
-			                                                offsetX,                                        //e) X Offset
+			                                                offsetX,                                        //updateNav) X Offset
 			                                                offsetY,                                        //f) Y Offset
 			                                                offsetZ,                                        //g) Z Offset
 			                                                speed,                                          //h) Particle Speed
@@ -76,14 +74,6 @@ public class ParticlePacket_1_9_R2 extends ParticlePacket
 		
 		//PlayerConnection is only used once per packet, so retrieving it here is a non-issue
 		((CraftPlayer) player).getHandle().playerConnection.sendPacket(particlePacket);
-	}
-	
-	@Override
-	public void sendToCheapPlayer(Location center, CheapPlayer player) throws PacketInstantiationException, PacketSendingException
-	{
-		initialize(center);
-		
-		((PlayerConnection) player.getPlayerConnection()).sendPacket(particlePacket);
 	}
 	
 }
