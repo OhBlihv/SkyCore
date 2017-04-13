@@ -32,6 +32,10 @@ public class TaggedPlayer
 	
 	private boolean sneaking = false;
 	
+	@Getter
+	@Setter
+	private boolean hideTags = false;
+	
 	private TagLine spacerLine = new TagLine(PetUtil.getNextEntityId(), "");
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
@@ -67,7 +71,6 @@ public class TaggedPlayer
 		}
 		
 		setLine(0, prefix + player.getName());
-		setLine(1, "\u00A7cExample Line");
 	}
 	
 	public double getHatHeight()
@@ -227,95 +230,98 @@ public class TaggedPlayer
 			}
 			else
 			{
-				if(tagLine.getLineEntity().isAlive())
+				if(!hideTags)
 				{
-					WrapperPlayServerSpawnEntityLiving spawnPacket = new WrapperPlayServerSpawnEntityLiving();
-					
-					spawnPacket.setEntityID(tagLine.getTagId());
-					
-					spawnPacket.setType(tagLine.getLineEntity());
-					
-					spawnPacket.setX(player.locX);
-					spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
-					spawnPacket.setZ(player.locZ);
-					
-					WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
-					
-					metadataPacket.setEntityID(tagLine.getTagId());
-					
-					WrappedDataWatcher metadata = tagLine.getMetadata();
-					
-					if(sneaking)
+					if(tagLine.getLineEntity().isAlive())
 					{
-						metadata.setObject(0, (byte) SNEAKING_FLAG);
+						WrapperPlayServerSpawnEntityLiving spawnPacket = new WrapperPlayServerSpawnEntityLiving();
+						
+						spawnPacket.setEntityID(tagLine.getTagId());
+						
+						spawnPacket.setType(tagLine.getLineEntity());
+						
+						spawnPacket.setX(player.locX);
+						spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
+						spawnPacket.setZ(player.locZ);
+						
+						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
+						
+						metadataPacket.setEntityID(tagLine.getTagId());
+						
+						WrappedDataWatcher metadata = tagLine.getMetadata();
+						
+						if(sneaking)
+						{
+							metadata.setObject(0, (byte) SNEAKING_FLAG);
+						}
+						else
+						{
+							metadata.setObject(0, (byte) 0);
+						}
+						
+						//Set Baby Rabbit
+						metadata.setObject(11, contentLineNum == 0);
+						
+						metadataPacket.setMetadata(metadata.getWatchableObjects());
+						spawnPacket.setMetadata(metadata);
+						
+						spawnPackets.add(spawnPacket);
+						
+						updatePackets.add(metadataPacket);
+						
+						contentLineNum++;
 					}
 					else
 					{
-						metadata.setObject(0, (byte) 0);
+						WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
+						
+						spawnPacket.setEntityID(tagLine.getTagId());
+						
+						int entityTypeId = tagLine.getLineEntity().getTypeId();
+						switch(tagLine.getLineEntity())
+						{
+							case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
+							case SNOWBALL: entityTypeId = 61; break;
+						}
+						
+						spawnPacket.setType(entityTypeId);
+						
+						spawnPacket.setX(player.locX);
+						spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
+						spawnPacket.setZ(player.locZ);
+						
+						spawnPackets.add(spawnPacket);
+						
+						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
+						
+						metadataPacket.setEntityID(tagLine.getTagId());
+						
+						WrappedDataWatcher metadata = tagLine.getMetadata();
+						
+						if(sneaking)
+						{
+							metadata.setObject(0, (byte) SNEAKING_FLAG);
+						}
+						else
+						{
+							metadata.setObject(0, (byte) 0);
+						}
+						
+						metadataPacket.setMetadata(metadata.getWatchableObjects());
+						
+						updatePackets.add(metadataPacket);
 					}
 					
-					//Set Baby Rabbit
-					metadata.setObject(11, contentLineNum == 0);
-					
-					metadataPacket.setMetadata(metadata.getWatchableObjects());
-					spawnPacket.setMetadata(metadata);
-					
-					spawnPackets.add(spawnPacket);
-					
-					updatePackets.add(metadataPacket);
-					
-					contentLineNum++;
-				}
-				else
-				{
-					WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
-					
-					spawnPacket.setEntityID(tagLine.getTagId());
-				
-					int entityTypeId = tagLine.getLineEntity().getTypeId();
-					switch(tagLine.getLineEntity())
-					{
-						case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
-						case SNOWBALL: entityTypeId = 61; break;
-					}
-					
-					spawnPacket.setType(entityTypeId);
-					
-					spawnPacket.setX(player.locX);
-					spawnPacket.setY(player.locY + ((++lineHeight * amx) + amv));
-					spawnPacket.setZ(player.locZ);
-					
-					spawnPackets.add(spawnPacket);
-					
-					WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
-					
-					metadataPacket.setEntityID(tagLine.getTagId());
-					
-					WrappedDataWatcher metadata = tagLine.getMetadata();
-					
-					if(sneaking)
-					{
-						metadata.setObject(0, (byte) SNEAKING_FLAG);
-					}
-					else
-					{
-						metadata.setObject(0, (byte) 0);
-					}
-					
-					metadataPacket.setMetadata(metadata.getWatchableObjects());
-					
-					updatePackets.add(metadataPacket);
-				}
-				
-				if(!tagLine.getLineEntity().isAlive())
-				{
-					spawnPackets.add(getMountPacket(lastVehicleId, lastPassengers));
-					
-					lastVehicleId = tagLine.getTagId();
-				}
-				else
-				{
 					lastPassengers.add(tagLine.getTagId());
+					
+					if(!tagLine.getLineEntity().isAlive())
+					{
+						lastPassengers.add(tagLine.getTagId());
+						
+						spawnPackets.add(getMountPacket(lastVehicleId, lastPassengers));
+						
+						lastVehicleId = tagLine.getTagId();
+					}
 				}
 			}
 			
