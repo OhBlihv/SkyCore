@@ -90,9 +90,9 @@ public class TagController implements Listener
 	
 	//
 	
-	public void setPlayerTagStatus(UUID playerUUID, boolean hidden)
+	public void setPlayerTagStatus(Player player, boolean hidden)
 	{
-		playerTagMap.get(playerUUID).setHideTags(hidden);
+		getPlayerTag(player).setHideTags(hidden);
 	}
 	
 	public TaggedPlayer getPlayerTag(Player player)
