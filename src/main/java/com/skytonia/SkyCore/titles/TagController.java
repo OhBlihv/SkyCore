@@ -92,7 +92,14 @@ public class TagController implements Listener
 	
 	public void setPlayerTagStatus(Player player, boolean hidden)
 	{
-		getPlayerTag(player).setHideTags(hidden);
+		TaggedPlayer taggedPlayer = getPlayerTag(player);
+		
+		if(hidden != taggedPlayer.isHideTags())
+		{
+			taggedPlayer.setHideTags(hidden);
+			
+			taggedPlayer.setAllNearbyDirty(DirtyPlayerType.ADD);
+		}
 	}
 	
 	public TaggedPlayer getPlayerTag(Player player)
