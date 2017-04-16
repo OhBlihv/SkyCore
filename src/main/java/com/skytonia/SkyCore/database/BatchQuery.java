@@ -81,7 +81,6 @@ public class BatchQuery<T>
 							continue;
 						}
 						statement.addBatch();
-						batchCount++;
 						
 						if(++batchCount % batchSize == 0)
 						{
