@@ -61,6 +61,11 @@ public class FlatFile
 		flatfileInstances.remove(plugin);
 	}
 	
+	public static FlatFile forFileName(String fileName)
+	{
+		return new FlatFile(fileName, null);
+	}
+	
 	public static FlatFile getInstance()
 	{
 		if(fileHandler == null)
