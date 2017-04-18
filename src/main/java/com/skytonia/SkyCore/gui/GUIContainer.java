@@ -22,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Deque;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Created by OhBlihv (Chris) on 22/11/2015.
@@ -72,7 +73,16 @@ public class GUIContainer implements Listener
 			Bukkit.getPluginManager().registerEvents(guiListener, SkyCore.getPluginInstance());
 		}*/
 		
-		this.guiTitlePattern = Pattern.compile(guiTitle.replaceAll("\\{.*\\}", ".*"));
+		Pattern tempTitlePattern = Pattern.compile(guiTitle);
+		try
+		{
+			tempTitlePattern = Pattern.compile(guiTitle.replaceAll("\\{.*\\}", ".*"));
+		}
+		catch(PatternSyntaxException e)
+		{
+			//
+		}
+		this.guiTitlePattern = tempTitlePattern;
 		this.guiTitle = guiTitle;
 		this.guiSize = guiSize;
 		this.requiredPermission = requiredPermission;
