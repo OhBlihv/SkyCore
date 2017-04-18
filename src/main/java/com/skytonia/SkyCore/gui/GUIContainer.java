@@ -73,7 +73,7 @@ public class GUIContainer implements Listener
 			Bukkit.getPluginManager().registerEvents(guiListener, SkyCore.getPluginInstance());
 		}*/
 		
-		Pattern tempTitlePattern = Pattern.compile(guiTitle);
+		Pattern tempTitlePattern = null;
 		try
 		{
 			tempTitlePattern = Pattern.compile(guiTitle.replaceAll("\\{.*\\}", ".*"));
@@ -135,7 +135,14 @@ public class GUIContainer implements Listener
 
 	public boolean compareGUITitle(String inventoryTitle)
 	{
-		return guiTitlePattern.matcher(inventoryTitle).find();
+		if(guiTitlePattern == null)
+		{
+			return guiTitle.equals(inventoryTitle);
+		}
+		else
+		{
+			return guiTitlePattern.matcher(inventoryTitle).find();
+		}
 	}
 
 	public void openInventory(Player player)
