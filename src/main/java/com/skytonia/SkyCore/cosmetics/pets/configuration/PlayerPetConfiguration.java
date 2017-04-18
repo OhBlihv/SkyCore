@@ -43,11 +43,6 @@ public class PlayerPetConfiguration
 		return defaultConfiguration != null;
 	}
 	
-	public String getConfigName()
-	{
-		return defaultConfiguration.configName;
-	}
-	
 	public String getDefaultName()
 	{
 		return defaultConfiguration.defaultName;

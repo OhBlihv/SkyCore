@@ -124,7 +124,6 @@ public class SkyCore extends JavaPlugin implements Listener
 				MiniPet miniPet = new MiniPet(event.getPlayer(),
 				                              new PlayerPetConfiguration(
 				                              	new PetConfiguration(
-				                              		"Example-Pet",
 					                                StoredHeads.PIG.asItemContainer(),
 					                                "§cExample Pet",
 					                                1.5D

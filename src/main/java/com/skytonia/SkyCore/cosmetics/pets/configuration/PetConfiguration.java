@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 public class PetConfiguration
 {
 	
-	public final String configName;
-	
 	public final ItemContainer petSkull;
 	
 	public final String defaultName;
