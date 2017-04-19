@@ -293,13 +293,15 @@ public class ItemContainerConstructor
 		Color armorColor = null;
 		if(configurationSection.contains("color"))
 		{
+			String colourString = configurationSection.getString("color");
 			try
 			{
-				armorColor = Color.fromRGB(configurationSection.getInt("color"));
+				armorColor = Color.fromRGB(Integer.parseInt(colourString, 16));
 			}
 			catch(IllegalArgumentException e)
 			{
-				BUtil.logInfo("Could not parse armour colour " + configurationSection.getInt("color") + ". Is it in the correct format?");
+				BUtil.logInfo("Could not parse armour colour " + colourString + ". Is it in the correct format?");
+				BUtil.logInfo(e.getMessage());
 				armorColor = Color.WHITE;
 			}
 		}
