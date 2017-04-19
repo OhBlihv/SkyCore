@@ -276,7 +276,7 @@ public class ItemContainerConstructor
 		
 		List<String> lore = overriddenValues.containsKey(ItemContainerVariable.LORE) ?
 			                    BUtil.translateColours((List<String>) overriddenValues.get(ItemContainerVariable.LORE)) :
-				                                                                                                            BUtil.translateColours(configurationSection.getStringList("lore"));
+				                BUtil.translateColours(configurationSection.getStringList("lore"));
 		
 		String owner = (String) overriddenValues.get(ItemContainerVariable.OWNER);
 		if(owner == null && configurationSection.contains("owner"))
@@ -291,9 +291,17 @@ public class ItemContainerConstructor
 		}
 		
 		Color armorColor = null;
-		if(armorColor == null && configurationSection.contains("color"))
+		if(configurationSection.contains("color"))
 		{
-			armorColor = Color.fromRGB(configurationSection.getInt("color"));
+			try
+			{
+				armorColor = Color.fromRGB(configurationSection.getInt("color"));
+			}
+			catch(IllegalArgumentException e)
+			{
+				BUtil.logInfo("Could not parse armour colour " + configurationSection.getInt("color") + ". Is it in the correct format?");
+				armorColor = Color.WHITE;
+			}
 		}
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
