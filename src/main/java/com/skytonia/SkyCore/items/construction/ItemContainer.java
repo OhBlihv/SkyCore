@@ -200,6 +200,8 @@ public class ItemContainer
 		{
 			LeatherArmorMeta leatherMeta = (LeatherArmorMeta) itemMeta;
 			leatherMeta.setColor(armorColor);
+			
+			leatherMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		}
 		
 		if(SkyCore.isSkytonia() && material == DIAMOND_PICKAXE)
