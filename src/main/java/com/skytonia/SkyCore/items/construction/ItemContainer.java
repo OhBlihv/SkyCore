@@ -11,11 +11,13 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.SpawnEgg;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,8 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.bukkit.Material.AIR;
-import static org.bukkit.Material.DIAMOND_PICKAXE;
+import static org.bukkit.Material.*;
 
 /**
  * Created by Chris Brown (OhBlihv) on 26/09/2016.
@@ -218,6 +219,15 @@ public class ItemContainer
 		if(enchantmentMap != null)
 		{
 			itemStack.addUnsafeEnchantments(enchantmentMap);
+		}
+		
+		if(material == MONSTER_EGG && damage > 0)
+		{
+			SpawnEgg spawnEgg = (SpawnEgg) itemStack.getData();
+			
+			spawnEgg.setSpawnedType(EntityType.fromId(damage));
+			
+			itemStack.setData(spawnEgg);
 		}
 		
 		if(enchantStatus != null)
