@@ -96,7 +96,8 @@ public class MiniPet extends BaseCosmetic
 	@Override
 	public void removeCosmetic()
 	{
-	
+		petTags.setOnline(false);
+		petEntity.die();
 	}
 	
 	@Override
