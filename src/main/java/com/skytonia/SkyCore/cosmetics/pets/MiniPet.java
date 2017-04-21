@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.server.v1_9_R2.World;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.entity.Player;
 
@@ -49,7 +51,20 @@ public class MiniPet extends BaseCosmetic
 		
 		petEntity = new PetZombieSource(world, attachedPlayer, petConfiguration);
 		
-		Location spawnLocation = attachedPlayer.getLocation();
+		Location spawnLocation = attachedPlayer.getLocation().add(0.25, 0, 0.25);
+		{
+			Location offsetSpawnLocation = spawnLocation.clone().add(1, 0, 1);
+			Block offsetBlock = offsetSpawnLocation.getBlock();
+			if(offsetBlock == null || offsetBlock.getType() == Material.AIR)
+			{
+				Block offsetBlockBase = offsetSpawnLocation.clone().add(0, -1, 0).getBlock();
+				if(offsetBlockBase != null && offsetBlockBase.getType() != Material.AIR)
+				{
+					spawnLocation = offsetSpawnLocation;
+				}
+			}
+		}
+		
 		petEntity.setLocation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
 		
 		world.addEntity(petEntity);
