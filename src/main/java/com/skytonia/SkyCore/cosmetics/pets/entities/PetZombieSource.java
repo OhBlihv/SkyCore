@@ -3,6 +3,7 @@ package com.skytonia.SkyCore.cosmetics.pets.entities;
 import com.skytonia.SkyCore.cosmetics.pets.configuration.PlayerPetConfiguration;
 import com.skytonia.SkyCore.cosmetics.pets.pathfinders.PathfinderPetActions;
 import com.skytonia.spigot.entities.OverriddenEntity;
+import lombok.Getter;
 import net.minecraft.server.v1_9_R2.AxisAlignedBB;
 import net.minecraft.server.v1_9_R2.DamageSource;
 import net.minecraft.server.v1_9_R2.EntityZombie;
@@ -28,8 +29,10 @@ public class PetZombieSource extends EntityZombie implements OverriddenEntity
 	
 	private static final PotionEffect INVISIBILITY = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false);
 	
+	@Getter
 	private final Player attachedPlayer;
 	
+	@Getter
 	private final PlayerPetConfiguration petConfiguration;
 	
 	public PetZombieSource(World world, Player attachedPlayer, PlayerPetConfiguration petConfiguration)
