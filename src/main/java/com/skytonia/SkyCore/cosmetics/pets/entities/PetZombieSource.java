@@ -1,8 +1,6 @@
 package com.skytonia.SkyCore.cosmetics.pets.entities;
 
 import com.skytonia.SkyCore.cosmetics.pets.configuration.PlayerPetConfiguration;
-import com.skytonia.SkyCore.cosmetics.pets.entities.controllers.PetJumpController;
-import com.skytonia.SkyCore.cosmetics.pets.entities.controllers.PetMoveController;
 import com.skytonia.SkyCore.cosmetics.pets.pathfinders.PathfinderPetActions;
 import com.skytonia.spigot.entities.OverriddenEntity;
 import net.minecraft.server.v1_9_R2.AxisAlignedBB;
@@ -43,9 +41,6 @@ public class PetZombieSource extends EntityZombie implements OverriddenEntity
 		
 		fireProof = true;
 		maxFireTicks = 0;
-		
-		this.g = new PetJumpController(this);
-		this.moveController = new PetMoveController(this, (PetJumpController) this.g);
 		
 		setBaby(petConfiguration.isBaby());
 	}

@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * Created by Chris Brown (OhBlihv) on 4/10/2017.
  */
-public class PathfinderPetActions extends PathfinderGoal implements PetPathfinder
+public class PathfinderPetActions extends PathfinderGoal
 {
 	
 	private enum PathfinderAction
@@ -190,7 +190,7 @@ public class PathfinderPetActions extends PathfinderGoal implements PetPathfinde
 			//Moving
 			else
 			{
-				canJump = rolledNumber < 85;
+				canJump = rolledNumber < 75;
 			}
 			
 			if(canJump)
