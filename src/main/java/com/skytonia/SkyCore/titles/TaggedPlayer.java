@@ -16,10 +16,10 @@ import net.minecraft.server.v1_9_R2.EntityPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Chris Brown (OhBlihv) on 4/10/2017.
@@ -38,7 +38,7 @@ public class TaggedPlayer
 	private TagLine spacerLine = new TagLine(PetUtil.getNextEntityId(), "");
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
-	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new HashMap<>();
+	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new ConcurrentHashMap<>();
 	
 	@Getter
 	private final Entity entity;
