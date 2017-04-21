@@ -7,9 +7,11 @@ import com.skytonia.SkyCore.items.EnchantStatus;
 import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.server.v1_9_R2.NBTTagCompound;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
@@ -17,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.SpawnEgg;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -120,6 +121,24 @@ public class ItemContainer
 		String          owner = (String) getOverriddenValue(overriddenValues, ItemContainerVariable.OWNER, this.owner);
 		
 		ItemStack itemStack = new ItemStack(material, amount, (short) damage);
+		
+		//Handle NBT Tags early on before we customise it too much
+		if(material == MONSTER_EGG && damage > 0)
+		{
+			net.minecraft.server.v1_9_R2.ItemStack stack = CraftItemStack.asNMSCopy(itemStack);
+			NBTTagCompound tagCompound = stack.getTag();
+			if(tagCompound == null)
+			{
+				tagCompound = new NBTTagCompound();
+			}
+			
+			NBTTagCompound id = new NBTTagCompound();
+			id.setString("id", EntityType.fromId(damage).getName());
+			tagCompound.set("EntityTag", id);
+			stack.setTag(tagCompound);
+			itemStack = CraftItemStack.asBukkitCopy(stack);
+		}
+		
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		
 		if(displayName != null)
@@ -221,15 +240,6 @@ public class ItemContainer
 		if(enchantmentMap != null)
 		{
 			itemStack.addUnsafeEnchantments(enchantmentMap);
-		}
-		
-		if(material == MONSTER_EGG && damage > 0)
-		{
-			SpawnEgg spawnEgg = (SpawnEgg) itemStack.getData();
-			
-			spawnEgg.setSpawnedType(EntityType.fromId(damage));
-			
-			itemStack.setData(spawnEgg);
 		}
 		
 		if(enchantStatus != null)
