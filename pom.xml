@@ -74,6 +74,12 @@
 		
 		<!-- Plugin Dependencies -->
 		<dependency>
+			<groupId>com.skytonia</groupId>
+			<artifactId>SkyCosmetics</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
 			<artifactId>ProtocolLib-API</artifactId>
 			<version>4.2.0</version>

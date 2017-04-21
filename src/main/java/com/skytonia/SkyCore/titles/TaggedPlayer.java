@@ -8,7 +8,11 @@ import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntityLiving;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
-import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCosmetics.SkyCosmetics;
+import com.skytonia.SkyCosmetics.cosmetics.CosmeticType;
+import com.skytonia.SkyCosmetics.cosmetics.types.WearableHeadCosmetic;
+import com.skytonia.SkyCosmetics.cosmetics.wrappers.WrappedBasicCosmetic;
+import com.skytonia.SkyCosmetics.storage.PlayerCosmetics;
 import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
 import net.minecraft.server.v1_9_R2.Entity;
@@ -85,12 +89,21 @@ public class TaggedPlayer
 	{
 		if(entity instanceof EntityPlayer)
 		{
-			//TODO: Read off worn hat
-			String serverName = RedisManager.getServerName().toLowerCase();
-			if(serverName.startsWith("hub") || serverName.startsWith("murder"))
+			try
 			{
-				//Hubs contain rabbit ears for now
-				return 1;
+				PlayerCosmetics playerCosmetics = SkyCosmetics.getInstance().getPlayerManager().getCosmetics(entity.getUniqueID());
+				if(playerCosmetics != null)
+				{
+					WrappedBasicCosmetic cosmetic = playerCosmetics.getActiveCosmetic(CosmeticType.WEARABLE_HEAD);
+					if(cosmetic != null)
+					{
+						return ((WearableHeadCosmetic) cosmetic.getCosmetic()).getSpacerType().getHeight();
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 		
