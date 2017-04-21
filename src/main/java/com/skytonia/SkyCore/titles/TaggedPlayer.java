@@ -122,8 +122,7 @@ public class TaggedPlayer
 			if(System.currentTimeMillis() - lastRelocation < 1000)
 			{
 				return true;
-			}
-			else
+			} else
 			{
 				lastRelocation = -1;
 			}
