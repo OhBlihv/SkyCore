@@ -1,6 +1,5 @@
 package com.skytonia.SkyCore.cosmetics.pets.pathfinders;
 
-import net.minecraft.server.v1_9_R2.Entity;
 import net.minecraft.server.v1_9_R2.EntityInsentient;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import net.minecraft.server.v1_9_R2.PathfinderGoal;
@@ -12,28 +11,19 @@ public class PathfinderGoalLookAtOwner extends PathfinderGoal implements PetPath
 	protected EntityPlayer owningPlayer;
 	protected float c;
 	private int e;
-	private float f;
+	private final float LOOK_CHANCE = 0.25f;
 	
 	public PathfinderGoalLookAtOwner(EntityInsentient entity, EntityPlayer owningPlayer, float var3)
 	{
 		this.entity = entity;
 		this.owningPlayer = owningPlayer;
 		this.c = var3;
-		this.f = 0.02F;
-		this.a(2);
-	}
-	
-	public PathfinderGoalLookAtOwner(EntityInsentient var1, Class<? extends Entity> var2, float var3, float var4)
-	{
-		this.entity = var1;
-		this.c = var3;
-		this.f = var4;
 		this.a(2);
 	}
 	
 	public boolean a()
 	{
-		return !(this.entity.getRandom().nextFloat() >= this.f) && this.owningPlayer != null;
+		return this.entity.getRandom().nextFloat() < this.LOOK_CHANCE && this.owningPlayer != null;
 	}
 	
 	public boolean b()

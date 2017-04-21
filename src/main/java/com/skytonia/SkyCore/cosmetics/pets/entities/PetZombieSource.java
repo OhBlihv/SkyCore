@@ -3,8 +3,7 @@ package com.skytonia.SkyCore.cosmetics.pets.entities;
 import com.skytonia.SkyCore.cosmetics.pets.configuration.PlayerPetConfiguration;
 import com.skytonia.SkyCore.cosmetics.pets.entities.controllers.PetJumpController;
 import com.skytonia.SkyCore.cosmetics.pets.entities.controllers.PetMoveController;
-import com.skytonia.SkyCore.cosmetics.pets.pathfinders.PathfinderGoalFollowOwner;
-import com.skytonia.SkyCore.cosmetics.pets.pathfinders.PathfinderGoalLookAtOwner;
+import com.skytonia.SkyCore.cosmetics.pets.pathfinders.PathfinderPetActions;
 import com.skytonia.spigot.entities.OverriddenEntity;
 import net.minecraft.server.v1_9_R2.AxisAlignedBB;
 import net.minecraft.server.v1_9_R2.DamageSource;
@@ -57,8 +56,7 @@ public class PetZombieSource extends EntityZombie implements OverriddenEntity
 		setUpGoalSelector(targetSelector);
 		
 		goalSelector.a(0, new PathfinderGoalFloat(this));
-		goalSelector.a(4, new PathfinderGoalFollowOwner(this, ((CraftPlayer) attachedPlayer).getHandle(), petConfiguration.getPetSpeed()));
-		goalSelector.a(8, new PathfinderGoalLookAtOwner(this, ((CraftPlayer) attachedPlayer).getHandle(), 8.0F));
+		goalSelector.a(1, new PathfinderPetActions(this, ((CraftPlayer) attachedPlayer).getHandle(), petConfiguration.getPetSpeed()));
 		
 		Zombie bukkitZombie = (Zombie) getBukkitEntity();
 		bukkitZombie.getEquipment().setHelmet(petConfiguration.getPetSkull().toItemStack());
@@ -87,13 +85,24 @@ public class PetZombieSource extends EntityZombie implements OverriddenEntity
 	}
 	
 	/*
-	 * NMS Overrides
+	 * NMS Accessors/Helpers
 	 */
+	
+	public void jump()
+	{
+		this.motY = 0.30F;
+		
+		this.impulse = true;
+	}
 	
 	public boolean getBd()
 	{
 		return bd;
 	}
+	
+	/*
+	 * NMS Overrides
+	 */
 	
 	public void c(double d0)
 	{

@@ -24,11 +24,11 @@ public class PetMoveController extends ControllerMove
 	
 	public void c()
 	{
-		if(this.i.onGround && !this.i.getBd() && !controllerJump.getA())
+		/*if(this.i.onGround && !this.i.getBd() && !controllerJump.getA())
 		{
-			this.i.c(0.0D);
+			//this.i.c(0.0D);
 		}
-		else if(this.a())
+		else */if(this.a())
 		{
 			this.i.c(this.j);
 		}
