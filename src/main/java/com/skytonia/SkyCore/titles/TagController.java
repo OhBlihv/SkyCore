@@ -137,7 +137,7 @@ public class TagController implements Listener
 	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
 	{
-		RunnableShorthand.forPlugin(plugin).with(() -> entityTagMap.get(event.getPlayer().getUniqueId()).setSneaking(!event.getPlayer().isSneaking())).runASync();
+		RunnableShorthand.forPlugin(plugin).with(() -> entityTagMap.get(event.getPlayer().getUniqueId()).setSneaking(/*!*/event.getPlayer().isSneaking())).runASync();
 	}
 	
 	@EventHandler
