@@ -75,7 +75,7 @@ public class PathfinderPetActions extends PathfinderGoal implements PetPathfinde
 	private int actionDelay = 0;
 	
 	private static final int
-		DELAY_DEFAULT_PATHING = 5,
+		DELAY_DEFAULT_PATHING = 3,
 		DELAY_DEFAULT_JUMP = 25,
 		DELAY_DEFAULT_ACTION = 50;
 	
@@ -247,7 +247,7 @@ public class PathfinderPetActions extends PathfinderGoal implements PetPathfinde
 			double speed = this.speed;
 			if(owningPlayer.isSprinting())
 			{
-				speed *= 1.2;
+				speed *= 1.25;
 			}
 			
 			this.entity.getNavigation().a(path, speed);
