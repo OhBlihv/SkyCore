@@ -39,7 +39,12 @@ public class RedisManager
 		
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		poolConfig.setMinIdle(8);
-		poolConfig.setMaxTotal(128); //Lower?
+		poolConfig.setMaxTotal(256);
+		poolConfig.setMaxWaitMillis(15000); //15 second max wait time
+		poolConfig.setTestWhileIdle(true);
+		poolConfig.setTestOnReturn(true);
+		poolConfig.setNumTestsPerEvictionRun(10);
+		poolConfig.setTimeBetweenEvictionRunsMillis(60000); //60 seconds
 		
 		jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
 		
@@ -62,9 +67,18 @@ public class RedisManager
 		jedisPool.destroy();
 	}
 	
+	@Deprecated
 	public static Jedis getConnection()
 	{
 		return jedisPool.getResource();
+	}
+	
+	public static void accessConnection(RedisRunnable runnable)
+	{
+		try(Jedis jedis = jedisPool.getResource())
+		{
+			runnable.run(jedis);
+		}
 	}
 	
 	public static void registerSubscription(ChannelSubscription subscriber, String... channels)
