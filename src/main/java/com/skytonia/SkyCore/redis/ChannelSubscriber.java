@@ -21,13 +21,16 @@ public class ChannelSubscriber
 	
 	private final Thread subscriptionThread;
 	
+	private final Jedis connection;
+	
 	public ChannelSubscriber(Jedis jedis, List<String> channels, ChannelSubscription channelSubscription)
 	{
 		this(jedis, channels, channelSubscription, null);
 	}
 	
-	public ChannelSubscriber(Jedis jedis, List<String> channels, ChannelSubscription channelSubscription, Thread subscriptionThread)
+	public ChannelSubscriber(Jedis connection, List<String> channels, ChannelSubscription channelSubscription, Thread subscriptionThread)
 	{
+		this.connection = connection;
 		this.channels = channels;
 		
 		this.subscription = new JedisPubSub()
@@ -51,8 +54,8 @@ public class ChannelSubscriber
 		{
 			subscriptionThread = new Thread(() ->
 			{
-				jedis.subscribe(subscription, channels.toArray(new String[channels.size()]));
-				jedis.close();
+				connection.subscribe(subscription, channels.toArray(new String[channels.size()]));
+				connection.close();
 			});
 		}
 		
@@ -71,6 +74,11 @@ public class ChannelSubscriber
 		
 		subscription.unsubscribe();
 		subscriptionThread.interrupt();
+		
+		if(connection != null)
+		{
+			connection.close();
+		}
 	}
 	
 }

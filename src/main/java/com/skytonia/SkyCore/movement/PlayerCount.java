@@ -4,7 +4,6 @@ import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,31 +27,32 @@ public class PlayerCount
 	
 	public static void updatePlayerCount(int players)
 	{
-		try(Jedis jedis =  RedisManager.getConnection())
+		RedisManager.accessConnection((jedis) ->
 		{
 			jedis.set(RedisManager.getServerName() + PLAYER_COUNT_KEY, String.valueOf(players));
-		}
+		});
 	}
 	
 	public static int getPlayerCount(String server)
 	{
-		try(Jedis jedis =  RedisManager.getConnection())
+		final int[] playerCount = new int[] {0};
+		RedisManager.accessConnection((jedis) ->
 		{
 			String playerCountString = jedis.get(server + PLAYER_COUNT_KEY);
 			if(playerCountString != null && !playerCountString.isEmpty())
 			{
 				try
 				{
-					return Integer.parseInt(playerCountString);
+					playerCount[0] = Integer.parseInt(playerCountString);
 				}
 				catch(NumberFormatException e)
 				{
 					//
 				}
 			}
-			
-			return 0;
-		}
+		});
+		
+		return playerCount[0];
 	}
 	
 }
