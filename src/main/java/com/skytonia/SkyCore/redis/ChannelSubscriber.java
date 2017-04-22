@@ -77,7 +77,14 @@ public class ChannelSubscriber
 		
 		if(connection != null)
 		{
-			connection.close();
+			try
+			{
+				connection.close();
+			}
+			catch(IllegalStateException e)
+			{
+				//
+			}
 		}
 	}
 	
