@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Collection;
 
@@ -67,7 +68,7 @@ public class MiniPet extends BaseCosmetic
 		
 		petEntity.setLocation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
 		
-		world.addEntity(petEntity);
+		world.addEntity(petEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
 		
 		petEntity.initialize();
 		
