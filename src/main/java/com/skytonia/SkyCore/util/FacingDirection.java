@@ -1,19 +1,34 @@
 package com.skytonia.SkyCore.util;
 
-import com.skytonia.SkyCosmetics.util.Pair;
-
 /**
  * Created by Chris Brown (OhBlihv) on 4/24/2017.
  */
 public enum FacingDirection
 {
 	
-	NORTH,
-	EAST,
-	SOUTH,
-	WEST;
+	NORTH(0),
+	EAST(90),
+	SOUTH(180),
+	WEST(270);
 	
-	public CardinalRotation getRotationFor(FacingDirection facingDirection)
+	final double directionDegrees;
+	
+	FacingDirection(double directionDegrees)
+	{
+		this.directionDegrees = directionDegrees;
+	}
+	
+	public double getRotationFor(FacingDirection facingDirection)
+	{
+		double rotationDifference = this.directionDegrees - facingDirection.directionDegrees;
+		if(rotationDifference < 0)
+		{
+			rotationDifference += 360D;
+		}
+		return rotationDifference;
+	}
+	
+	public CardinalRotation getFacingRotationFor(FacingDirection facingDirection)
 	{
 		switch(this)
 		{
@@ -67,11 +82,11 @@ public enum FacingDirection
 		return CardinalRotation.NONE;
 	}
 	
-	public Pair<Integer, Integer> translateCoordinates(FacingDirection to, int x, int z)
+	public Pair<Double, Double> translateCoordinates(FacingDirection to, double x, double z)
 	{
-		int newX = x;
-		int newZ = z;
-		switch(getRotationFor(to))
+		double newX = x;
+		double newZ = z;
+		switch(getFacingRotationFor(to))
 		{
 			case NONE:
 			{
