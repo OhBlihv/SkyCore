@@ -1,6 +1,7 @@
 package com.skytonia.SkyCore.util;
 
 import com.skytonia.SkyCore.SkyCore;
+import com.skytonia.SkyCore.firework.CustomEntityFirework;
 import com.skytonia.SkyCore.firework.FireworkType;
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
@@ -44,36 +45,53 @@ public class BUtil
 
 	private static boolean useConsoleColours = false;
 	private static final Random random = new Random();
-
+	
 	// ------------------------------------------------------------------------------------------------------
-	// Miscellaneous
+	// Fireworks
 	// ------------------------------------------------------------------------------------------------------
-
+	
+	public static void createFirework(Location location, boolean instantExplosion, FireworkEffect fireworkEffect)
+	{
+		createFirework(location, instantExplosion, null, fireworkEffect);
+	}
+	
 	public static void createFirework(Location location, boolean instantExplosion, FireworkType fireworkType)
 	{
-		if(fireworkType == null)
+		createFirework(location, instantExplosion, fireworkType, null);
+	}
+	
+	private static void createFirework(Location location, boolean instantExplosion, FireworkType fireworkType, FireworkEffect fireworkEffect)
+	{
+		if(fireworkEffect == null)
 		{
-			fireworkType = FireworkType.CRATE_SPAWN;
+			if(fireworkType == null)
+			{
+				fireworkType = FireworkType.CRATE_SPAWN;
+			}
+			
+			fireworkEffect = FireworkEffect.builder().flicker(random.nextBoolean())
+				                 .withColor(fireworkType.getColour1(), fireworkType.getColour2()).withFade(fireworkType.getColour3())
+				                 .with(fireworkType.getType()).trail(random.nextBoolean()).build();
 		}
-
-		FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean())
-				.withColor(fireworkType.getColour1(), fireworkType.getColour2()).withFade(fireworkType.getColour3())
-				.with(fireworkType.getType()).trail(random.nextBoolean()).build();
-
+		
 		if(instantExplosion)
 		{
 			location.setY(location.getY() + 2.0D);
-			//CustomEntityFirework_1_8_R3.spawn(location, effect);
+			CustomEntityFirework.spawn(location, fireworkEffect, 0);
 		}
 		else
 		{
 			Firework firework = location.getWorld().spawn(location, Firework.class);
 			FireworkMeta meta = firework.getFireworkMeta();
-			meta.addEffect(effect);
+			meta.addEffect(fireworkEffect);
 			firework.setFireworkMeta(meta);
 			firework.setVelocity(new Vector(0.00, 0.05, 0.00));
 		}
 	}
+	
+	// ------------------------------------------------------------------------------------------------------
+	// Miscellaneous
+	// ------------------------------------------------------------------------------------------------------
 	
 	public static double round(double value, int places)
 	{
