@@ -21,6 +21,10 @@
 			<id>dmulloy2-repo</id>
 			<url>http://repo.dmulloy2.net/content/groups/public/</url>
 		</repository>
+		<repository>
+			<id>LilypadMC</id>
+			<url>http://ci.lilypadmc.org/plugin/repository/everything/</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>
@@ -71,6 +75,13 @@
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>2.9.0</version>
+		</dependency>
+		
+		<!-- Lilypad -->
+		<dependency>
+			<groupId>lilypad.client.connect</groupId>
+			<artifactId>api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- Database -->
