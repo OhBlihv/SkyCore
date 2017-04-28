@@ -7,6 +7,8 @@ import com.skytonia.SkyCore.movement.PlayerCount;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.titles.TagController;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.ReflectionUtils;
+import com.skytonia.SkyCore.util.SupportedVersion;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -46,6 +48,21 @@ public class SkyCore extends JavaPlugin implements Listener
 		{
 			return instance;
 		}
+	}
+	
+	private static SupportedVersion currentVersion = null;
+	public static SupportedVersion getCurrentVersion()
+	{
+		if(currentVersion == null)
+		{
+			currentVersion = SupportedVersion.getVersionForNumber(
+				Integer.parseInt(ReflectionUtils.PackageType.getServerVersion().length() > 7 ?
+					                 ReflectionUtils.PackageType.getServerVersion().substring(3, 5) : //1.10+
+				                     Character.toString(ReflectionUtils.PackageType.getServerVersion().charAt(3)))
+			);
+		}
+		
+		return currentVersion;
 	}
 	
 	private static boolean isSkytonia = false;

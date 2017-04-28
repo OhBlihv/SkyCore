@@ -34,7 +34,7 @@ public class PathfinderPetActions extends PathfinderGoal
 		
 	}
 	
-	private static class ActivePathfinderAction
+	protected static class ActivePathfinderAction
 	{
 		
 		private final PathfinderAction pathfinderAction;
