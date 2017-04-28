@@ -52,6 +52,7 @@ public abstract class AddonRegistry implements Listener
 		if(registeredActions == null)
 		{
 			registeredActions = new HashSet<>();
+			pluginRegistry.put(plugin, registeredActions);
 		}
 		
 		registeredActions.add(addonIdentifier);
