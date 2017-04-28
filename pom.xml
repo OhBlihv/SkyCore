@@ -35,6 +35,14 @@
 		<!-- Spigot NMS Dependency -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
+			<artifactId>Spigot-v1_7_R4</artifactId>
+			<version>1.7.10-R0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<optional>true</optional>
+			<systemPath>${project.basedir}/../lib/spigot-1.7.10-tw.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
 			<artifactId>Spigot-v1_8_R3</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
@@ -77,6 +85,7 @@
 			<groupId>com.skytonia</groupId>
 			<artifactId>SkyCosmetics</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
