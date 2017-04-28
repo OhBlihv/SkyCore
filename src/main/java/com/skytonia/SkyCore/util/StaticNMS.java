@@ -3,15 +3,18 @@ package com.skytonia.SkyCore.util;
 import com.skytonia.SkyCore.cosmetics.util.IParticlePacketFactory;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_10_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_11_R1;
+import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_7_R4;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_8_R3;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_9_R2;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_10_R1;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_11_R1;
+import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_7_R4;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_8_R3;
 import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_9_R2;
 import com.skytonia.SkyCore.packets.PacketLibrary;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_11_R1;
+import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_7_R4;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_8_R3;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_9_R2;
 import org.bukkit.Bukkit;
@@ -52,44 +55,6 @@ public class StaticNMS
 		serverName = packageServerName;
 	}
 	
-	/*private static INMSHelper nmsHelper = null;
-	public static INMSHelper getNMSHelper() throws IllegalArgumentException
-	{
-		if(nmsHelper == null)
-		{
-			switch(BUtil.getNMSVersion())
-			{
-				case "v1_7_R1": nmsHelper = new NMSHelper_1_7_R1(); break;
-				case "v1_7_R2": nmsHelper = new NMSHelper_1_7_R2(); break;
-				case "v1_7_R3": nmsHelper = new NMSHelper_1_7_R3(); break;
-				case "v1_7_R4": nmsHelper = new NMSHelper_1_7_R4(); break;
-				case "v1_8_R1": nmsHelper = new NMSHelper_1_8_R1(); break;
-				case "v1_8_R2": nmsHelper = new NMSHelper_1_8_R2(); break;
-				case "v1_8_R3": nmsHelper = new NMSHelper_1_8_R3(); break;
-				case "v1_9_R1": nmsHelper = new NMSHelper_1_9_R2(); break;
-				case "v1_9_R2": nmsHelper = new NMSHelper_1_9_R2(); break;
-				case "v1_10_R1": nmsHelper = new NMSHelper_1_10_R1(); break;
-				default: //Check if we're running forge
-				{
-					if(isForge)
-					{
-						//Cauldron is 1.7.10 -> v1_7_R4
-						nmsHelper = new NMSHelper_1_7_R4();
-					}
-					
-					if(nmsHelper == null)
-					{
-						throw new IllegalArgumentException("This server version is not supported '" + serverName + "'");
-					}
-				}
-			}
-			
-			BUtil.logInfo("Hooked NMS Version: " + BUtil.getNMSVersion());
-		}
-		
-		return nmsHelper;
-	}*/
-	
 	private static IParticlePacketFactory particleFactoryInstance = null;
 	public static IParticlePacketFactory getParticleFactoryInstance() throws IllegalArgumentException
 	{
@@ -97,11 +62,10 @@ public class StaticNMS
 		{
 			switch(BUtil.getNMSVersion())
 			{
-				//TODO: Convert to Factory
 				//case "v1_7_R1": particleFactoryInstance = new ParticlePacketFactory_1_7_R1(); break;
 				//case "v1_7_R2": particleFactoryInstance = new ParticlePacketFactory_1_7_R2(); break;
 				//case "v1_7_R3": particleFactoryInstance = new ParticlePacketFactory_1_7_R3(); break;
-				//case "v1_7_R4": particleFactoryInstance = new ParticlePacketFactory_1_7_R4(); break;
+				case "v1_7_R4": particleFactoryInstance = new ParticlePacketFactory_1_7_R4(); break;
 				//case "v1_8_R1": particleFactoryInstance = new ParticlePacketFactory_1_8_R1(); break;
 				//case "v1_8_R2": particleFactoryInstance = new ParticlePacketFactory_1_8_R2(); break;
 				case "v1_8_R3": particleFactoryInstance = new ParticlePacketFactory_1_8_R3(); break;
@@ -136,11 +100,10 @@ public class StaticNMS
 		{
 			switch(BUtil.getNMSVersion())
 			{
-				//TODO: Convert to Factory
 				//case "v1_7_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R1(); break;
 				//case "v1_7_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R2(); break;
 				//case "v1_7_R3": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R3(); break;
-				//case "v1_7_R4": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R4(); break;
+				case "v1_7_R4": guiCreationFactory = new GUICreationFactory_1_7_R4(); break;
 				//case "v1_8_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R1(); break;
 				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
 				case "v1_8_R3": guiCreationFactory = new GUICreationFactory_1_8_R3(); break;
@@ -178,7 +141,7 @@ public class StaticNMS
 				//case "v1_7_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R1(); break;
 				//case "v1_7_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R2(); break;
 				//case "v1_7_R3": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R3(); break;
-				//case "v1_7_R4": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R4(); break;
+				case "v1_7_R4": packetLibrary = new PacketLibrary_1_7_R4(); break;
 				//case "v1_8_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R1(); break;
 				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
 				case "v1_8_R3": packetLibrary = new PacketLibrary_1_8_R3(); break;
