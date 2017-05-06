@@ -5,16 +5,14 @@ import com.mojang.authlib.properties.Property;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.items.EnchantStatus;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.StaticNMS;
 import com.skytonia.SkyCore.util.SupportedVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.server.v1_9_R2.NBTTagCompound;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -126,36 +124,7 @@ public class ItemContainer
 		//Handle NBT Tags early on before we customise it too much
 		if(material == MONSTER_EGG && damage > 0)
 		{
-			if(SkyCore.getCurrentVersion().isExact(SupportedVersion.ONE_NINE))
-			{
-				net.minecraft.server.v1_9_R2.ItemStack stack = CraftItemStack.asNMSCopy(itemStack);
-				NBTTagCompound tagCompound = stack.getTag();
-				if(tagCompound == null)
-				{
-					tagCompound = new NBTTagCompound();
-				}
-				
-				NBTTagCompound id = new NBTTagCompound();
-				id.setString("id", EntityType.fromId(damage).getName());
-				tagCompound.set("EntityTag", id);
-				stack.setTag(tagCompound);
-				itemStack = CraftItemStack.asBukkitCopy(stack);
-			}
-			else if(SkyCore.getCurrentVersion().isExact(SupportedVersion.ONE_SEVEN))
-			{
-				net.minecraft.server.v1_7_R4.ItemStack stack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asNMSCopy(itemStack);
-				net.minecraft.server.v1_7_R4.NBTTagCompound tagCompound = stack.getTag();
-				if(tagCompound == null)
-				{
-					tagCompound = new net.minecraft.server.v1_7_R4.NBTTagCompound();
-				}
-				
-				net.minecraft.server.v1_7_R4.NBTTagCompound id = new net.minecraft.server.v1_7_R4.NBTTagCompound();
-				id.setString("id", EntityType.fromId(damage).getName());
-				tagCompound.set("EntityTag", id);
-				stack.setTag(tagCompound);
-				itemStack = org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);
-			}
+			itemStack = StaticNMS.getNMSItemUtil().setSpawnedEntity(itemStack, damage);
 		}
 		
 		ItemMeta itemMeta = itemStack.getItemMeta();
