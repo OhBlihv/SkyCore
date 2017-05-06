@@ -2,6 +2,7 @@ package com.skytonia.SkyCore.redis;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.movement.MovementManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -46,7 +47,14 @@ public class RedisManager
 		poolConfig.setNumTestsPerEvictionRun(10);
 		poolConfig.setTimeBetweenEvictionRunsMillis(60000); //60 seconds
 		
-		jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
+		if(SkyCore.isSkytonia())
+		{
+			jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
+		}
+		else
+		{
+			jedisPool = new JedisPool(poolConfig, "localhost", 6379, 5000);
+		}
 		
 		//Handle this manually to avoid server/beta case handling
 		try(Jedis jedis = jedisPool.getResource())
