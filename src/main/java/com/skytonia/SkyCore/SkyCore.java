@@ -107,6 +107,8 @@ public class SkyCore extends JavaPlugin implements Listener
 				BUtil.logInfo("Could not set up Redis Connection");
 				e.printStackTrace();
 			}
+			
+			TagController.getInstance(); //Enable Tags
 		}
 		
 		//Initialize Addon Registries
@@ -120,8 +122,6 @@ public class SkyCore extends JavaPlugin implements Listener
 			BUtil.logError("An issue occurred while initializing stored variables. Refer to the stack trace below.");
 			BUtil.logStackTrace(e);
 		}
-		
-		TagController.getInstance(); //Enable Tags
 	}
 	
 	@Override
