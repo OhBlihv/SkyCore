@@ -12,6 +12,7 @@ import com.skytonia.SkyCore.redis.RedisMessage;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.SupportedVersion;
 import lilypad.client.connect.api.Connect;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -93,6 +94,7 @@ public class MovementManager
 	private static final Map<String, MovementInfo> movementMap = new HashMap<>();
 	private static final Set<String> incomingPlayers = new HashSet<>();
 	
+	@Getter
 	private static MovementHandler movementHandler;
 	
 	protected static long timeoutDelay = 40L; //2 second timeout as default (TODO: Configurable)

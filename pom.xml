@@ -84,6 +84,12 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.arkhamnetwork</groupId>
+			<artifactId>ArkhamServerSync</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
 		<!-- Database -->
 		<dependency>
 			<groupId>com.zaxxer</groupId>

@@ -1,7 +1,11 @@
 package com.skytonia.SkyCore.movement;
 
+import com.skytonia.SkyCore.movement.handlers.LilypadMovementHandler;
+import com.skytonia.SkyCore.movement.handlers.RedisMovementHandler;
 import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
+import org.arkhamnetwork.ArkhamServerSync.ArkhamServerSync;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,26 +37,45 @@ public class PlayerCount
 		});
 	}
 	
+	private static boolean printedUnsupportedPlayerCount = false;
+	
 	public static int getPlayerCount(String server)
 	{
-		final int[] playerCount = new int[] {0};
-		RedisManager.accessConnection((jedis) ->
+		if(MovementManager.getMovementHandler() instanceof RedisMovementHandler)
 		{
-			String playerCountString = jedis.get(server + PLAYER_COUNT_KEY);
-			if(playerCountString != null && !playerCountString.isEmpty())
+			final int[] playerCount = new int[] {0};
+			RedisManager.accessConnection((jedis) ->
 			{
-				try
+				String playerCountString = jedis.get(server + PLAYER_COUNT_KEY);
+				if(playerCountString != null && !playerCountString.isEmpty())
 				{
-					playerCount[0] = Integer.parseInt(playerCountString);
+					try
+					{
+						playerCount[0] = Integer.parseInt(playerCountString);
+					}
+					catch(NumberFormatException e)
+					{
+						//
+					}
 				}
-				catch(NumberFormatException e)
-				{
-					//
-				}
+			});
+			
+			return playerCount[0];
+		}
+		else if(MovementManager.getMovementHandler() instanceof LilypadMovementHandler)
+		{
+			return ArkhamServerSync.lily_server_map.getCurrentPlayers(server);
+		}
+		else
+		{
+			if(!printedUnsupportedPlayerCount)
+			{
+				printedUnsupportedPlayerCount = true;
+				BUtil.logInfo("Unsupported system. Cannot retrieve player count without Lilypad/Redis support.");
 			}
-		});
-		
-		return playerCount[0];
+			
+			return 0;
+		}
 	}
 	
 }
