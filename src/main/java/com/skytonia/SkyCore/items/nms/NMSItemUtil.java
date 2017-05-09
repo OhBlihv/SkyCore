@@ -10,4 +10,6 @@ public interface NMSItemUtil
 	
 	ItemStack setSpawnedEntity(ItemStack itemStack, int damage);
 	
+	Object addEnchantmentEffect(Object enchTag);
+	
 }

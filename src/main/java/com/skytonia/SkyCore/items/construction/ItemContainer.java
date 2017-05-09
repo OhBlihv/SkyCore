@@ -211,8 +211,8 @@ public class ItemContainer
 			leatherMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		}
 		
-		if(SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE) &&
-			   SkyCore.isSkytonia() && material == DIAMOND_PICKAXE)
+		if(SkyCore.isSkytonia() && SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE) &&
+			    material == DIAMOND_PICKAXE)
 		{
 			itemMeta.spigot().setUnbreakable(true);
 			itemMeta.addItemFlags(

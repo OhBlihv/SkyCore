@@ -10,6 +10,7 @@ import com.skytonia.SkyCore.movement.handlers.RedisMovementHandler;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.redis.RedisMessage;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.SupportedVersion;
 import lilypad.client.connect.api.Connect;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -183,6 +184,18 @@ public class MovementManager
 		
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
+		
+		if(movementHandler == null)
+		{
+			if(SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE))
+			{
+				movementHandler = new RedisMovementHandler();
+			}
+			else
+			{
+				movementHandler = new LilypadMovementHandler();
+			}
+		}
 		
 		movementHandler.sendPlayerTo(player.getName(), server);
 		
