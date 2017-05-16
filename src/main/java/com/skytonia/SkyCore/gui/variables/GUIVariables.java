@@ -62,6 +62,7 @@ public class GUIVariables extends AddonRegistry
 		}
 		
 		super.registerAddon(addonIdentifier, skyAddon);
+		((GUIVariable) skyAddon.getAddon()).loadGUIVariable();
 	}
 	
 	@Override

@@ -5,6 +5,8 @@ import com.mojang.authlib.properties.Property;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.items.EnchantStatus;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.StaticNMS;
+import com.skytonia.SkyCore.util.SupportedVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Color;
@@ -26,8 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.bukkit.Material.AIR;
-import static org.bukkit.Material.DIAMOND_PICKAXE;
+import static org.bukkit.Material.*;
 
 /**
  * Created by Chris Brown (OhBlihv) on 26/09/2016.
@@ -119,6 +120,13 @@ public class ItemContainer
 		String          owner = (String) getOverriddenValue(overriddenValues, ItemContainerVariable.OWNER, this.owner);
 		
 		ItemStack itemStack = new ItemStack(material, amount, (short) damage);
+		
+		//Handle NBT Tags early on before we customise it too much
+		if(material == MONSTER_EGG && damage > 0)
+		{
+			itemStack = StaticNMS.getNMSItemUtil().setSpawnedEntity(itemStack, damage);
+		}
+		
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		
 		if(displayName != null)
@@ -199,9 +207,12 @@ public class ItemContainer
 		{
 			LeatherArmorMeta leatherMeta = (LeatherArmorMeta) itemMeta;
 			leatherMeta.setColor(armorColor);
+			
+			leatherMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		}
 		
-		if(SkyCore.isSkytonia() && material == DIAMOND_PICKAXE)
+		if(SkyCore.isSkytonia() && SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE) &&
+			    material == DIAMOND_PICKAXE)
 		{
 			itemMeta.spigot().setUnbreakable(true);
 			itemMeta.addItemFlags(

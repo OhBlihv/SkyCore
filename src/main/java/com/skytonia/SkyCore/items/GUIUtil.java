@@ -1,8 +1,11 @@
 package com.skytonia.SkyCore.items;
 
+import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.items.construction.ItemContainer;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.ReflectionUtils;
+import com.skytonia.SkyCore.util.StaticNMS;
+import com.skytonia.SkyCore.util.SupportedVersion;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -120,77 +123,56 @@ public class GUIUtil
 
 	public static ItemStack addEnchantmentEffect(ItemStack itemStack)
 	{
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		
-		itemMeta.addEnchant(Enchantment.MENDING, 1, true);
-		itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
-		
-		itemStack.setItemMeta(itemMeta);
-		
-		return itemStack;
-		
-		/*if(!initEnchantmentNMS())
+		if(SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE))
 		{
-			BUtil.logInfo("Could not initialize NMS");
-			return item; //Return the item without enchantment effects
+			ItemMeta itemMeta = itemStack.getItemMeta();
+			
+			itemMeta.addEnchant(Enchantment.MENDING, 1, true);
+			itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_ATTRIBUTES);
+			
+			itemStack.setItemMeta(itemMeta);
+			
+			return itemStack;
 		}
-
-		try
+		else
 		{
-			Object  nmsStack = CRAFT_ItemStack_asNMSCopy.invoke(null, item),
+			if(!initEnchantmentNMS())
+			{
+				BUtil.logInfo("Could not initialize NMS");
+				return itemStack; //Return the item without enchantment effects
+			}
+			
+			try
+			{
+				Object  nmsStack = CRAFT_ItemStack_asNMSCopy.invoke(null, itemStack),
 					tag = null, //NBTTagCompound
 					enchTag;    //NBTTagList
-
-			if(!((boolean) NMS_ItemStack_hasTag.invoke(nmsStack)))
-			{
-				tag = NMS_NBTTagCompound.newInstance();
-				NMS_ItemStack_setTag.invoke(nmsStack, tag);
-			}
-
-			if (tag == null)
-			{
-				tag = NMS_ItemStack_getTag.invoke(nmsStack);
-			}
-
-			enchTag = NMS_NBTTagList.newInstance();
-			
-			//TODO: Properly Test this and streamline it?
-			/*try
-			{
-				switch(BUtil.getNMSVersion())
+				
+				if(!((boolean) NMS_ItemStack_hasTag.invoke(nmsStack)))
 				{
-					case "v1_9_R2":
-					{
-						BUtil.logInfo(enchTag.toString());
-						net.minecraft.server.v1_9_R2.NBTTagList enchTagList = (net.minecraft.server.v1_9_R2.NBTTagList) enchTag;
-						while(!enchTagList.isEmpty())
-						{
-							enchTagList.remove(0);
-						}
-						((net.minecraft.server.v1_9_R2.NBTTagList) enchTag).add(new net.minecraft.server.v1_9_R2.NBTTagInt(-1));
-						BUtil.logInfo(enchTag.toString());
-						break;
-					}
-					default: break;
+					tag = NMS_NBTTagCompound.newInstance();
+					NMS_ItemStack_setTag.invoke(nmsStack, tag);
 				}
+				
+				if (tag == null)
+				{
+					tag = NMS_ItemStack_getTag.invoke(nmsStack);
+				}
+				
+				enchTag = StaticNMS.getNMSItemUtil().addEnchantmentEffect(NMS_NBTTagList.newInstance());
+				
+				NMS_NBTTagCompound_set.invoke(tag, "ench", enchTag);
+				NMS_ItemStack_setTag.invoke(nmsStack, tag);
+				
+				return (ItemStack) CRAFT_ItemStack_asCraftMirror.invoke(null, nmsStack);
 			}
-			catch(Exception updateNav)
+			catch(ClassCastException | IllegalAccessException | InvocationTargetException | InstantiationException e)
 			{
-				updateNav.printStackTrace();
-				return item;
-			}*
-			
-			NMS_NBTTagCompound_set.invoke(tag, "ench", enchTag);
-			NMS_ItemStack_setTag.invoke(nmsStack, tag);
-
-			return (ItemStack) CRAFT_ItemStack_asCraftMirror.invoke(null, nmsStack);
+				e.printStackTrace();
+				BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
+				return itemStack;
+			}
 		}
-		catch(ClassCastException | IllegalAccessException | InvocationTargetException | InstantiationException updateNav)
-		{
-			updateNav.printStackTrace();
-			BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
-			return tiem;
-		}*/
 	}
 
 	public static ItemStack removeEnchantmentEffect(ItemStack item)

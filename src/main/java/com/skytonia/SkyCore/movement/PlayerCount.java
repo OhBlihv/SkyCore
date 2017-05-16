@@ -1,10 +1,13 @@
 package com.skytonia.SkyCore.movement;
 
+import com.skytonia.SkyCore.movement.handlers.LilypadMovementHandler;
+import com.skytonia.SkyCore.movement.handlers.RedisMovementHandler;
 import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
+import org.arkhamnetwork.ArkhamServerSync.ArkhamServerSync;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,27 +31,47 @@ public class PlayerCount
 	
 	public static void updatePlayerCount(int players)
 	{
-		try(Jedis jedis =  RedisManager.getConnection())
+		RedisManager.accessConnection((jedis) ->
 		{
 			jedis.set(RedisManager.getServerName() + PLAYER_COUNT_KEY, String.valueOf(players));
-		}
+		});
 	}
+	
+	private static boolean printedUnsupportedPlayerCount = false;
 	
 	public static int getPlayerCount(String server)
 	{
-		try(Jedis jedis =  RedisManager.getConnection())
+		if(MovementManager.getMovementHandler() instanceof RedisMovementHandler)
 		{
-			String playerCountString = jedis.get(server + PLAYER_COUNT_KEY);
-			if(playerCountString != null && !playerCountString.isEmpty())
+			final int[] playerCount = new int[] {0};
+			RedisManager.accessConnection((jedis) ->
 			{
-				try
+				String playerCountString = jedis.get(server + PLAYER_COUNT_KEY);
+				if(playerCountString != null && !playerCountString.isEmpty())
 				{
-					return Integer.parseInt(playerCountString);
+					try
+					{
+						playerCount[0] = Integer.parseInt(playerCountString);
+					}
+					catch(NumberFormatException e)
+					{
+						//
+					}
 				}
-				catch(NumberFormatException e)
-				{
-					//
-				}
+			});
+			
+			return playerCount[0];
+		}
+		else if(MovementManager.getMovementHandler() instanceof LilypadMovementHandler)
+		{
+			return ArkhamServerSync.lily_server_map.getCurrentPlayers(server);
+		}
+		else
+		{
+			if(!printedUnsupportedPlayerCount)
+			{
+				printedUnsupportedPlayerCount = true;
+				BUtil.logInfo("Unsupported system. Cannot retrieve player count without Lilypad/Redis support.");
 			}
 			
 			return 0;

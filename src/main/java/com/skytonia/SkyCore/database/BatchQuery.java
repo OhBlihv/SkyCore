@@ -72,6 +72,9 @@ public class BatchQuery<T>
 			int batchCount = 0;
 			if(batchItems != null)
 			{
+				//Set the execution time to the last batched item
+				batchSize = batchItems.size();
+				
 				for(T batchItem : batchItems)
 				{
 					try
@@ -81,11 +84,13 @@ public class BatchQuery<T>
 							continue;
 						}
 						statement.addBatch();
-						batchCount++;
 						
 						if(++batchCount % batchSize == 0)
 						{
 							statement.executeBatch();
+							
+							//Avoid executing the batch twice if it's already been done here
+							batchCount = 0;
 						}
 					}
 					catch(SQLException e)
@@ -119,12 +124,10 @@ public class BatchQuery<T>
 				}
 			}
 			
-			if(batchCount == 0)
+			if(batchCount > 0)
 			{
-				return;
+				statement.executeBatch();
 			}
-			
-			statement.executeBatch();
 			
 			if(completeAction != null)
 			{

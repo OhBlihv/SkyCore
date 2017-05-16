@@ -3,6 +3,7 @@ package com.skytonia.SkyCore.util.file;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.LocationUtil;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,6 +53,7 @@ public class FlatFile
 	protected final String pluginString;
 	protected final JavaPlugin plugin;
 	
+	@Getter
 	String fileName = "config.yml";
 	
 	private static final Map<String, FlatFile> flatfileInstances = new HashMap<>();
@@ -59,6 +61,11 @@ public class FlatFile
 	public static void unregisterFlatFile(String plugin)
 	{
 		flatfileInstances.remove(plugin);
+	}
+	
+	public static FlatFile forFileName(String fileName)
+	{
+		return new FlatFile(fileName, null);
 	}
 	
 	public static FlatFile getInstance()

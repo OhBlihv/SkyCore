@@ -4,9 +4,15 @@ import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.movement.events.PlayerChangeServerEvent;
 import com.skytonia.SkyCore.movement.events.PlayerEnterServerEvent;
 import com.skytonia.SkyCore.movement.events.PlayerServerChangeRequestEvent;
+import com.skytonia.SkyCore.movement.handlers.LilypadMovementHandler;
+import com.skytonia.SkyCore.movement.handlers.MovementHandler;
+import com.skytonia.SkyCore.movement.handlers.RedisMovementHandler;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.redis.RedisMessage;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.SupportedVersion;
+import lilypad.client.connect.api.Connect;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -88,15 +94,48 @@ public class MovementManager
 	private static final Map<String, MovementInfo> movementMap = new HashMap<>();
 	private static final Set<String> incomingPlayers = new HashSet<>();
 	
+	@Getter
+	private static MovementHandler movementHandler;
+	
 	protected static long timeoutDelay = 40L; //2 second timeout as default (TODO: Configurable)
 	
 	private MovementManager()
 	{
 		HubManager.getInstance();
 		
-		Bukkit.getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
+		MovementHandler tempMovementHandler = null;
+		try
+		{
+			if(!RedisManager.getServerName().isEmpty())
+			{
+				tempMovementHandler = new RedisMovementHandler();
+				
+				RedisManager.registerSubscription(this::onMessage, CHANNEL_MOVE_PLAYER_REQ, CHANNEL_MOVE_PLAYER_REPLY);
+			}
+		}
+		catch(Exception e)
+		{
+			//
+		}
 		
-		RedisManager.registerSubscription(this::onMessage, CHANNEL_MOVE_PLAYER_REQ, CHANNEL_MOVE_PLAYER_REPLY);
+		try
+		{
+			if(tempMovementHandler == null && SkyCore.getPluginInstance().getServer().getServicesManager().getRegistration(Connect.class).getProvider() != null)
+			{
+				tempMovementHandler = new LilypadMovementHandler();
+			}
+		}
+		catch(Exception e)
+		{
+			//
+		}
+		
+		if(tempMovementHandler == null)
+		{
+			throw new IllegalArgumentException("Unable to select movement handler. Server Movement will not work");
+		}
+		
+		movementHandler = tempMovementHandler;
 	}
 	
 	public static void requestMove(String server, Player player) throws IllegalArgumentException
@@ -148,7 +187,19 @@ public class MovementManager
 		BUtil.logMessage("Requesting move of " + player.getName() + " to " + server);
 		movementMap.put(player.getName(), new MovementInfo(player, server, movementAction));
 		
-		RedisManager.sendMessage(server, CHANNEL_MOVE_PLAYER_REQ, RedisManager.getServerName() + SPLITTER + player.getName());
+		if(movementHandler == null)
+		{
+			if(SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE))
+			{
+				movementHandler = new RedisMovementHandler();
+			}
+			else
+			{
+				movementHandler = new LilypadMovementHandler();
+			}
+		}
+		
+		movementHandler.sendPlayerTo(player.getName(), server);
 		
 		return server;
 	}

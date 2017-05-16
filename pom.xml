@@ -21,6 +21,10 @@
 			<id>dmulloy2-repo</id>
 			<url>http://repo.dmulloy2.net/content/groups/public/</url>
 		</repository>
+		<repository>
+			<id>LilypadMC</id>
+			<url>http://ci.lilypadmc.org/plugin/repository/everything/</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>
@@ -33,6 +37,14 @@
 		</dependency>
 		
 		<!-- Spigot NMS Dependency -->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>Spigot-v1_7_R4</artifactId>
+			<version>1.7.10-R0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<optional>true</optional>
+			<systemPath>${project.basedir}/../lib/spigot-1.7.10-tw.jar</systemPath>
+		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>Spigot-v1_8_R3</artifactId>
@@ -65,6 +77,19 @@
 			<version>2.9.0</version>
 		</dependency>
 		
+		<!-- Lilypad -->
+		<dependency>
+			<groupId>lilypad.client.connect</groupId>
+			<artifactId>api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.arkhamnetwork</groupId>
+			<artifactId>ArkhamServerSync</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
 		<!-- Database -->
 		<dependency>
 			<groupId>com.zaxxer</groupId>
@@ -73,6 +98,13 @@
 		</dependency>
 		
 		<!-- Plugin Dependencies -->
+		<dependency>
+			<groupId>com.skytonia</groupId>
+			<artifactId>SkyCosmetics</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
 			<artifactId>ProtocolLib-API</artifactId>

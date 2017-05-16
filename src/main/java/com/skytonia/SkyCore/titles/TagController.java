@@ -13,7 +13,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -36,6 +38,8 @@ public class TagController implements Listener
 		return instance;
 	}
 	
+	private Plugin plugin = SkyCore.getPluginInstance();
+	
 	private final Map<UUID, TaggedPlayer> entityTagMap = new ConcurrentHashMap<>();
 	
 	TagController()
@@ -45,7 +49,7 @@ public class TagController implements Listener
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.SNOWBALL);
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.RABBIT);
 		
-		SkyCore.getPluginInstance().getServer().getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
+		plugin.getServer().getPluginManager().registerEvents(this, SkyCore.getPluginInstance());
 		
 		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
@@ -133,13 +137,13 @@ public class TagController implements Listener
 	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
 	{
-		entityTagMap.get(event.getPlayer().getUniqueId()).setSneaking(!event.getPlayer().isSneaking());
+		RunnableShorthand.forPlugin(plugin).with(() -> entityTagMap.get(event.getPlayer().getUniqueId()).setSneaking(/*!*/event.getPlayer().isSneaking())).runASync();
 	}
 	
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
-		entityTagMap.get(event.getPlayer().getUniqueId()).setOnline(false);
+		RunnableShorthand.forPlugin(plugin).with(() -> entityTagMap.get(event.getPlayer().getUniqueId()).setOnline(false)).runASync();
 	}
 	
 	@EventHandler
@@ -147,12 +151,26 @@ public class TagController implements Listener
 	{
 		if(!entityTagMap.isEmpty() && event.getEntityType() != EntityType.PLAYER)
 		{
-			TaggedPlayer taggedPlayer = entityTagMap.get(event.getEntity().getUniqueId());
-			if(taggedPlayer != null)
+			RunnableShorthand.forPlugin(plugin).with(() ->
 			{
-				taggedPlayer.setOnline(false);
-			}
+				TaggedPlayer taggedPlayer = entityTagMap.get(event.getEntity().getUniqueId());
+				if(taggedPlayer != null)
+				{
+					taggedPlayer.setOnline(false);
+				}
+			}).runASync();
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerTeleport(PlayerTeleportEvent event)
+	{
+		RunnableShorthand.forPlugin(plugin).with(() ->
+		{
+			TaggedPlayer taggedPlayer = getPlayerTag(event.getPlayer());
+			taggedPlayer.clearNearbyPlayers();
+			taggedPlayer.updateLastRelocation();
+		}).runASync();
 	}
 	
 }

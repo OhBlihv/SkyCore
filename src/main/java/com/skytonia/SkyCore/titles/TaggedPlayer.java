@@ -8,7 +8,11 @@ import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntityLiving;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
-import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCosmetics.SkyCosmetics;
+import com.skytonia.SkyCosmetics.cosmetics.CosmeticType;
+import com.skytonia.SkyCosmetics.cosmetics.types.WearableHeadCosmetic;
+import com.skytonia.SkyCosmetics.cosmetics.wrappers.WrappedBasicCosmetic;
+import com.skytonia.SkyCosmetics.storage.PlayerCosmetics;
 import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
 import net.minecraft.server.v1_9_R2.Entity;
@@ -16,10 +20,10 @@ import net.minecraft.server.v1_9_R2.EntityPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Chris Brown (OhBlihv) on 4/10/2017.
@@ -38,13 +42,15 @@ public class TaggedPlayer
 	private TagLine spacerLine = new TagLine(PetUtil.getNextEntityId(), "");
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
-	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new HashMap<>();
+	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new ConcurrentHashMap<>();
 	
 	@Getter
 	private final Entity entity;
 	
 	@Getter
 	private boolean online = true;
+	
+	private long lastRelocation = -1;
 	
 	public TaggedPlayer(Entity player)
 	{
@@ -83,16 +89,46 @@ public class TaggedPlayer
 	{
 		if(entity instanceof EntityPlayer)
 		{
-			//TODO: Read off worn hat
-			String serverName = RedisManager.getServerName().toLowerCase();
-			if(serverName.startsWith("hub") || serverName.startsWith("murder"))
+			try
 			{
-				//Hubs contain rabbit ears for now
-				return 1;
+				PlayerCosmetics playerCosmetics = SkyCosmetics.getInstance().getPlayerManager().getCosmetics(entity.getUniqueID());
+				if(playerCosmetics != null)
+				{
+					WrappedBasicCosmetic cosmetic = playerCosmetics.getActiveCosmetic(CosmeticType.WEARABLE_HEAD);
+					if(cosmetic != null)
+					{
+						return ((WearableHeadCosmetic) cosmetic.getCosmetic()).getSpacerType().getHeight();
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 		
 		return 0;
+	}
+	
+	public void updateLastRelocation()
+	{
+		lastRelocation = System.currentTimeMillis();
+	}
+	
+	public boolean isRecentlyRelocated()
+	{
+		if(lastRelocation != -1)
+		{
+			if(System.currentTimeMillis() - lastRelocation < 1000)
+			{
+				return true;
+			} else
+			{
+				lastRelocation = -1;
+			}
+		}
+		
+		return false;
 	}
 	
 	public void setSneaking(boolean sneaking)
@@ -206,6 +242,18 @@ public class TaggedPlayer
 		}
 	}
 	
+	public void clearNearbyPlayers()
+	{
+		for(ComparisonPlayer nearbyPlayer : nearbyPlayers.values())
+		{
+			nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
+		}
+		
+		update();
+		
+		nearbyPlayers.clear();
+	}
+	
 	public boolean update()
 	{
 		//Avoid updating if there are no players that require it
@@ -220,6 +268,9 @@ public class TaggedPlayer
 		//Update Packets
 		List<AbstractPacket> updatePackets = new ArrayList<>();
 		
+		//Mount Packets
+		List<AbstractPacket> mountPackets = new ArrayList<>();
+		
 		//Destroy IDs/Packets
 		List<Integer> tagIds = new ArrayList<>();
 		
@@ -230,11 +281,13 @@ public class TaggedPlayer
 		//Thanks to cyberpwn for the following values
 		final double amx = 0.375, amv = -0.161;
 		
+		boolean hasSpacer = false;
 		int lastVehicleId = entity.getId();
 		List<TagLine> visibleTags = new ArrayList<>();
 		if(getHatHeight() > 0)
 		{
 			visibleTags.add(spacerLine);
+			hasSpacer = true;
 		}
 		else
 		{
@@ -271,7 +324,29 @@ public class TaggedPlayer
 						spawnPacket.setType(tagLine.getLineEntity());
 						
 						spawnPacket.setX(entity.locX);
-						spawnPacket.setY(entity.locY + ((++lineHeight * amx) + amv));
+						
+						//AreaEffectClouds are only used on the first line. This spawns them on the right height
+						double yHeight = entity.locY;
+						switch(lineHeight)
+						{
+							//Spacer or initial
+							case 3:
+							{
+								if(hasSpacer)
+								{
+									yHeight += ((++lineHeight * amx) + amv);
+								}
+								else
+								{
+									yHeight += ((++lineHeight * amx));
+								}
+								break;
+							}
+							case 4: yHeight += ((++lineHeight * amx)); break;
+							case 5: yHeight += ((++lineHeight * amx)); break;
+						}
+						
+						spawnPacket.setY(yHeight);
 						spawnPacket.setZ(entity.locZ);
 						
 						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
@@ -348,7 +423,7 @@ public class TaggedPlayer
 					{
 						lastPassengers.add(tagLine.getTagId());
 						
-						spawnPackets.add(getMountPacket(lastVehicleId, lastPassengers));
+						mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
 						
 						lastVehicleId = tagLine.getTagId();
 					}
@@ -360,7 +435,7 @@ public class TaggedPlayer
 		
 		if(!lastPassengers.isEmpty())
 		{
-			spawnPackets.add(getMountPacket(lastVehicleId, lastPassengers));
+			mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
 		}
 		
 		playerTags.removeAll(tagsToRemove);
@@ -377,7 +452,8 @@ public class TaggedPlayer
 			destroyPacket.setEntityIds(destroyIds);
 		}
 		
-		//TODO: Force respawn after a few ticks?
+		boolean recentlyRelocated = isRecentlyRelocated();
+		
 		List<UUID> playersToRemove = new ArrayList<>();
 		for(ComparisonPlayer nearbyPlayer : nearbyPlayers.values())
 		{
@@ -385,6 +461,10 @@ public class TaggedPlayer
 			if(!isOnline() || !nearbyBukkitPlayer.isOnline())
 			{
 				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
+			}
+			else if(recentlyRelocated)
+			{
+				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.ADD);
 			}
 			
 			switch(nearbyPlayer.getDirtyPlayerType())
@@ -400,6 +480,11 @@ public class TaggedPlayer
 					}
 					
 					for(AbstractPacket packet : updatePackets)
+					{
+						packet.sendPacket(nearbyBukkitPlayer);
+					}
+					
+					for(AbstractPacket packet : mountPackets)
 					{
 						packet.sendPacket(nearbyBukkitPlayer);
 					}

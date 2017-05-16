@@ -217,16 +217,19 @@ public class DatabaseSource
 				e.printStackTrace();
 			}
 			
-			if(resultAction != null && resultSet != null && resultSet.next())
+			if(resultAction != null && resultSet != null)
 			{
-				try
+				while(resultSet.next())
 				{
-					resultAction.processResults(resultSet);
-				}
-				catch(Exception e)
-				{
-					BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
-					e.printStackTrace();
+					try
+					{
+						resultAction.processResults(resultSet);
+					}
+					catch(Exception e)
+					{
+						BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+						e.printStackTrace();
+					}
 				}
 			}
 		}
