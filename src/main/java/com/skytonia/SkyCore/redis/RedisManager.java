@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Created by Chris Brown (OhBlihv) on 3/3/2017.
  */
+@Deprecated
 public class RedisManager
 {
 	
