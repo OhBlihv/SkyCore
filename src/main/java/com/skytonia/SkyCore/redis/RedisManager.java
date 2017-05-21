@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.movement.MovementManager;
+import com.skytonia.SkyCore.util.SupportedVersion;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
@@ -33,6 +34,11 @@ public class RedisManager
 	
 	static
 	{
+		if(!SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE))
+		{
+			throw new IllegalArgumentException("Redis not supported on Pre-1.9 versions");
+		}
+		
 		RedisFlatFile redisFlatFile = RedisFlatFile.getInstance();
 		
 		serverName = redisFlatFile.getString("server-name");
