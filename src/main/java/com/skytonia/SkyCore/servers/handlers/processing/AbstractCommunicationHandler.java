@@ -8,6 +8,7 @@ import com.skytonia.SkyCore.movement.events.PlayerEnterServerEvent;
 import com.skytonia.SkyCore.movement.events.PlayerServerChangeRequestEvent;
 import com.skytonia.SkyCore.servers.MovementAction;
 import com.skytonia.SkyCore.servers.MovementInfo;
+import com.skytonia.SkyCore.servers.ServerInfo;
 import com.skytonia.SkyCore.servers.ServerStatus;
 import com.skytonia.SkyCore.servers.handlers.CommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
@@ -78,6 +79,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	protected final Map<String, MovementInfo> movementMap = new HashMap<>();
 	
 	protected final Set<String> incomingPlayers = new HashSet<>();
+	
+	/*
+	 * Server Management
+	 */
+	
+	protected final Map<String, ServerInfo> serverMap = new HashMap<>();
 	
 	@Getter
 	@Setter
@@ -448,6 +455,68 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			event.allow();
 			incomingPlayers.remove(event.getPlayer().getName());
 		}
+	}
+	
+	/*
+	 * Server Management
+	 */
+	
+	@Override
+	public String getOnlineHub()
+	{
+		return null;
+	}
+	
+	@Override
+	public List<String> getServersMatching(String searchPhrase)
+	{
+		searchPhrase = searchPhrase.toLowerCase();
+		
+		List<String> matchedServers = new ArrayList<>();
+		for(String serverName : serverMap.keySet())
+		{
+			if(serverName.toLowerCase().contains(searchPhrase))
+			{
+				matchedServers.add(serverName);
+			}
+		}
+		
+		return matchedServers;
+	}
+	
+	@Override
+	public List<String> getAvailableServersMatching(String searchPhrase)
+	{
+		searchPhrase = searchPhrase.toLowerCase();
+		
+		List<String> matchedServers = new ArrayList<>();
+		for(Map.Entry<String, ServerInfo> entry : serverMap.entrySet())
+		{
+			if(entry.getValue().getServerStatus() == ServerStatus.ONLINE && entry.getKey().toLowerCase().contains(searchPhrase))
+			{
+				matchedServers.add(entry.getKey());
+			}
+		}
+		
+		return matchedServers;
+	}
+	
+	@Override
+	public ServerInfo getServer(String serverName)
+	{
+		ServerInfo serverInfo = serverMap.get(serverName);
+		if(serverInfo == null)
+		{
+			serverInfo = new ServerInfo();
+		}
+		
+		return serverInfo;
+	}
+	
+	@Override
+	public int getPlayerCount(String serverName)
+	{
+		return getServer(serverName).getPlayerCount();
 	}
 	
 }

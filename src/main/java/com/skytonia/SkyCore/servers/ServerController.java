@@ -6,6 +6,7 @@ import com.skytonia.SkyCore.servers.handlers.LilypadCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.LilypadRedisCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.RedisCommunicationHandler;
 import com.skytonia.SkyCore.util.BUtil;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 /**
@@ -16,7 +17,8 @@ public class ServerController
 	
 	private final SkyCore plugin;
 	
-	private CommunicationHandler communicationHandler;
+	@Getter
+	private static CommunicationHandler communicationHandler = null;
 	
 	public ServerController(SkyCore plugin)
 	{

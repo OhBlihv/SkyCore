@@ -27,6 +27,8 @@ public interface CommunicationHandler
 	
 	List<String> getServersMatching(String searchPhrase);
 	
+	List<String> getAvailableServersMatching(String searchPhrase);
+	
 	ServerInfo getServer(String serverName);
 	
 	void receiveMessage(InboundCommunicationMessage message) throws MessageException;

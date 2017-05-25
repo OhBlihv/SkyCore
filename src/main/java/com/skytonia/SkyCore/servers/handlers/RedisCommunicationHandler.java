@@ -4,7 +4,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.servers.MovementAction;
-import com.skytonia.SkyCore.servers.ServerInfo;
 import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.processing.InboundCommunicationMessage;
@@ -62,12 +61,6 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	}
 	
 	@Override
-	public int getPlayerCount(String serverName)
-	{
-		return 0;
-	}
-	
-	@Override
 	public void requestPlayerTransfer(Player player, String serverName, MovementAction movementAction)
 	{
 		super.requestPlayerTransfer(player, serverName, movementAction);
@@ -86,24 +79,6 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		out.writeUTF(serverName);
 		
 		player.sendPluginMessage(SkyCore.getPluginInstance(), "BungeeCord", out.toByteArray());
-	}
-	
-	@Override
-	public String getOnlineHub()
-	{
-		return null;
-	}
-	
-	@Override
-	public List<String> getServersMatching(String searchPhrase)
-	{
-		return null;
-	}
-	
-	@Override
-	public ServerInfo getServer(String serverName)
-	{
-		return null;
 	}
 	
 	@Override

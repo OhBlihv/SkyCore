@@ -1,11 +1,12 @@
 package com.skytonia.SkyCore.servers.handlers;
 
 import com.skytonia.SkyCore.servers.MovementAction;
-import com.skytonia.SkyCore.servers.ServerInfo;
 import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMessage;
+import com.skytonia.SkyCore.servers.listeners.ChannelSubscriber;
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
+import com.skytonia.SkyCore.servers.listeners.LilypadChannelSubscriber;
 import com.skytonia.SkyCore.util.BUtil;
 import lilypad.client.connect.api.Connect;
 import lilypad.client.connect.api.event.MessageEvent;
@@ -17,7 +18,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -71,24 +74,6 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-	public String getOnlineHub()
-	{
-		return null;
-	}
-	
-	@Override
-	public List<String> getServersMatching(String searchPhrase)
-	{
-		return null;
-	}
-	
-	@Override
-	public ServerInfo getServer(String serverName)
-	{
-		return null;
-	}
 
 	public void sendMessage(OutboundCommunicationMessage message) throws MessageException
 	{
@@ -107,10 +92,24 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		}
 	}
 	
+	/**
+	 *
+	 * @param subscriber
+	 * @param prefixWithServerName Ignored since Lilypad handles channels separately
+	 * @param channelList
+	 */
 	@Override
 	public void registerSubscription(ChannelSubscription subscriber, boolean prefixWithServerName, String... channels)
 	{
-	
+		List<String> channelList = new ArrayList<>();
+		Collections.addAll(channelList, channels);
+		
+		ChannelSubscriber channelSubscriber = new LilypadChannelSubscriber(lilypad, channelList, subscriber);
+		
+		for(String channel : channelList)
+		{
+			subscriptionMap.put(channel, channelSubscriber);
+		}
 	}
 	
 	@EventHandler
