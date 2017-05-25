@@ -138,7 +138,14 @@ public class SkyCore extends JavaPlugin implements Listener
 	{
 		PlayerCount.updatePlayerCount(0); //Show we're offline
 		
-		RedisManager.shutdown();
+		try
+		{
+			RedisManager.shutdown();
+		}
+		catch(Exception e)
+		{
+			//Silence any errors on shutdown
+		}
 	}
 	
 	@EventHandler
