@@ -1,6 +1,12 @@
 package com.skytonia.SkyCore.servers;
 
 import com.skytonia.SkyCore.SkyCore;
+import com.skytonia.SkyCore.servers.handlers.CommunicationHandler;
+import com.skytonia.SkyCore.servers.handlers.LilypadCommunicationHandler;
+import com.skytonia.SkyCore.servers.handlers.LilypadRedisCommunicationHandler;
+import com.skytonia.SkyCore.servers.handlers.RedisCommunicationHandler;
+import com.skytonia.SkyCore.util.BUtil;
+import org.bukkit.Bukkit;
 
 /**
  * Created by Chris Brown (OhBlihv) on 5/16/2017.
@@ -8,11 +14,46 @@ import com.skytonia.SkyCore.SkyCore;
 public class ServerController
 {
 	
-	private static ServerController serverController;
+	private final SkyCore plugin;
 	
-	private ServerController(SkyCore plugin)
+	private CommunicationHandler communicationHandler;
+	
+	public ServerController(SkyCore plugin)
 	{
-	
+		this.plugin = plugin;
+		
+		/*
+		 * Priority - Redis, Lilypad, BungeeCord
+		 */
+		boolean hasLilypad = Bukkit.getPluginManager().getPlugin("Bukkit-Connect").isEnabled();
+		
+		//Redis
+		try
+		{
+			if(hasLilypad)
+			{
+				communicationHandler = new LilypadRedisCommunicationHandler();
+				BUtil.log("Initialised Redis/Lilypad Communication Handler");
+			}
+			else
+			{
+				communicationHandler = new RedisCommunicationHandler();
+				BUtil.log("Initialised Redis Communication Handler");
+			}
+		}
+		catch(Exception e)
+		{
+			if(Bukkit.getPluginManager().getPlugin("Bukkit-Connect").isEnabled())
+			{
+				communicationHandler = new LilypadCommunicationHandler();
+				BUtil.log("Initialised Lilypad Communication Handler");
+			}
+			else
+			{
+				//TODO: Bungeecord Support
+				throw new IllegalArgumentException("Redis/Lilypad not found. Cannot initiate cross-server communication.");
+			}
+		}
 	}
 	
 }

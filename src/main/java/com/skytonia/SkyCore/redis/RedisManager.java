@@ -1,9 +1,11 @@
 package com.skytonia.SkyCore.redis;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.movement.MovementManager;
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
@@ -28,12 +30,25 @@ public class RedisManager
 	@Getter
 	private static boolean isBeta = false;
 	
-	private static final Multimap<String, ChannelSubscriber> subscriptionMap = MultimapBuilder.hashKeys().arrayListValues().build();
+	private static final Multimap<String, ChannelSubscriber> subscriptionMap;
 	
 	private static JedisPool jedisPool;
 	
 	static
 	{
+		Multimap<String, ChannelSubscriber> tempSubscriptionMap;
+		try
+		{
+			tempSubscriptionMap = MultimapBuilder.hashKeys().arrayListValues().build();
+		}
+		catch(Exception e)
+		{
+			BUtil.log("Server version does not support Guava 16.0. Creating Multimap directly...");
+			tempSubscriptionMap = HashMultimap.create();
+		}
+		
+		subscriptionMap = tempSubscriptionMap;
+		
 		RedisFlatFile redisFlatFile = RedisFlatFile.getInstance();
 		
 		serverName = redisFlatFile.getString("server-name");

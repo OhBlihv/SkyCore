@@ -5,6 +5,7 @@ import com.skytonia.SkyCore.gui.variables.GUIVariables;
 import com.skytonia.SkyCore.movement.MovementManager;
 import com.skytonia.SkyCore.movement.PlayerCount;
 import com.skytonia.SkyCore.redis.RedisManager;
+import com.skytonia.SkyCore.servers.ServerController;
 import com.skytonia.SkyCore.titles.TagController;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.ReflectionUtils;
@@ -71,12 +72,19 @@ public class SkyCore extends JavaPlugin implements Listener
 		return isSkytonia;
 	}
 	
+	@Getter
+	private ServerController serverController = null;
+	
 	@Override
 	public void onEnable()
 	{
 		instance = this;
 		
 		getServer().getPluginManager().registerEvents(this, this);
+		
+		//Initialize ASync to avoid lockups while searching for Redis and other issues
+		Bukkit.getScheduler().runTaskAsynchronously(this, () -> serverController = new ServerController(this));
+		
 		BUtil.logInfo("Using Spigot flavour '" + getServer().getName() + "'");
 		if(getServer().getName().equals("SkyPaper"))
 		{
@@ -96,6 +104,7 @@ public class SkyCore extends JavaPlugin implements Listener
 				}
 			}
 			
+			//TODO: Deprecated. Still existing alongside the new system to avoid issues
 			//Set up Redis/Jedis
 			try
 			{

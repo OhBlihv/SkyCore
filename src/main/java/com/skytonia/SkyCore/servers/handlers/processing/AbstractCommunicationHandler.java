@@ -1,14 +1,24 @@
 package com.skytonia.SkyCore.servers.handlers.processing;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.skytonia.SkyCore.movement.events.PlayerChangeServerEvent;
+import com.skytonia.SkyCore.movement.events.PlayerEnterServerEvent;
+import com.skytonia.SkyCore.movement.events.PlayerServerChangeRequestEvent;
 import com.skytonia.SkyCore.servers.MovementAction;
 import com.skytonia.SkyCore.servers.MovementInfo;
+import com.skytonia.SkyCore.servers.ServerStatus;
 import com.skytonia.SkyCore.servers.handlers.CommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
+import com.skytonia.SkyCore.servers.listeners.ChannelSubscriber;
+import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
+import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,6 +46,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	 * Messaging
 	 */
 	
+	protected final Multimap<String, ChannelSubscriber> subscriptionMap;
+	
 	private final CopyOnWriteArrayList<CommunicationMessage> pendingMessages = new CopyOnWriteArrayList<>();
 
 	@Getter
@@ -48,6 +60,9 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	/*
 	 * Player Movement
 	 */
+	
+	protected final String CHANNEL_MOVE_REQ  = "SC_MoveReq",
+						   CHANNEL_MOVE_REPL = "SC_MoveRep";
 	
 	protected final MovementAction defaultAction = new MovementAction()
 	{
@@ -67,6 +82,22 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	@Getter
 	@Setter
 	protected String currentServer = "NULL";
+	
+	public AbstractCommunicationHandler()
+	{
+		Multimap<String, ChannelSubscriber> tempSubscriptionMap;
+		try
+		{
+			tempSubscriptionMap = MultimapBuilder.hashKeys().arrayListValues().build();
+		}
+		catch(Exception e)
+		{
+			BUtil.log("Server version does not support Guava 16.0. Creating Multimap directly...");
+			tempSubscriptionMap = HashMultimap.create();
+		}
+		
+		subscriptionMap = tempSubscriptionMap;
+	}
 	
 	public void run()
 	{
@@ -200,7 +231,118 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	
 	public abstract void sendMessage(OutboundCommunicationMessage message) throws MessageException;
 	
-	public abstract void receiveMessage(InboundCommunicationMessage message) throws MessageException;
+	@Override
+	public void receiveMessage(InboundCommunicationMessage message) throws MessageException
+	{
+		switch(message.getChannel())
+		{
+			case CHANNEL_MOVE_REQ:
+			{
+				String serverName = message.getMessageArgs()[0],
+					playerName = message.getMessageArgs()[1];
+				
+				//No response is success.
+				String response = "";
+				
+				if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
+				{
+					response = "FULL";
+				}
+				else if(Bukkit.hasWhitelist())
+				{
+					OfflinePlayer offlinePlayer = null;
+					try
+					{
+						offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+						if(offlinePlayer == null)
+						{
+							throw new IllegalArgumentException();
+						}
+					}
+					catch(Exception e)
+					{
+						//
+					}
+					
+					if(offlinePlayer == null || !Bukkit.getWhitelistedPlayers().contains(offlinePlayer))
+					{
+						response = ServerStatus.WHITELIST.name();
+					}
+				}
+				
+				PlayerServerChangeRequestEvent requestEvent = new PlayerServerChangeRequestEvent(playerName, response, !response.isEmpty());
+				Bukkit.getPluginManager().callEvent(requestEvent);
+				if(requestEvent.isCancelled())
+				{
+					response = requestEvent.getCancelReason();
+				}
+				else
+				{
+					response = ""; //Reset the response
+				}
+				
+				sendMessage(new OutboundCommunicationMessage(
+					                                            serverName, CHANNEL_MOVE_REPL, MessageUtil.mergeArguments(serverName, playerName, response)
+				));
+				
+				if(!requestEvent.isCancelled())
+				{
+					//Ensure the player can join once their request has been accepted
+					incomingPlayers.add(playerName);
+					
+					Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(playerName));
+				}
+				
+				break;
+			}
+			case CHANNEL_MOVE_REPL:
+			{
+				String targetServer = message.getMessageArgs()[0],
+					playerName   = message.getMessageArgs()[1],
+					response     = "";
+				
+				OfflinePlayer offlinePlayer = null;
+				try
+				{
+					offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+					if(offlinePlayer == null || !offlinePlayer.isOnline())
+					{
+						offlinePlayer = null;
+					}
+				}
+				catch(Exception e)
+				{
+					//
+				}
+				
+				if(offlinePlayer == null)
+				{
+					BUtil.log("Player " + playerName + " was not online and could not be moved to " + targetServer);
+					return;
+				}
+				
+				if(message.getMessageArgs().length >= 3)
+				{
+					response = message.getMessageArgs()[2];
+				}
+				
+				if(response.isEmpty())
+				{
+					BUtil.log("Received successful reply for " + playerName + "'s transfer to " + targetServer);
+					setPlayerMovementStatusSuccess(playerName);
+					
+					transferPlayer(offlinePlayer.getPlayer(), targetServer);
+				}
+				else
+				{
+					BUtil.log("Received unsuccessful reply for " + playerName + "'s transfer to " + targetServer);
+					setPlayerMovementStatusFailure(playerName);
+				}
+				
+				break;
+			}
+		}
+	}
 	
 	/* ----------------------------------------------------------------------
 	 *                              Messaging
@@ -220,6 +362,13 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	{
 		this.pendingMessages.add(message);
 	}
+	
+	public void registerSubscription(ChannelSubscription subscriber, String... channels)
+	{
+		registerSubscription(subscriber, true, channels);
+	}
+	
+	public abstract void registerSubscription(ChannelSubscription subscriber, boolean prefixWithServerName, String... channels);
 	
 	/* ----------------------------------------------------------------------
 	 *                      Communications Handler
@@ -245,6 +394,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		}
 		
 		movementInfo.failPlayer();
+	}
+	
+	@Override
+	public void requestPlayerTransfer(Player player, String serverName)
+	{
+		requestPlayerTransfer(player, serverName, null);
 	}
 	
 	@Override

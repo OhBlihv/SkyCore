@@ -700,16 +700,24 @@ public class BUtil
 	// Logging
 	// ------------------------------------------------------------------------------------------------------
 
+	public static void log(String message)
+	{
+		logMessageAsPlugin(getCallingPlugin(), "INFO: " + message);
+	}
+	
+	@Deprecated
 	public static void logInfo(String message)
 	{
 		logMessage("INFO: " + message);
 	}
-
+	
+	@Deprecated
 	public static void logError(String message)
 	{
 		logMessage("ERROR: " + message);
 	}
 	
+	@Deprecated
 	public static void logMessage(String message)
 	{
 		logMessageAsPlugin(getCallingPlugin(), message);
