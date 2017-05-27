@@ -165,12 +165,13 @@ public class FlatFile
 			    //Attempt to create a new text file to save to.
 			    try
 			    {
+			    	saveFile.mkdirs();
 				    saveFile.createNewFile();
 			    }
 			    catch(IOException ex)
 			    {
-				    //ex.printStackTrace();
-				    BUtil.logError("This plugin is not compatible with SkyCore.");
+				    ex.printStackTrace();
+				    BUtil.logError("(FILE) This plugin is not compatible with SkyCore.");
 			    }
 		    }
 	    }
