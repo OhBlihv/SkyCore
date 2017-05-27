@@ -94,7 +94,7 @@ public class StaticNMS
 					
 					if(particleFactoryInstance == null)
 					{
-						throw new IllegalArgumentException("This server version is not supported '" + serverName + "'");
+						throw new IllegalArgumentException("(PARTICLES) This server version is not supported '" + serverName + "' (" + BUtil.getNMSVersion() +  ")");
 					}
 				}
 			}
@@ -133,7 +133,7 @@ public class StaticNMS
 					
 					if(guiCreationFactory == null)
 					{
-						throw new IllegalArgumentException("This server version is not supported '" + serverName + "'");
+						throw new IllegalArgumentException("(GUI) This server version is not supported '" + serverName + "' (" + BUtil.getNMSVersion() +  ")");
 					}
 				}
 			}
@@ -172,7 +172,7 @@ public class StaticNMS
 					
 					if(packetLibrary == null)
 					{
-						throw new IllegalArgumentException("This server version is not supported '" + serverName + "'");
+						throw new IllegalArgumentException("(PACKETS) This server version is not supported '" + serverName + "' (" + BUtil.getNMSVersion() +  ")");
 					}
 				}
 			}
@@ -211,7 +211,7 @@ public class StaticNMS
 					
 					if(nmsItemUtil == null)
 					{
-						throw new IllegalArgumentException("This server version is not supported '" + serverName + "'");
+						throw new IllegalArgumentException("(NMSITEMS) This server version is not supported '" + serverName + "' (" + BUtil.getNMSVersion() +  ")");
 					}
 				}
 			}
