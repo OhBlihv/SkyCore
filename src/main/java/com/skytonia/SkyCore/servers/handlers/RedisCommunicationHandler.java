@@ -58,6 +58,10 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		{
 			jedis.publish(CHANNEL_REGISTRATION, currentServer);
 		}
+		catch(Throwable e)
+		{
+			throw new IllegalArgumentException("Redis Not Supported");
+		}
 	}
 	
 	@Override

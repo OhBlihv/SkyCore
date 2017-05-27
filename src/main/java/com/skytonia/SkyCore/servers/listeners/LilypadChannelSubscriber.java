@@ -3,6 +3,7 @@ package com.skytonia.SkyCore.servers.listeners;
 import com.skytonia.SkyCore.servers.handlers.processing.InboundCommunicationMessage;
 import com.skytonia.SkyCore.util.BUtil;
 import lilypad.client.connect.api.Connect;
+import lilypad.client.connect.api.event.EventListener;
 import lilypad.client.connect.api.event.MessageEvent;
 import org.bukkit.event.Listener;
 
@@ -28,6 +29,7 @@ public class LilypadChannelSubscriber extends ChannelSubscriber
 		listener = new Listener()
 		{
 			
+			@EventListener
 			public void onMessage(MessageEvent event)
 			{
 				try

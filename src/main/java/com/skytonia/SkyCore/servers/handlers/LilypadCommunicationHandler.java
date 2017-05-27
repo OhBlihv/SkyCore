@@ -9,13 +9,13 @@ import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
 import com.skytonia.SkyCore.servers.listeners.LilypadChannelSubscriber;
 import com.skytonia.SkyCore.util.BUtil;
 import lilypad.client.connect.api.Connect;
+import lilypad.client.connect.api.event.EventListener;
 import lilypad.client.connect.api.event.MessageEvent;
 import lilypad.client.connect.api.request.RequestException;
 import lilypad.client.connect.api.request.impl.MessageRequest;
 import lilypad.client.connect.api.request.impl.RedirectRequest;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		}
 	}
 	
-	@EventHandler
+	@EventListener
 	public void onMessage(MessageEvent event)
 	{
 		try

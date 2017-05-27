@@ -61,6 +61,8 @@ public class ServerController
 				throw new IllegalArgumentException("Redis/Lilypad not found. Cannot initiate cross-server communication.");
 			}
 		}
+		
+		((Thread) communicationHandler).start();
 	}
 	
 }
