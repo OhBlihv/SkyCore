@@ -443,6 +443,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				serverInfo.setServerStatus(serverStatus);
 				serverInfo.setPlayerCount(playerCount);
 				
+				BUtil.log("Updated " + serverName + " as " + serverStatus + " with " + playerCount + " players.");
+				
 				break;
 			}
 		}

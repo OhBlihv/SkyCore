@@ -8,6 +8,7 @@ import com.skytonia.SkyCore.servers.handlers.RedisCommunicationHandler;
 import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Created by Chris Brown (OhBlihv) on 5/16/2017.
@@ -27,7 +28,11 @@ public class ServerController
 		/*
 		 * Priority - Redis, Lilypad, BungeeCord
 		 */
-		boolean hasLilypad = Bukkit.getPluginManager().getPlugin("Bukkit-Connect").isEnabled();
+		boolean hasLilypad;
+		{
+			Plugin connectPlugin = Bukkit.getPluginManager().getPlugin("LilyPad-Connect");
+			hasLilypad = connectPlugin != null && connectPlugin.isEnabled();
+		}
 		
 		//Redis
 		try
@@ -45,7 +50,7 @@ public class ServerController
 		}
 		catch(Exception e)
 		{
-			if(Bukkit.getPluginManager().getPlugin("Bukkit-Connect").isEnabled())
+			if(hasLilypad)
 			{
 				communicationHandler = new LilypadCommunicationHandler();
 				BUtil.log("Initialised Lilypad Communication Handler");

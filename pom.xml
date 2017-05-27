@@ -69,6 +69,14 @@
 			<optional>true</optional>
 			<systemPath>${project.basedir}/../lib/spigot-1.11.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>Spigot-v1_12_R1</artifactId>
+			<version>1.12-R0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<optional>true</optional>
+			<systemPath>${project.basedir}/../lib/spigot-1.12.jar</systemPath>
+		</dependency>
 		
 		<!-- Redis -->
 		<dependency>
