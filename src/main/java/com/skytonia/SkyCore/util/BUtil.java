@@ -20,6 +20,7 @@ import org.bukkit.util.Vector;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -765,9 +766,19 @@ public class BUtil
 	}
 
 	// ------------------------------------------------------------------------------------------------------
-	// UUID Encoding
+	// Basic Compression / UUID Utils
 	// ------------------------------------------------------------------------------------------------------
-
+	
+	public static String compressString(String string)
+	{
+		return Base64.getEncoder().encodeToString(string.getBytes()).split("=")[0];
+	}
+	
+	public static String deCompressString(String string)
+	{
+		return new String(Base64.getDecoder().decode(string.split(":")[0].concat("==")), StandardCharsets.UTF_8);
+	}
+	
 	public static String compressUUID(UUID uuid)
 	{
 		return Base64.getEncoder().encodeToString(toBytes(uuid)).split("=")[0];
