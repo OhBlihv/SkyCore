@@ -82,12 +82,30 @@
 			<groupId>lilypad.client.connect</groupId>
 			<artifactId>api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
+		
+		<!-- Server Management -->
 		
 		<dependency>
 			<groupId>org.arkhamnetwork</groupId>
 			<artifactId>ArkhamServerSync</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>me.vaqxuine</groupId>
+			<artifactId>NetworkManager</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.skytonia</groupId>
+			<artifactId>SkyRestart</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- Database -->

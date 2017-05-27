@@ -15,7 +15,9 @@ import java.util.List;
 public interface CommunicationHandler
 {
 	
-	int getPlayerCount(String serverName);
+	/*
+	 * Player Movement
+	 */
 	
 	void requestPlayerTransfer(Player player, String serverName);
 	
@@ -23,13 +25,23 @@ public interface CommunicationHandler
 	
 	void transferPlayer(Player player, String serverName);
 	
+	/*
+	 * Server Management
+	 */
+	
+	int getPlayerCount(String serverName);
+	
 	String getOnlineHub();
 	
-	List<String> getServersMatching(String searchPhrase);
+	List<String> getServersMatching(String... searchPhrases);
 	
-	List<String> getAvailableServersMatching(String searchPhrase);
+	List<String> getAvailableServersMatching(String... searchPhrases);
 	
 	ServerInfo getServer(String serverName);
+	
+	/*
+	 * Messaging
+	 */
 	
 	void receiveMessage(InboundCommunicationMessage message) throws MessageException;
 	

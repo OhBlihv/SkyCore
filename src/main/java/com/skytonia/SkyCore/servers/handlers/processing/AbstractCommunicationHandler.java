@@ -16,8 +16,10 @@ import com.skytonia.SkyCore.servers.listeners.ChannelSubscriber;
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
 import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyRestart.SkyRestart;
 import lombok.Getter;
 import lombok.Setter;
+import me.vaqxine.NetworkManager.NetworkManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -34,6 +36,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -84,6 +87,11 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	 * Server Management
 	 */
 	
+	protected final String CHANNEL_INFO_REQ  = "SC_InfoReq",
+						   CHANNEL_INFO_REPL = "SC_InfoRep";
+	
+	private final Random random = new Random();
+	
 	protected final Map<String, ServerInfo> serverMap = new HashMap<>();
 	
 	@Getter
@@ -114,6 +122,9 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		
 		while(isRunning)
 		{
+			/*
+			 * Check movement expiries every 1/2 seconds
+			 */
 			if(tick % 10 == 0)
 			{
 				for(Iterator<Map.Entry<String, MovementInfo>> entryItr = movementMap.entrySet().iterator(); entryItr.hasNext();)
@@ -131,6 +142,46 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 						entryItr.remove();
 					}
 				}
+			}
+			
+			/*
+			 * Update server info/player counts every 1 second
+			 */
+			if(tick % 20 == 0)
+			{
+				ServerStatus serverStatus = ServerStatus.ONLINE;
+				int onlinePlayerCount = Bukkit.getOnlinePlayers().size();
+				
+				if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
+				{
+					serverStatus = ServerStatus.FULL;
+				}
+				else if(Bukkit.hasWhitelist())
+				{
+					serverStatus = ServerStatus.WHITELIST;
+				}
+				//Rebooting Plugins
+				else
+				{
+					if(Bukkit.getPluginManager().getPlugin("SkyRestart").isEnabled())
+					{
+						if(SkyRestart.isRestarting())
+						{
+							serverStatus = ServerStatus.REBOOTING;
+						}
+					}
+					else if(Bukkit.getPluginManager().getPlugin("NetworkManager").isEnabled())
+					{
+						if(NetworkManager.getPlugin().rebooting)
+						{
+							serverStatus = ServerStatus.REBOOTING;
+						}
+					}
+				}
+				
+				addOutgoingMessage(null, CHANNEL_INFO_REPL, MessageUtil.mergeArguments(
+					currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount))
+				);
 			}
 			
 			if(pendingMessages.isEmpty())
@@ -190,7 +241,15 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			executionEnd = System.currentTimeMillis();
 			
 			//Attempt to make up time if we're lagging behind to keep on a 50ms cycle
-			sleepFor(50L - Math.max(49L, (executionEnd - executionStart)));
+			long catchup = (executionEnd - executionStart);
+			if(catchup > 49)
+			{
+				BUtil.log("Communications Thread behind 20tps target! Last execution took " + (50 - catchup) + "ms longer than expected.");
+			}
+			else
+			{
+				sleepFor(50L - Math.min(49L, catchup));
+			}
 		}
 	}
 	
@@ -246,7 +305,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			case CHANNEL_MOVE_REQ:
 			{
 				String serverName = message.getMessageArgs()[0],
-					playerName = message.getMessageArgs()[1];
+					   playerName = message.getMessageArgs()[1];
 				
 				//No response is success.
 				String response = "";
@@ -305,8 +364,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			case CHANNEL_MOVE_REPL:
 			{
 				String targetServer = message.getMessageArgs()[0],
-					playerName   = message.getMessageArgs()[1],
-					response     = "";
+					   playerName   = message.getMessageArgs()[1],
+					   response     = "";
 				
 				OfflinePlayer offlinePlayer = null;
 				try
@@ -348,6 +407,44 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				
 				break;
 			}
+			case CHANNEL_INFO_REPL:
+			{
+				String serverName        = message.getMessageArgs()[0],
+					   statusString      = message.getMessageArgs()[1],
+					   playerCountString = message.getMessageArgs()[2];
+					   
+				ServerInfo serverInfo = serverMap.get(serverName);
+				if(serverInfo == null)
+				{
+					serverInfo = new ServerInfo();
+					serverMap.put(serverName, serverInfo);
+				}
+				
+				ServerStatus serverStatus = ServerStatus.ONLINE;
+				try
+				{
+					serverStatus = ServerStatus.valueOf(statusString);
+				}
+				catch(IllegalArgumentException e)
+				{
+					BUtil.log("Unable to parse server status string '" + statusString + "'. Defaulting to ONLINE");
+				}
+				
+				int playerCount = 0;
+				try
+				{
+					playerCount = Integer.parseInt(playerCountString);
+				}
+				catch(NumberFormatException e)
+				{
+					BUtil.log("Unable to parse server player count string '" + playerCountString + "'. Defaulting to 0.");
+				}
+				
+				serverInfo.setServerStatus(serverStatus);
+				serverInfo.setPlayerCount(playerCount);
+				
+				break;
+			}
 		}
 	}
 	
@@ -360,9 +457,9 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		addMessage(new InboundCommunicationMessage(sendingServer, channel, message));
 	}
 	
-	public void addOutgoingMessage(String sendingServer, String channel, String message)
+	public void addOutgoingMessage(String targetServer, String channel, String message)
 	{
-		addMessage(new OutboundCommunicationMessage(sendingServer, channel, message));
+		addMessage(new OutboundCommunicationMessage(targetServer, channel, message));
 	}
 	
 	public void addMessage(CommunicationMessage message)
@@ -464,20 +561,29 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	@Override
 	public String getOnlineHub()
 	{
-		return null;
+		List<String> availableHubs = getAvailableServersMatching("hub", "lobby");
+		
+		return availableHubs.get(random.nextInt(availableHubs.size()));
 	}
 	
 	@Override
-	public List<String> getServersMatching(String searchPhrase)
+	public List<String> getServersMatching(String... searchPhrases)
 	{
-		searchPhrase = searchPhrase.toLowerCase();
+		for(int i = 0;i < searchPhrases.length;i++)
+		{
+			searchPhrases[i] = searchPhrases[i].toLowerCase();
+		}
 		
 		List<String> matchedServers = new ArrayList<>();
 		for(String serverName : serverMap.keySet())
 		{
-			if(serverName.toLowerCase().contains(searchPhrase))
+			String lowerServerName = serverName.toLowerCase();
+			for(String searchPhrase : searchPhrases)
 			{
-				matchedServers.add(serverName);
+				if(lowerServerName.contains(searchPhrase))
+				{
+					matchedServers.add(serverName);
+				}
 			}
 		}
 		
@@ -485,16 +591,23 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	}
 	
 	@Override
-	public List<String> getAvailableServersMatching(String searchPhrase)
+	public List<String> getAvailableServersMatching(String... searchPhrases)
 	{
-		searchPhrase = searchPhrase.toLowerCase();
+		for(int i = 0;i < searchPhrases.length;i++)
+		{
+			searchPhrases[i] = searchPhrases[i].toLowerCase();
+		}
 		
 		List<String> matchedServers = new ArrayList<>();
 		for(Map.Entry<String, ServerInfo> entry : serverMap.entrySet())
 		{
-			if(entry.getValue().getServerStatus() == ServerStatus.ONLINE && entry.getKey().toLowerCase().contains(searchPhrase))
+			String lowerServerName = entry.getKey().toLowerCase();
+			for(String searchPhrase : searchPhrases)
 			{
-				matchedServers.add(entry.getKey());
+				if(entry.getValue().getServerStatus() == ServerStatus.ONLINE && lowerServerName.contains(searchPhrase))
+				{
+					matchedServers.add(entry.getKey());
+				}
 			}
 		}
 		
