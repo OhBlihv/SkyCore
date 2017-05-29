@@ -161,7 +161,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			 */
 			if(tick % 40 == 0)
 			{
-				ServerStatus serverStatus = ServerStatus.ONLINE;
+				ServerStatus serverStatus = ServerStatus.LOCAL_SERVER;
 				int onlinePlayerCount = Bukkit.getOnlinePlayers().size(),
 					maxPlayers = Bukkit.getMaxPlayers();
 				
@@ -621,6 +621,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	@Override
 	public void requestPlayerTransfer(Player player, String serverName, MovementAction movementAction)
 	{
+		if(movementMap.containsKey(player.getName()))
+		{
+			player.sendMessage("§c§l(!) §cPlease wait a few seconds between attempts.");
+			return;
+		}
+		
 		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
 		Bukkit.getPluginManager().callEvent(event);
 		
@@ -674,6 +680,10 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	public String getOnlineHub()
 	{
 		List<String> availableHubs = getAvailableServersMatching("hub", "lobby");
+		if(availableHubs.isEmpty())
+		{
+			return "";
+		}
 		
 		return availableHubs.get(random.nextInt(availableHubs.size()));
 	}
@@ -722,9 +732,19 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			String lowerServerName = entry.getKey().toLowerCase();
 			for(String searchPhrase : searchPhrases)
 			{
-				if(entry.getValue().getServerStatus() == ServerStatus.ONLINE && lowerServerName.contains(searchPhrase))
+				switch(entry.getValue().getServerStatus())
 				{
-					matchedServers.add(entry.getKey());
+					case ONLINE:
+					case FULL:
+					case LOCAL_SERVER:
+					case VIP_JOIN:
+					case WHITELIST:
+					{
+						if(lowerServerName.contains(searchPhrase))
+						{
+							matchedServers.add(entry.getKey());
+						}
+					}
 				}
 			}
 		}
