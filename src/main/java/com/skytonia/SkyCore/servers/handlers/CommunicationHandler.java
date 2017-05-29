@@ -8,7 +8,9 @@ import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMes
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Chris Brown (OhBlihv) on 5/24/2017.
@@ -48,6 +50,12 @@ public interface CommunicationHandler
 	
 	/**
 	 *
+	 * @return
+	 */
+	String getCurrentServer();
+	
+	/**
+	 *
 	 * @param serverName
 	 * @return
 	 */
@@ -58,6 +66,12 @@ public interface CommunicationHandler
 	 * @return
 	 */
 	String getOnlineHub();
+	
+	/**
+	 *
+	 * @return
+	 */
+	Collection<Map.Entry<String, ServerInfo>> getAllServers();
 	
 	/**
 	 *

@@ -16,6 +16,32 @@ import java.util.List;
 public class LilypadChannelSubscriber extends ChannelSubscriber
 {
 	
+	public static class ChannelListener implements Listener
+	{
+		
+		private final ChannelSubscription channelSubscription;
+		
+		public ChannelListener(ChannelSubscription channelSubscription)
+		{
+			this.channelSubscription = channelSubscription;
+		}
+		
+		@EventListener
+		public void onMessage(MessageEvent event)
+		{
+			try
+			{
+				channelSubscription.onMessage(new InboundCommunicationMessage(event.getSender(), event.getChannel(), event.getMessageAsString()));
+			}
+			catch(Throwable e)
+			{
+				BUtil.log("Unable to handle message on channel '" + event.getChannel() + "' with '" + Arrays.toString(event.getMessage()) + "'");
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
 	private final Connect lilypad;
 	
 	private final Listener listener;
@@ -26,24 +52,7 @@ public class LilypadChannelSubscriber extends ChannelSubscriber
 		
 		this.lilypad = lilypad;
 		
-		listener = new Listener()
-		{
-			
-			@EventListener
-			public void onMessage(MessageEvent event)
-			{
-				try
-				{
-					channelSubscription.onMessage(new InboundCommunicationMessage(event.getSender(), event.getChannel(), event.getMessageAsString()));
-				}
-				catch(Throwable e)
-				{
-					BUtil.log("Unable to handle message on channel '" + event.getChannel() + "' with '" + Arrays.toString(event.getMessage()) + "'");
-					e.printStackTrace();
-				}
-			}
-			
-		};
+		listener = new ChannelListener(channelSubscription);
 		
 		this.lilypad.registerEvents(listener);
 	}

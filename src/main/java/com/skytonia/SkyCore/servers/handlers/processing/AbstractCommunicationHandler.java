@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -161,7 +162,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			if(tick % 40 == 0)
 			{
 				ServerStatus serverStatus = ServerStatus.ONLINE;
-				int onlinePlayerCount = Bukkit.getOnlinePlayers().size();
+				int onlinePlayerCount = Bukkit.getOnlinePlayers().size(),
+					maxPlayers = Bukkit.getMaxPlayers();
 				
 				if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
 				{
@@ -190,6 +192,15 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					}
 				}
 				
+				ServerInfo currentServerInfo = serverMap.get(currentServer);
+				if(currentServerInfo == null)
+				{
+					currentServerInfo = new ServerInfo();
+					serverMap.put(currentServer, currentServerInfo);
+				}
+				
+				currentServerInfo.setLastUpdate(System.currentTimeMillis());
+				
 				String[] onlinePlayers = new String[Bukkit.getOnlinePlayers().size()];
 				int i = -1;
 				for(Player player : Bukkit.getOnlinePlayers())
@@ -197,11 +208,14 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					onlinePlayers[++i] = player.getName();
 				}
 				
-				//
-				List<String> staffList = serverMap.get(currentServer).getStaffList();
+				currentServerInfo.getPlayerList().clear();
+				currentServerInfo.getPlayerList().addAll(Arrays.asList(onlinePlayers));
+				
+				//Updated from other plugins
+				List<String> staffList = currentServerInfo.getStaff();
 				
 				addOutgoingMessage(null, CHANNEL_INFO_REPL, MessageUtil.mergeArguments(
-					currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount),
+					currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount), String.valueOf(maxPlayers),
 					MessageUtil.mergeArguments(staffList.toArray(new String[staffList.size()])), "|||",
 					MessageUtil.mergeArguments(onlinePlayers))
 				);
@@ -212,11 +226,11 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			}
 			
 			/*
-			 * Timeout servers which have not responded in 3 seconds
+			 * Timeout servers which have not responded in 10 seconds
 			 */
 			if(tick % 60 == 0)
 			{
-				long expireTime = System.currentTimeMillis() - 3000L,
+				long expireTime = System.currentTimeMillis() - 10000L,
 					 removalTime = System.currentTimeMillis() - 3600000L;
 				for(Iterator<Map.Entry<String, ServerInfo>> entryItr = serverMap.entrySet().iterator();entryItr.hasNext();)
 				{
@@ -273,11 +287,6 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				{
 					try
 					{
-						/*if(message.getChannel().equals(CHANNEL_INFO_REPL))
-						{
-							BUtil.log("Sending status...");
-						}*/
-						
 						sendMessage((OutboundCommunicationMessage) message);
 					}
 					catch(Throwable e)
@@ -471,7 +480,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			{
 				String serverName        = message.getMessageArgs()[0],
 					   statusString      = message.getMessageArgs()[1],
-					   playerCountString = message.getMessageArgs()[2];
+					   playerCountString = message.getMessageArgs()[2],
+					   maxPlayersString  = message.getMessageArgs()[3];
 				
 				//Ignore floods to self
 				if(serverName.equals(currentServer))
@@ -506,32 +516,41 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					BUtil.log("Unable to parse server player count string '" + playerCountString + "'. Defaulting to 0.");
 				}
 				
+				int maxPlayers = 0;
+				try
+				{
+					maxPlayers = Integer.parseInt(maxPlayersString);
+				}
+				catch(NumberFormatException e)
+				{
+					BUtil.log("Unable to parse server max player count string '" + maxPlayersString + "'. Defaulting to 0.");
+				}
+				
 				serverInfo.setServerStatus(serverStatus);
 				serverInfo.setPlayerCount(playerCount);
+				serverInfo.setMaxPlayers(maxPlayers);
 				
 				serverInfo.setLastUpdate(System.currentTimeMillis());
-				
-				BUtil.log("Updated " + serverName + " as " + serverStatus + " with " + playerCount + " players.");
 				
 				String[] messageArgs = message.getMessageArgs();
 				
 				//Staff List prefixes the player list separated by '|||'
 				//Cycle until we find that, then move to the player list
-				List<String> staffList = serverInfo.getStaffList();
-				staffList.clear();
+				List<String> staffList = new ArrayList<>();
 				
-				int i = 3;
+				int i = 4;
 				for(;i < messageArgs.length;i++)
 				{
 					String staffName = messageArgs[i];
-					if(staffName.equals("|||"))
+					if(staffName.isEmpty() || staffName.equals("|||"))
 					{
 						break;
 					}
 					
 					staffList.add(staffName);
-					BUtil.log("Adding '" + staffName + "' as staff");
 				}
+				
+				serverInfo.setStaff(staffList);
 				
 				//Attempt to parse the player list
 				serverInfo.getPlayerList().clear();
@@ -657,6 +676,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		List<String> availableHubs = getAvailableServersMatching("hub", "lobby");
 		
 		return availableHubs.get(random.nextInt(availableHubs.size()));
+	}
+	
+	@Override
+	public Collection<Map.Entry<String, ServerInfo>> getAllServers()
+	{
+		return serverMap.entrySet();
 	}
 	
 	@Override

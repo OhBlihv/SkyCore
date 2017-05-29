@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,6 +22,9 @@ public class ServerInfo
 	private int playerCount = 0;
 	
 	@Getter
+	@Setter
+	private int maxPlayers = 0;
+	
 	private final List<String> staffList = new ArrayList<>();
 	
 	@Getter
@@ -28,6 +32,27 @@ public class ServerInfo
 	
 	@Getter
 	@Setter
-	private long lastUpdate = 0L;
+	private long lastUpdate = System.currentTimeMillis();
+	
+	public void addStaff(String playerName)
+	{
+		staffList.add(playerName);
+	}
+	
+	public void removeStaff(String playerName)
+	{
+		staffList.remove(playerName);
+	}
+	
+	public void setStaff(Collection<String> staffList)
+	{
+		this.staffList.clear();
+		this.staffList.addAll(staffList);
+	}
+	
+	public List<String> getStaff()
+	{
+		return staffList;
+	}
 	
 }

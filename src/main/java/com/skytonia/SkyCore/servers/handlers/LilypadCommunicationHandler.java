@@ -82,6 +82,11 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 			throw new IllegalArgumentException("Lilypad Inaccessible. (Offline?)");
 		}
 		
+		if(message.getChannel().equals("dscMessage"))
+		{
+			BUtil.log("Sending chat to " + message.getServer() + " as " + message.getMessage());
+		}
+		
 		try
 		{
 			lilypad.request(new MessageRequest(message.getServer(), message.getChannel(), message.getMessage()));
