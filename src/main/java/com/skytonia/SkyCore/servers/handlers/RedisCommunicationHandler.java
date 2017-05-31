@@ -36,7 +36,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	{
 		super();
 		
-		FlatFile commFile = FlatFile.forFileName("communications.yml");
+		FlatFile commFile = FlatFile.forFileName("communication.yml");
 		
 		//Attempt to set up our Pool
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
