@@ -58,6 +58,9 @@ public class ServerController
 			else
 			{
 				//TODO: Bungeecord Support
+				BUtil.log("Lilypad-Connect not found - Redis Handler failed with the following stack trace:");
+				e.printStackTrace();
+				
 				throw new IllegalArgumentException("Redis/Lilypad not found. Cannot initiate cross-server communication.");
 			}
 		}
