@@ -150,31 +150,29 @@ public class FlatFile
 		    }
 		    catch(Exception e)
 		    {
-			    BUtil.logError("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
-		    }
+			    //
+			}
 	    }
-	    
-	    if (!saveFile.exists())
-	    {
+		
+		if (!saveFile.exists())
+		{
 		    try
 		    {
-			    plugin.saveResource(fileName, false);
+		        plugin.saveResource(fileName, false);
 		    }
 		    catch(Exception e)
 		    {
-			    //Attempt to create a new text file to save to.
-			    try
+		        try
 			    {
-			    	saveFile.mkdirs();
-				    saveFile.createNewFile();
+			    	saveFile.createNewFile();
 			    }
-			    catch(IOException ex)
+			    catch(Exception e2)
 			    {
-				    ex.printStackTrace();
-				    BUtil.logError("(FILE) This plugin is not compatible with SkyCore.");
+			        BUtil.logError("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
+			        e.printStackTrace();
 			    }
 		    }
-	    }
+		}
 	}
 	
 	public void saveToFile() 
