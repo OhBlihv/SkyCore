@@ -6,12 +6,19 @@ package com.skytonia.SkyCore.servers;
 public enum ServerStatus
 {
 	
-	ONLINE,
-	FULL,
-	VIP_JOIN,
-	OFFLINE,
-	LOCAL_SERVER,
-	REBOOTING,
-	WHITELIST;
+	ONLINE(true),
+	FULL(false),
+	VIP_JOIN(true),
+	OFFLINE(false),
+	LOCAL_SERVER(false),
+	REBOOTING(false),
+	WHITELIST(true);
+	
+	public final boolean joinable;
+	
+	ServerStatus(boolean joinable)
+	{
+		this.joinable = joinable;
+	}
 	
 }

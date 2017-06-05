@@ -124,200 +124,222 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		
 		while(isRunning)
 		{
-			++tick;
-			
-			/*
-			 * Check movement expiries every 1/2 seconds
-			 */
-			if(tick % 10 == 0)
+			try
 			{
-				Iterator<Map.Entry<String, MovementInfo>> entryItr = movementMap.entrySet().iterator();
-				while(entryItr.hasNext())
+				++tick;
+			
+				/*
+				 * Check movement expiries every 1/2 seconds
+				 */
+				if(tick % 10 == 0)
 				{
-					try
+					Iterator<Map.Entry<String, MovementInfo>> entryItr = movementMap.entrySet().iterator();
+					while(entryItr.hasNext())
 					{
-						Map.Entry<String, MovementInfo> entry = entryItr.next();
+						try
+						{
+							Map.Entry<String, MovementInfo> entry = entryItr.next();
+							
+							MovementInfo movementInfo = entry.getValue();
+							if(movementInfo.hasTimedOut())
+							{
+								movementInfo.failPlayer();
+								entryItr.remove();
+							}
+							else if(movementInfo.getInitialTimestamp() == -1 || !entry.getValue().getPlayer().isOnline())
+							{
+								entryItr.remove();
+							}
+						}
+						catch(Throwable e)
+						{
+							entryItr.remove();
+						}
+					}
+				}
+			
+				/*
+				 * Update server info/player counts every 2 seconds
+				 */
+				if(tick % 40 == 0)
+				{
+					ServerStatus serverStatus = ServerStatus.ONLINE;
+					int onlinePlayerCount = Bukkit.getOnlinePlayers().size(),
+						maxPlayers = Bukkit.getMaxPlayers();
+					
+					if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
+					{
+						serverStatus = ServerStatus.FULL;
+					}
+					else if(Bukkit.hasWhitelist())
+					{
+						serverStatus = ServerStatus.WHITELIST;
+					}
+					//Rebooting Plugins
+					else
+					{
+						if(Bukkit.getPluginManager().getPlugin("SkyRestart") != null)
+						{
+							if(SkyRestart.isRestarting())
+							{
+								serverStatus = ServerStatus.REBOOTING;
+							}
+						}
+						else if(Bukkit.getPluginManager().getPlugin("NetworkManager") != null)
+						{
+							if(NetworkManager.getPlugin().rebooting)
+							{
+								serverStatus = ServerStatus.REBOOTING;
+							}
+						}
+					}
+					
+					ServerInfo currentServerInfo = serverMap.get(currentServer);
+					if(currentServerInfo == null)
+					{
+						currentServerInfo = new ServerInfo();
+						serverMap.put(currentServer, currentServerInfo);
+					}
+					
+					currentServerInfo.setLastUpdate(System.currentTimeMillis());
+					
+					//Updated from other plugins
+					List<String> staffList = currentServerInfo.getStaff();
+					String[] onlinePlayers;
+					
+					currentServerInfo.getPlayerList().clear();
+					if(serverStatus.joinable || serverStatus == ServerStatus.LOCAL_SERVER)
+					{
+						onlinePlayers = new String[Bukkit.getOnlinePlayers().size()];
+						int i = -1;
+						for(Player player : Bukkit.getOnlinePlayers())
+						{
+							onlinePlayers[++i] = player.getName();
+						}
 						
-						MovementInfo movementInfo = entry.getValue();
-						if(movementInfo.hasTimedOut())
-						{
-							movementInfo.failPlayer();
-							entryItr.remove();
-						}
-						else if(!entry.getValue().getPlayer().isOnline())
-						{
-							entryItr.remove();
-						}
+						currentServerInfo.getPlayerList().addAll(Arrays.asList(onlinePlayers));
 					}
-					catch(Throwable e)
+					else
 					{
-						entryItr.remove();
+						onlinePlayers = new String[]{};
+						staffList.clear();
+					}
+					
+					addOutgoingMessage(null, CHANNEL_INFO_REPL, MessageUtil.mergeArguments(
+						currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount), String.valueOf(maxPlayers),
+						MessageUtil.mergeArguments(staffList.toArray(new String[staffList.size()])), "|||",
+						MessageUtil.mergeArguments(onlinePlayers))
+					);
+					
+					//Update us to local server once we've updated our status
+					currentServerInfo.setServerStatus(ServerStatus.LOCAL_SERVER);
+				
+					/*BUtil.log("Publishing status as <>" + MessageUtil.mergeArguments(
+						currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount)) + "<>");
+					*/
+				}
+			
+				/*
+				 * Timeout servers which have not responded in 10 seconds
+				 */
+				if(tick % 60 == 0)
+				{
+					long expireTime = System.currentTimeMillis() - 10000L,
+						removalTime = System.currentTimeMillis() - 3600000L;
+					for(Iterator<Map.Entry<String, ServerInfo>> entryItr = serverMap.entrySet().iterator();entryItr.hasNext();)
+					{
+						Map.Entry<String, ServerInfo> entry = entryItr.next();
+						
+						ServerInfo serverInfo = entry.getValue();
+						if(serverInfo.getLastUpdate() < expireTime)
+						{
+							//Remove any servers offline for over 1 hour
+							if(serverInfo.getLastUpdate() < removalTime)
+							{
+								entryItr.remove();
+							}
+							else
+							{
+								serverInfo.setPlayerCount(0);
+								serverInfo.setServerStatus(ServerStatus.OFFLINE);
+								serverInfo.getPlayerList().clear();
+								serverInfo.getStaff().clear();
+							}
+						}
 					}
 				}
-			}
-			
-			/*
-			 * Update server info/player counts every 2 seconds
-			 */
-			if(tick % 40 == 0)
-			{
-				ServerStatus serverStatus = ServerStatus.LOCAL_SERVER;
-				int onlinePlayerCount = Bukkit.getOnlinePlayers().size(),
-					maxPlayers = Bukkit.getMaxPlayers();
 				
-				if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
+				if(pendingMessages.isEmpty())
 				{
-					serverStatus = ServerStatus.FULL;
+					sleep();
+					continue;
 				}
-				else if(Bukkit.hasWhitelist())
+				
+				executionStart = System.currentTimeMillis();
+				
+				Deque<CommunicationMessage> currentMessages = new ArrayDeque<>();
+				currentMessages.addAll(pendingMessages);
+				pendingMessages.clear();
+				
+				int sentMessages = currentMessages.size();
+				
+				for(CommunicationMessage message : currentMessages)
 				{
-					serverStatus = ServerStatus.WHITELIST;
+					if(message.getDirection() == CommunicationDirection.INBOUND)
+					{
+						try
+						{
+							receiveMessage((InboundCommunicationMessage) message);
+						}
+						catch(Throwable e)
+						{
+							BUtil.log("Unable to receive message " + message.toString());
+							e.printStackTrace();
+							
+							sentMessages--;
+						}
+					}
+					else //if(message.getDirection() == CommunicationDirection.OUTBOUND)
+					{
+						try
+						{
+							sendMessage((OutboundCommunicationMessage) message);
+						}
+						catch(Throwable e)
+						{
+							BUtil.log("Unable to send message " + message.toString());
+							e.printStackTrace();
+							
+							sentMessages--;
+						}
+					}
 				}
-				//Rebooting Plugins
+				
+				//Hold our message throughput
+				if(tick == MESSAGE_REPORTS.length)
+				{
+					tick = 0;
+					
+					MESSAGE_REPORTS[tick] = sentMessages;
+				}
+				
+				executionEnd = System.currentTimeMillis();
+				
+				//Attempt to make up time if we're lagging behind to keep on a 50ms cycle
+				long catchup = (executionEnd - executionStart);
+				if(catchup > 49)
+				{
+					BUtil.log("Communications Thread behind 20tps target! Last execution took " + (50 - catchup) + "ms longer than expected.");
+				}
 				else
 				{
-					if(Bukkit.getPluginManager().getPlugin("SkyRestart").isEnabled())
-					{
-						if(SkyRestart.isRestarting())
-						{
-							serverStatus = ServerStatus.REBOOTING;
-						}
-					}
-					else if(Bukkit.getPluginManager().getPlugin("NetworkManager").isEnabled())
-					{
-						if(NetworkManager.getPlugin().rebooting)
-						{
-							serverStatus = ServerStatus.REBOOTING;
-						}
-					}
-				}
-				
-				ServerInfo currentServerInfo = serverMap.get(currentServer);
-				if(currentServerInfo == null)
-				{
-					currentServerInfo = new ServerInfo();
-					serverMap.put(currentServer, currentServerInfo);
-				}
-				
-				currentServerInfo.setLastUpdate(System.currentTimeMillis());
-				
-				String[] onlinePlayers = new String[Bukkit.getOnlinePlayers().size()];
-				int i = -1;
-				for(Player player : Bukkit.getOnlinePlayers())
-				{
-					onlinePlayers[++i] = player.getName();
-				}
-				
-				currentServerInfo.getPlayerList().clear();
-				currentServerInfo.getPlayerList().addAll(Arrays.asList(onlinePlayers));
-				
-				//Updated from other plugins
-				List<String> staffList = currentServerInfo.getStaff();
-				
-				addOutgoingMessage(null, CHANNEL_INFO_REPL, MessageUtil.mergeArguments(
-					currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount), String.valueOf(maxPlayers),
-					MessageUtil.mergeArguments(staffList.toArray(new String[staffList.size()])), "|||",
-					MessageUtil.mergeArguments(onlinePlayers))
-				);
-				
-				/*BUtil.log("Publishing status as <>" + MessageUtil.mergeArguments(
-					currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount)) + "<>");
-				*/
-			}
-			
-			/*
-			 * Timeout servers which have not responded in 10 seconds
-			 */
-			if(tick % 60 == 0)
-			{
-				long expireTime = System.currentTimeMillis() - 10000L,
-					 removalTime = System.currentTimeMillis() - 3600000L;
-				for(Iterator<Map.Entry<String, ServerInfo>> entryItr = serverMap.entrySet().iterator();entryItr.hasNext();)
-				{
-					Map.Entry<String, ServerInfo> entry = entryItr.next();
-					
-					ServerInfo serverInfo = entry.getValue();
-					if(serverInfo.getLastUpdate() < expireTime)
-					{
-						//Remove any servers offline for over 1 hour
-						if(serverInfo.getLastUpdate() < removalTime)
-						{
-							entryItr.remove();
-						}
-						else
-						{
-							serverInfo.setPlayerCount(0);
-							serverInfo.setServerStatus(ServerStatus.OFFLINE);
-						}
-					}
+					sleepFor(50L - Math.min(49L, catchup));
 				}
 			}
-			
-			if(pendingMessages.isEmpty())
+			catch(Throwable e)
 			{
-				sleep();
-				continue;
-			}
-			
-			executionStart = System.currentTimeMillis();
-			
-			Deque<CommunicationMessage> currentMessages = new ArrayDeque<>();
-			currentMessages.addAll(pendingMessages);
-			pendingMessages.clear();
-			
-			int sentMessages = currentMessages.size();
-			
-			for(CommunicationMessage message : currentMessages)
-			{
-				if(message.getDirection() == CommunicationDirection.INBOUND)
-				{
-					try
-					{
-						receiveMessage((InboundCommunicationMessage) message);
-					}
-					catch(Throwable e)
-					{
-						BUtil.log("Unable to receive message " + message.toString());
-						e.printStackTrace();
-						
-						sentMessages--;
-					}
-				}
-				else //if(message.getDirection() == CommunicationDirection.OUTBOUND)
-				{
-					try
-					{
-						sendMessage((OutboundCommunicationMessage) message);
-					}
-					catch(Throwable e)
-					{
-						BUtil.log("Unable to send message " + message.toString());
-						e.printStackTrace();
-						
-						sentMessages--;
-					}
-				}
-			}
-			
-			//Hold our message throughput
-			if(tick == MESSAGE_REPORTS.length)
-			{
-				tick = 0;
-				
-				MESSAGE_REPORTS[tick] = sentMessages;
-			}
-			
-			executionEnd = System.currentTimeMillis();
-			
-			//Attempt to make up time if we're lagging behind to keep on a 50ms cycle
-			long catchup = (executionEnd - executionStart);
-			if(catchup > 49)
-			{
-				BUtil.log("Communications Thread behind 20tps target! Last execution took " + (50 - catchup) + "ms longer than expected.");
-			}
-			else
-			{
-				sleepFor(50L - Math.min(49L, catchup));
+				BUtil.log("Failed tick in " + this.getClass().getSimpleName() + ".");
+				e.printStackTrace();
 			}
 		}
 	}

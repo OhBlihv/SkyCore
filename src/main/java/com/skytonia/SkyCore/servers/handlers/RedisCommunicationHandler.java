@@ -53,6 +53,9 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		currentServer = commFile.getString("communication.redis.server");
 		
 		registerSubscription(this, true, CHANNEL_MOVE_REQ, CHANNEL_MOVE_REPL);
+		registerSubscription(this, false, CHANNEL_INFO_REPL);
+		
+		SkyCore.getPluginInstance().getServer().getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
 		
 		try(Jedis jedis = jedisPool.getResource())
 		{
@@ -69,10 +72,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	{
 		super.requestPlayerTransfer(player, serverName, movementAction);
 		
-		accessConnection((jedis) ->
-		{
-			jedis.publish(CHANNEL_MOVE_REQ, MessageUtil.mergeArguments(serverName, player.getName()));
-		});
+		sendMessage(serverName, CHANNEL_MOVE_REQ, player.getName());
 	}
 	
 	@Override

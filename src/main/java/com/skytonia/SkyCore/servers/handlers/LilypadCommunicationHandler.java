@@ -7,6 +7,7 @@ import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMes
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscriber;
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
 import com.skytonia.SkyCore.servers.listeners.LilypadChannelSubscriber;
+import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import lilypad.client.connect.api.Connect;
 import lilypad.client.connect.api.event.EventListener;
@@ -54,7 +55,7 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		
 		try
 		{
-			lilypad.request(new MessageRequest(serverName, CHANNEL_MOVE_REQ, player.getName()));
+			lilypad.request(new MessageRequest(serverName, CHANNEL_MOVE_REQ, MessageUtil.mergeArguments(currentServer, player.getName())));
 		}
 		catch(RequestException | UnsupportedEncodingException e)
 		{
@@ -80,11 +81,6 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		if(!lilypad.isConnected() || lilypad.isClosed())
 		{
 			throw new IllegalArgumentException("Lilypad Inaccessible. (Offline?)");
-		}
-		
-		if(message.getChannel().equals("dscMessage"))
-		{
-			BUtil.log("Sending chat to " + message.getServer() + " as " + message.getMessage());
 		}
 		
 		try
