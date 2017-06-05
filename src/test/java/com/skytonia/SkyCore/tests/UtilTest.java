@@ -3,6 +3,8 @@ package com.skytonia.SkyCore.tests;
 import com.skytonia.SkyCore.util.BUtil;
 import org.junit.Test;
 
+import java.text.NumberFormat;
+import java.util.ArrayDeque;
 import java.util.Collection;
 
 /**
@@ -138,6 +140,89 @@ public class UtilTest
 		}
 		
 		return slot;
+	}
+	
+	class InstanceofTestClass
+	{
+		
+		boolean isAsync() { return false; }
+		
+	}
+	
+	final class InstanceofTestClassExtension extends InstanceofTestClass
+	{
+		
+		boolean isAsync() { return true; }
+		
+	}
+	
+	@Test
+	public void instanceofTest()
+	{
+		final int MAX_IN_COLLECTION = 10000000;
+		
+		ArrayDeque<InstanceofTestClass> testCollection = new ArrayDeque<>();
+		for(int i = 0;i < MAX_IN_COLLECTION;i++)
+		{
+			testCollection.add(new InstanceofTestClassExtension());
+		}
+		
+		long startTime, endTime;
+		int value = 0;
+		
+		startTime = System.nanoTime();
+		
+		for(InstanceofTestClass testClass : testCollection)
+		{
+			//22 Required
+			if(
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension &&
+				testClass instanceof InstanceofTestClassExtension
+				)
+			{
+				value++;
+			}
+		}
+		
+		endTime = System.nanoTime();
+		
+		System.out.println("Total time took for 'instanceof': " + NumberFormat.getIntegerInstance().format(endTime - startTime));
+		
+		value = 0;
+		
+		startTime = System.nanoTime();
+		
+		for(InstanceofTestClass testClass : testCollection)
+		{
+			if(testClass.isAsync())
+			{
+				value++;
+			}
+		}
+		
+		endTime = System.nanoTime();
+		
+		System.out.println("Total time took for 'isAsync': " + NumberFormat.getIntegerInstance().format(endTime - startTime));
 	}
 	
 }

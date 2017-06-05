@@ -69,6 +69,14 @@
 			<optional>true</optional>
 			<systemPath>${project.basedir}/../lib/spigot-1.11.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>Spigot-v1_12_R1</artifactId>
+			<version>1.12-R0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<optional>true</optional>
+			<systemPath>${project.basedir}/../lib/spigot-1.12.jar</systemPath>
+		</dependency>
 		
 		<!-- Redis -->
 		<dependency>
@@ -82,12 +90,30 @@
 			<groupId>lilypad.client.connect</groupId>
 			<artifactId>api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
+		
+		<!-- Server Management -->
 		
 		<dependency>
 			<groupId>org.arkhamnetwork</groupId>
 			<artifactId>ArkhamServerSync</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>me.vaqxuine</groupId>
+			<artifactId>NetworkManager</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.skytonia</groupId>
+			<artifactId>SkyRestart</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- Database -->

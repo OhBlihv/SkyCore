@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by Chris Brown (OhBlihv) on 28/09/2016.
  */
+@Deprecated
 public class HubManager
 {
 	

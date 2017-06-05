@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Chris Brown (OhBlihv) on 11/17/2016.
  */
+@Deprecated
 public class PlayerCount
 {
 	

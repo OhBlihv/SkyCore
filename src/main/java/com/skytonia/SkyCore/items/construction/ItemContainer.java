@@ -122,7 +122,7 @@ public class ItemContainer
 		ItemStack itemStack = new ItemStack(material, amount, (short) damage);
 		
 		//Handle NBT Tags early on before we customise it too much
-		if(material == MONSTER_EGG && damage > 0)
+		if((material == MONSTER_EGG || material == MOB_SPAWNER) && damage > 0)
 		{
 			itemStack = StaticNMS.getNMSItemUtil().setSpawnedEntity(itemStack, damage);
 		}

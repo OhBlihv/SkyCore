@@ -1,10 +1,11 @@
 package com.skytonia.SkyCore.redis;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.movement.MovementManager;
-import com.skytonia.SkyCore.util.SupportedVersion;
+import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
@@ -17,6 +18,7 @@ import java.util.List;
 /**
  * Created by Chris Brown (OhBlihv) on 3/3/2017.
  */
+@Deprecated
 public class RedisManager
 {
 	
@@ -28,16 +30,24 @@ public class RedisManager
 	@Getter
 	private static boolean isBeta = false;
 	
-	private static final Multimap<String, ChannelSubscriber> subscriptionMap = MultimapBuilder.hashKeys().arrayListValues().build();
+	private static final Multimap<String, ChannelSubscriber> subscriptionMap;
 	
 	private static JedisPool jedisPool;
 	
 	static
 	{
-		if(!SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_NINE))
+		Multimap<String, ChannelSubscriber> tempSubscriptionMap;
+		try
 		{
-			throw new IllegalArgumentException("Redis not supported on Pre-1.9 versions");
+			tempSubscriptionMap = MultimapBuilder.hashKeys().arrayListValues().build();
 		}
+		catch(Exception e)
+		{
+			BUtil.log("Server version does not support Guava 16.0. Creating Multimap directly...");
+			tempSubscriptionMap = HashMultimap.create();
+		}
+		
+		subscriptionMap = tempSubscriptionMap;
 		
 		RedisFlatFile redisFlatFile = RedisFlatFile.getInstance();
 		
