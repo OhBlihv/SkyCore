@@ -19,7 +19,6 @@ import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyRestart.SkyRestart;
 import lombok.Getter;
 import lombok.Setter;
-import me.vaqxine.NetworkManager.NetworkManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -185,13 +184,6 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 								serverStatus = ServerStatus.REBOOTING;
 							}
 						}
-						else if(Bukkit.getPluginManager().getPlugin("NetworkManager") != null)
-						{
-							if(NetworkManager.getPlugin().rebooting)
-							{
-								serverStatus = ServerStatus.REBOOTING;
-							}
-						}
 					}
 					
 					ServerInfo currentServerInfo = serverMap.get(currentServer);
@@ -201,6 +193,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 						serverMap.put(currentServer, currentServerInfo);
 					}
 					
+					currentServerInfo.setPlayerCount(Bukkit.getOnlinePlayers().size());
+					currentServerInfo.setMaxPlayers(Bukkit.getMaxPlayers());
 					currentServerInfo.setLastUpdate(System.currentTimeMillis());
 					
 					//Updated from other plugins
