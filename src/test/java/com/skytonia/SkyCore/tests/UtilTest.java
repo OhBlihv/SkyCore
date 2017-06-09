@@ -20,6 +20,9 @@ public class UtilTest
 		System.out.println(BUtil.toRomanNumerals(1400));
 		System.out.println(BUtil.toRomanNumerals(14));
 		System.out.println(BUtil.toRomanNumerals(206));
+		System.out.println(BUtil.toRomanNumerals(3));
+		System.out.println(BUtil.toRomanNumerals(4));
+		System.out.println(BUtil.toRomanNumerals(14));
 	}
 	
 	//@Test

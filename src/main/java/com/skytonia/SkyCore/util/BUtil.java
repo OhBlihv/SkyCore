@@ -291,7 +291,7 @@ public class BUtil
 	// String Translation
 	// ------------------------------------------------------------------------------------------------------
 
-	private static final Map<Integer, Character> numeralMap = new TreeMap<>(
+	private static final Map<Integer, String> numeralMap = new TreeMap<>(
 	(o1, o2) ->
 	{
 		int compare = 0 - Integer.compare(o1, o2);
@@ -305,20 +305,26 @@ public class BUtil
 	
 	static
 	{
-		numeralMap.put(1000, 'M');
-		numeralMap.put(500, 'D');
-		numeralMap.put(100, 'C');
-		numeralMap.put(50, 'L');
-		numeralMap.put(10, 'X');
-		numeralMap.put(5, 'V');
-		numeralMap.put(1, 'I');
+		numeralMap.put(1000, "M");
+		numeralMap.put(900, "CM");
+		numeralMap.put(500, "D");
+		numeralMap.put(40, "CD");
+		numeralMap.put(100, "C");
+		numeralMap.put(90, "XC");
+		numeralMap.put(50, "L");
+		numeralMap.put(49, "XL");
+		numeralMap.put(10, "X");
+		numeralMap.put(9, "IV");
+		numeralMap.put(5, "V");
+		numeralMap.put(4, "IV");
+		numeralMap.put(1, "I");
 	}
 	
 	public static String toRomanNumerals(int number)
 	{
 		StringBuilder romanNumeralString = new StringBuilder();
 		
-		for(Map.Entry<Integer, Character> entry : numeralMap.entrySet())
+		for(Map.Entry<Integer, String> entry : numeralMap.entrySet())
 		{
 			while(number >= entry.getKey())
 			{
