@@ -8,6 +8,7 @@ public enum InventorySize
 	
 	//Absolute Sized Inventories
 	HOPPER(5),
+	DISPENSER(9),
 	
 	//Regular Chest/Double Chests
 	ONE_LINE(0, 9),
@@ -63,11 +64,11 @@ public enum InventorySize
 		return ofSize(slots, false);
 	}
 	
-	public static InventorySize ofSize(int slots, boolean ignoreHopper)
+	public static InventorySize ofSize(int slots, boolean ignoreSpecial)
 	{
 		for(InventorySize inventorySize : values())
 		{
-			if(ignoreHopper && inventorySize == HOPPER)
+			if(ignoreSpecial && (inventorySize == HOPPER || inventorySize == DISPENSER))
 			{
 				continue;
 			}
