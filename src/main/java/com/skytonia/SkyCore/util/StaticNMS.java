@@ -7,13 +7,6 @@ import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_12_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_7_R4;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_8_R3;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_9_R2;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_10_R1;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_11_R1;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_12_R1;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_7_R4;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_8_R3;
-import com.skytonia.SkyCore.gui.nms.GUICreationFactory_1_9_R2;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_11_R1;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_12_R1;
@@ -27,7 +20,6 @@ import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_7_R4;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_8_R3;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_9_R2;
 import org.bukkit.Bukkit;
-import org.bukkit.inventory.Inventory;
 
 import java.lang.reflect.Field;
 
@@ -101,45 +93,6 @@ public class StaticNMS
 		}
 		
 		return particleFactoryInstance;
-	}
-	
-	private static GUICreationFactory guiCreationFactory = null;
-	public static Inventory createInventory(int guiSize, String guiTitle) throws IllegalArgumentException
-	{
-		if(guiCreationFactory == null)
-		{
-			switch(BUtil.getNMSVersion())
-			{
-				//case "v1_7_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R1(); break;
-				//case "v1_7_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R2(); break;
-				//case "v1_7_R3": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R3(); break;
-				case "v1_7_R4": guiCreationFactory = new GUICreationFactory_1_7_R4(); break;
-				//case "v1_8_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R1(); break;
-				//case "v1_8_R2": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_8_R2(); break;
-				case "v1_8_R3": guiCreationFactory = new GUICreationFactory_1_8_R3(); break;
-				//case "v1_9_R1": cheapPlayerFactoryInstance = new CheapPlayerFactory_1_9_R1(); break;
-				case "v1_9_R2": guiCreationFactory = new GUICreationFactory_1_9_R2(); break;
-				case "v1_10_R1": guiCreationFactory = new GUICreationFactory_1_10_R1(); break;
-				case "v1_11_R1": guiCreationFactory = new GUICreationFactory_1_11_R1(); break;
-				case "v1_12_R1": guiCreationFactory = new GUICreationFactory_1_12_R1(); break;
-				default: //Check if we're running forge
-				{
-					/*if(isForge)
-					{
-						//Cauldron is 1.7.10 -> v1_7_R4
-						cheapPlayerFactoryInstance = new CheapPlayerFactory_1_7_R4();
-						break;
-					}*/
-					
-					if(guiCreationFactory == null)
-					{
-						throw new IllegalArgumentException("(GUI) This server version is not supported '" + serverName + "' (" + BUtil.getNMSVersion() +  ")");
-					}
-				}
-			}
-		}
-		
-		return guiCreationFactory.createInventory(guiSize, guiTitle);
 	}
 	
 	private static PacketLibrary packetLibrary = null;

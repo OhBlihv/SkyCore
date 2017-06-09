@@ -6,7 +6,6 @@ import com.skytonia.SkyCore.gui.config.InventorySize;
 import com.skytonia.SkyCore.gui.variables.GUIVariable;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
-import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -16,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -175,7 +175,15 @@ public class GUIContainer implements Listener
 	
 	protected Inventory createInventory(InventorySize guiSize, String guiTitle)
 	{
-		return StaticNMS.createInventory(guiSize.getSize(), guiTitle);
+		switch(guiSize)
+		{
+			case HOPPER: return Bukkit.createInventory(null, InventoryType.HOPPER, guiTitle);
+			case DISPENSER: return Bukkit.createInventory(null, InventoryType.DISPENSER, guiTitle);
+			default:
+			{
+				return Bukkit.createInventory(null, guiSize.getSize(), guiTitle);
+			}
+		}
 	}
 
 	public boolean updateInventory(Player player)
