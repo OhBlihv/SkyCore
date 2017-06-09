@@ -101,6 +101,10 @@ public class TaggedPlayer
 					}
 				}
 			}
+			catch(NoClassDefFoundError e)
+			{
+				//SkyCosmetics not installed.
+			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
