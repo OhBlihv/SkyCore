@@ -61,14 +61,14 @@ public enum InventorySize
 	
 	public static InventorySize ofSize(int slots)
 	{
-		return ofSize(slots, false);
+		return ofSize(slots, true);
 	}
 	
 	public static InventorySize ofSize(int slots, boolean ignoreSpecial)
 	{
 		for(InventorySize inventorySize : values())
 		{
-			if(ignoreSpecial && (inventorySize == HOPPER || inventorySize == DISPENSER))
+			if(ignoreSpecial && (inventorySize == DISPENSER))
 			{
 				continue;
 			}
