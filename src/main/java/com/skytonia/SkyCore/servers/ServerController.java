@@ -4,8 +4,10 @@ import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.servers.handlers.CommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.LilypadCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.LilypadRedisCommunicationHandler;
+import com.skytonia.SkyCore.servers.handlers.NullCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.RedisCommunicationHandler;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -24,6 +26,17 @@ public class ServerController
 	public ServerController(SkyCore plugin)
 	{
 		this.plugin = plugin;
+		
+		switch(StaticNMS.getServerName())
+		{
+			case "TWSpigot":
+			case "SkySpigot":
+				BUtil.log("Initializing Server Messaging System"); break;
+			default:
+				BUtil.log("Using Null Server Messaging System on unsupported software");
+				communicationHandler = new NullCommunicationHandler();
+				return;
+		}
 		
 		/*
 		 * Priority - Redis, Lilypad, BungeeCord
