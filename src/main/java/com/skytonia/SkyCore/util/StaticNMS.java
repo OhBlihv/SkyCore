@@ -19,6 +19,7 @@ import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_12_R1;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_7_R4;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_8_R3;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_9_R2;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.Field;
@@ -30,6 +31,7 @@ public class StaticNMS
 {
 	
 	private static boolean isForge = false;
+	@Getter
 	private static String serverName = "null";
 	static
 	{
