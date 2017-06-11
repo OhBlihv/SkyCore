@@ -1,9 +1,11 @@
 package com.skytonia.SkyCore.tests;
 
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.TimeUtil;
 import org.junit.Test;
 
 import java.text.NumberFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
 import java.util.Collection;
 
@@ -226,6 +228,15 @@ public class UtilTest
 		endTime = System.nanoTime();
 		
 		System.out.println("Total time took for 'isAsync': " + NumberFormat.getIntegerInstance().format(endTime - startTime));
+	}
+	
+	@Test
+	public void timeUtilTest()
+	{
+		//BUtil.log(TimeUtil.getNeatComparison((1497100847 * 1000L), System.currentTimeMillis(),
+		//                           ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.WEEKS, ChronoUnit.DAYS, ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS));
+		BUtil.log(TimeUtil.getNeatComparison((1494547200 * 1000L), System.currentTimeMillis(),
+		                           ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.WEEKS, ChronoUnit.DAYS));
 	}
 	
 }
