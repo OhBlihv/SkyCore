@@ -701,6 +701,23 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			return "";
 		}
 		
+		boolean isDev;
+		{
+			String currentServer = getCurrentServer().toLowerCase();
+			isDev = currentServer.contains("dev") || currentServer.contains("beta");
+		}
+		
+		List<String> unavailableHubs = new ArrayList<>();
+		for(String possibleHub : availableHubs)
+		{
+			if(!isDev && possibleHub.contains("dev") || possibleHub.contains("beta"))
+			{
+				unavailableHubs.add(possibleHub);
+			}
+		}
+		
+		availableHubs.removeAll(unavailableHubs);
+		
 		return availableHubs.get(random.nextInt(availableHubs.size()));
 	}
 	
