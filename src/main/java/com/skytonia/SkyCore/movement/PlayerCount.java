@@ -5,7 +5,6 @@ import com.skytonia.SkyCore.movement.handlers.RedisMovementHandler;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
-import org.arkhamnetwork.ArkhamServerSync.ArkhamServerSync;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -65,7 +64,8 @@ public class PlayerCount
 		}
 		else if(MovementManager.getMovementHandler() instanceof LilypadMovementHandler)
 		{
-			return ArkhamServerSync.lily_server_map.getCurrentPlayers(server);
+			//return ArkhamServerSync.lily_server_map.getCurrentPlayers(server);
+			return 0;
 		}
 		else
 		{
