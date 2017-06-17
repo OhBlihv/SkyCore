@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.tests;
 
+import com.skytonia.SkyCore.items.uniqueitems.UniqueItems;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.TimeUtil;
 import org.junit.Test;
@@ -7,7 +8,9 @@ import org.junit.Test;
 import java.text.NumberFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * Created by Chris Brown (OhBlihv) on 11/28/2016.
@@ -237,6 +240,67 @@ public class UtilTest
 		//                           ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.WEEKS, ChronoUnit.DAYS, ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS));
 		BUtil.log(TimeUtil.getNeatComparison((1494547200 * 1000L), System.currentTimeMillis(),
 		                           ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.WEEKS, ChronoUnit.DAYS));
+	}
+	
+	@Test
+	public void fastUtilCollectionTest()
+	{
+	/*	doCollectionTime(new ObjectLinkedOpenHashSet<>(), "ObjectLinkedOpenHashSet");
+		doCollectionTime(new ObjectArrayList<>(), "ObjectArrayList");
+		//doCollectionTime(new ObjectArraySet<>(), "ObjectArraySet"); //28 seconds
+		doCollectionTime(new ObjectRBTreeSet<>(), "ObjectRBTreeSet");
+		doCollectionTime(new ObjectBigArrayBigList<>(), "ObjectBigArrayBigList");
+		doCollectionTime(new ObjectOpenHashSet<>(), "ObjectOpenHashSet");*/
+	}
+	
+	private void doCollectionTime(Collection<String> collection, String name)
+	{
+		long startTime = System.currentTimeMillis();
+		
+		final int numMax = 100000;
+		final Random random = new Random();
+		
+		for(int i = 0;i < numMax;i++)
+		{
+			collection.add("" + i);
+		}
+		
+		for(int i = 0;i < 1000;i++)
+		{
+			collection.contains("" + random.nextInt(numMax));
+		}
+		
+		for(int i = 0;i < 1000;i++)
+		{
+			collection.remove("" + random.nextInt(numMax));
+		}
+		
+		long endTime = System.currentTimeMillis();
+		System.out.println("Total time took for '" + name + "': " + NumberFormat.getIntegerInstance().format(endTime - startTime) + "ms");
+	}
+	
+	@Test
+	public void uniqueItemTest()
+	{
+		UniqueItems uniqueItems = new UniqueItems(Arrays.asList("0008", "0034", "0001"));
+		
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());
 	}
 	
 }

@@ -131,6 +131,14 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<!-- Performant Collections -->
+		<!-- Used Collections are included in Spigot -->
+		<!--<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>7.2.1</version>
+		</dependency>-->
+		
 		<!-- Auto-generated Annotations -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
