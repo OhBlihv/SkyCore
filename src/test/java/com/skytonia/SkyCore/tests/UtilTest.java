@@ -1,6 +1,5 @@
 package com.skytonia.SkyCore.tests;
 
-import com.skytonia.SkyCore.items.uniqueitems.UniqueItems;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.TimeUtil;
 import org.junit.Test;
@@ -8,7 +7,6 @@ import org.junit.Test;
 import java.text.NumberFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
@@ -282,7 +280,7 @@ public class UtilTest
 	@Test
 	public void uniqueItemTest()
 	{
-		UniqueItems uniqueItems = new UniqueItems(Arrays.asList("0008", "0034", "0001"));
+		/*UniqueItems uniqueItems = new UniqueItems(Arrays.asList("0008", "0034", "0001"));
 		
 		BUtil.log(uniqueItems.getNextId());
 		BUtil.log(uniqueItems.getNextId());
@@ -300,7 +298,7 @@ public class UtilTest
 		BUtil.log(uniqueItems.getNextId());
 		BUtil.log(uniqueItems.getNextId());
 		BUtil.log(uniqueItems.getNextId());
-		BUtil.log(uniqueItems.getNextId());
+		BUtil.log(uniqueItems.getNextId());*/
 	}
 	
 }

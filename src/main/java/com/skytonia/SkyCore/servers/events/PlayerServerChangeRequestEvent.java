@@ -24,6 +24,8 @@ public class PlayerServerChangeRequestEvent extends Event implements Cancellable
 	
 	public PlayerServerChangeRequestEvent(String playerName, String cancelReason, boolean cancelled)
 	{
+		super(true);
+		
 		this.playerName = playerName;
 		
 		if(cancelReason != null && !cancelReason.isEmpty())

@@ -17,6 +17,8 @@ public class PlayerEnterServerEvent extends Event
 	
 	public PlayerEnterServerEvent(String playerName)
 	{
+		super(true);
+		
 		this.playerName = playerName;
 	}
 	
