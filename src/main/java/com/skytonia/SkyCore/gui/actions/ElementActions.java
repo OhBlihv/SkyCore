@@ -165,12 +165,12 @@ public class ElementActions extends AddonRegistry implements Listener
 			catch(IllegalArgumentException e)
 			{
 				BUtil.logError("Action '" + actionName + "' Failed loading at '" + subSection.getCurrentPath() + ". Please correct the configuration for this action.");
-				BUtil.logStackTrace(e);
+				e.printStackTrace();
 			}
 			catch(InstantiationException | IllegalAccessException | ClassNotFoundException e)
 			{
 				BUtil.logError("Action '" + actionName + "' Failed loading at '" + subSection.getCurrentPath() + ". INTERNAL ERROR.");
-				BUtil.logStackTrace(e);
+				e.printStackTrace();
 			}
 		}
 		
