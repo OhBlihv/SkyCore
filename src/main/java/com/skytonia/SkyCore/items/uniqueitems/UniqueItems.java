@@ -1,7 +1,6 @@
 package com.skytonia.SkyCore.items.uniqueitems;
 
 import com.skytonia.SkyCore.util.BUtil;
-import com.skytonia.SkyCore.util.RunnableShorthand;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
@@ -95,7 +94,6 @@ public class UniqueItems extends FlatFile
 		}
 		
 		lastId = String.valueOf(newId);
-		getSave().set
 		
 		return lastId;
 	}
