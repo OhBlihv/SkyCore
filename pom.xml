@@ -110,7 +110,7 @@
 			<groupId>com.skytonia</groupId>
 			<artifactId>SkyRestart</artifactId>
 			<version>1.0</version>
-			<scope>provided</scope>
+			<scope>system</scope>
 			<optional>true</optional>
 			<systemPath>${project.basedir}/lib/SkyRestart.jar</systemPath>
 		</dependency>
@@ -134,8 +134,8 @@
 		
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
-			<artifactId>ProtocolLib-API</artifactId>
-			<version>4.2.0</version>
+			<artifactId>ProtocolLib</artifactId>
+			<version>4.2.1</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -144,8 +144,8 @@
 			<groupId>com.skytonia</groupId>
 			<artifactId>SkyPerms</artifactId>
 			<version>1.0</version>
-			<scope>provided</scope>
 			<optional>true</optional>
+			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/SkyPerms.jar</systemPath>
 		</dependency>
 		
