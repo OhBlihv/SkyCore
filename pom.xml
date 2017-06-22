@@ -145,6 +145,8 @@
 			<artifactId>SkyPerms</artifactId>
 			<version>1.0</version>
 			<scope>provided</scope>
+			<optional>true</optional>
+			<systemPath>${project.basedir}/lib/SkyPerms.jar</systemPath>
 		</dependency>
 		
 		<!-- Performant Collections -->
