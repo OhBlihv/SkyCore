@@ -12,7 +12,8 @@ public enum SupportedVersion
 	ONE_EIGHT(8),
 	ONE_NINE(9),
 	ONE_TEN(10),
-	ONE_ELEVEN(11);
+	ONE_ELEVEN(11),
+	ONE_TWELVE(12);
 	
 	@Getter
 	final int versionNum;
