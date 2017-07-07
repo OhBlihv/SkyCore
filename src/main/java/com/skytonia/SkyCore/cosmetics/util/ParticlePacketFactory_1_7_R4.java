@@ -32,4 +32,10 @@ public class ParticlePacketFactory_1_7_R4 implements IParticlePacketFactory
 		return new ParticlePacket_1_7_R4(effect, color, longDistance);
 	}
 	
+	@Override
+	public int getServerVersion()
+	{
+		return 7;
+	}
+	
 }

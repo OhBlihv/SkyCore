@@ -20,4 +20,6 @@ public interface IParticlePacketFactory
 	
 	ParticlePacket getParticlePacket(ParticleEffect effect, ParticleEffect.ParticleColor color, boolean longDistance);
 	
+	int getServerVersion();
+	
 }

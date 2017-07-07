@@ -520,13 +520,7 @@ public enum ParticleEffect
 	 */
 	public boolean isSupported()
 	{
-		if(requiredVersion == -1)
-		{
-			return true;
-		}
-		
-		//TODO: Re-name once internal ParticlePacket is removed
-		return ParticlePacket.getVersion() >= requiredVersion;
+		return requiredVersion == -1 || StaticNMS.getParticleFactoryInstance().getServerVersion() >= requiredVersion;
 	}
 	
 	/**
