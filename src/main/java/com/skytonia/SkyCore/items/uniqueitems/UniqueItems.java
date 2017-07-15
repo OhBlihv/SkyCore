@@ -95,7 +95,13 @@ public class UniqueItems extends FlatFile
 		
 		lastId = String.valueOf(newId);
 		
-		return lastId;
+		StringBuilder formattedId = new StringBuilder();
+		for(char idChar : lastId.toCharArray())
+		{
+			formattedId.append("§").append(idChar);
+		}
+		
+		return UNIQUE_ID_KEY + formattedId.toString();
 	}
 	
 	public String getIdFrom(Collection<String> collection)
@@ -119,7 +125,7 @@ public class UniqueItems extends FlatFile
 		{
 			int endId = matcher.end();
 			//Min of 8 characters for this method
-			if(endId + 8 >= line.length())
+			if(endId + 8 > line.length())
 			{
 				return null;
 			}
