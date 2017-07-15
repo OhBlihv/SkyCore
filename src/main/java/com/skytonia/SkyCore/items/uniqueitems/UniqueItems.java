@@ -2,9 +2,9 @@ package com.skytonia.SkyCore.items.uniqueitems;
 
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +27,7 @@ public class UniqueItems extends FlatFile
 		//'K', 'L', 'M', 'N', 'O', 'R'
 	};
 	
-	private final ObjectOpenHashSet<String> usedItems = new ObjectOpenHashSet<>();
+	private final HashSet<String> usedItems = new HashSet<>();
 	
 	private String lastId = "0000";
 	
