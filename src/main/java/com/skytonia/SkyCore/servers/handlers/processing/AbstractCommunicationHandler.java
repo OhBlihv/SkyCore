@@ -648,8 +648,6 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
 		Bukkit.getPluginManager().callEvent(event);
 		
-		BUtil.log("Requesting move of " + player.getName() + " to " + serverName);
-		
 		if(event.isCancelled())
 		{
 			if(event.getCancelReason() != null && !event.getCancelReason().isEmpty())
