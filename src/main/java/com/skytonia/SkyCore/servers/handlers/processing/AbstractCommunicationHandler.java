@@ -487,7 +487,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				else
 				{
 					BUtil.log("Received unsuccessful reply for " + playerName + "'s transfer to " + targetServer);
-					setPlayerMovementStatusFailure(playerName);
+					setPlayerMovementStatusFailure(playerName, response);
 				}
 				
 				break;
@@ -617,13 +617,15 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		movementInfo.sendPlayer();
 	}
 	
-	public void setPlayerMovementStatusFailure(String playerName)
+	public void setPlayerMovementStatusFailure(String playerName, String response)
 	{
 		MovementInfo movementInfo = movementMap.get(playerName);
 		if(movementInfo == null)
 		{
 			return;
 		}
+		
+		movementInfo.setResponseMessage(response);
 		
 		movementInfo.failPlayer();
 	}
@@ -645,6 +647,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		
 		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
 		Bukkit.getPluginManager().callEvent(event);
+		
+		BUtil.log("Requesting move of " + player.getName() + " to " + serverName);
 		
 		if(event.isCancelled())
 		{
