@@ -20,7 +20,7 @@ public class MovementAction
 		
 		String formattedResponse = response;
 		
-		if(response.isEmpty())
+		if(response == null || response.isEmpty())
 		{
 			formattedResponse = "§c§l(!) §cAn unexpected error occurred while moving you to " + formattedServer;
 		}
