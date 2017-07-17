@@ -3,10 +3,8 @@ package com.skytonia.SkyCore.items.uniqueitems;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -104,7 +102,7 @@ public class UniqueItems extends FlatFile
 		return UNIQUE_ID_KEY + formattedId.toString();
 	}
 	
-	public String getIdFrom(Collection<String> collection)
+	/*public String getIdFrom(Collection<String> collection)
 	{
 		String idKey;
 		for(String line : collection)
@@ -116,9 +114,9 @@ public class UniqueItems extends FlatFile
 		}
 		
 		return null;
-	}
+	}*/
 	
-	public String getIdFrom(String line)
+	/*public String getIdFrom(String line)
 	{
 		Matcher matcher = UNIQUE_ID_KEY_PATTERN.matcher(line);
 		if(matcher.find())
@@ -134,7 +132,7 @@ public class UniqueItems extends FlatFile
 		}
 		
 		return null;
-	}
+	}*/
 	
 	/*
 	 * File Management
@@ -200,6 +198,119 @@ public class UniqueItems extends FlatFile
 		}
 		
 		return -1;
+	}
+	
+	/*
+	 * Public/Static API
+	 */
+	
+	public static String getIdFor(int value)
+	{
+		if(value < 0)
+		{
+			throw new IllegalArgumentException("ID Value must be positive");
+		}
+		
+		String idString = "";
+		
+		final int idCharLength = ID_CHARACTERS.length;
+		
+		int idElement;
+		while(true)
+		{
+			idElement = value % idCharLength;
+			
+			value /= idCharLength;
+			
+			idString = "§" + ID_CHARACTERS[idElement] + idString;
+			
+			if(value <= 0)
+			{
+				break;
+			}
+		}
+		
+		return UNIQUE_ID_KEY + idString; //TODO: Add ID
+	}
+	
+	public static int getValueFrom(Iterable<String> collection)
+	{
+		int value = 0;
+		for(String line : collection)
+		{
+			if((value = getValueFrom(line)) != -1)
+			{
+				return value;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public static int getValueFrom(String idString)
+	{
+		int result = 0;
+		
+		final int idCharLength = ID_CHARACTERS.length;
+		
+		for(char idChar : idString.toCharArray())
+		{
+			for(int i = 0;i < idCharLength;i++)
+			{
+				if(ID_CHARACTERS[i] == idChar)
+				{
+					result = (result * idCharLength) + i;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public static int getIdFrom(String line)
+	{
+		StringBuilder resultingIdString = new StringBuilder();
+		
+		int validFlagIds = 0;
+		for(char idChar : line.toCharArray())
+		{
+			//Parse rest of ID
+			if(validFlagIds == 4)
+			{
+				if(idChar == '§')
+				{
+					continue;
+				}
+				else if(!isValidIDRange(idChar))
+				{
+					break;
+				}
+				
+				resultingIdString.append(idChar);
+			}
+			else if( validFlagIds % 2 == 0 && idChar == '§' ||
+				     idChar == '0')
+			{
+				validFlagIds++;
+			}
+		}
+		
+		if(resultingIdString.length() == 0)
+		{
+			return -1;
+		}
+		else
+		{
+			return getValueFrom(resultingIdString.toString());
+		}
+	}
+	
+	public static boolean isValidIDRange(char idChar)
+	{
+		return (idChar >= '0' && idChar <= '9') ||
+			   (idChar >= 'a' && idChar <= 'f') ||
+			   (idChar >= 'k' && idChar <= 'r');
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.tests;
 
+import com.skytonia.SkyCore.items.uniqueitems.UniqueItems;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.TimeUtil;
 import org.junit.Test;
@@ -15,6 +16,16 @@ import java.util.Random;
  */
 public class UtilTest
 {
+	
+	@Test
+	public void uniqueIdGenerationTest()
+	{
+		for(int i = 0;i < 50;i++)
+		{
+			String idString = UniqueItems.getIdFor(i);
+			System.out.println("Value for " + i + ": " + idString + " (" + UniqueItems.getIdFrom(idString) + ")");
+		}
+	}
 	
 	@Test
 	public void romanNumeralTest()
