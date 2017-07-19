@@ -3,6 +3,7 @@ package com.skytonia.SkyCore.tests;
 import com.skytonia.SkyCore.items.uniqueitems.UniqueItems;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.TimeUtil;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.text.NumberFormat;
@@ -23,7 +24,10 @@ public class UtilTest
 		for(int i = 0;i < 50;i++)
 		{
 			String idString = UniqueItems.getIdFor(i);
-			System.out.println("Value for " + i + ": " + idString + " (" + UniqueItems.getIdFrom(idString) + ")");
+			int idValue = UniqueItems.getValueFrom(idString);
+			System.out.println("Expecting code for '" + i + "' (" + idString + ") = '" + idValue + "'");
+			Assert.assertEquals("Value for " + idString + " did not match '" + i + "' Actual (" + idValue + ")",
+			                    i, idValue);
 		}
 	}
 	

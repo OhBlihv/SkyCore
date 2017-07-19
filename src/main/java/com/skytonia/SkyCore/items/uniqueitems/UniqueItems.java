@@ -17,7 +17,7 @@ public class UniqueItems extends FlatFile
 	public static final Pattern UNIQUE_ID_KEY_PATTERN = Pattern.compile("§0§0");
 	public static final char[] ID_CHARACTERS = new char[]
 	{
-	    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	    /*'0', */'1', '2', '3', '4', '5', '6', '7', '8', '9',
 	    'a', 'b', 'c', 'd', 'e', 'f',
 	    'k', 'l', 'm', 'n', 'o', 'r'
 	    //TODO: Check if upper-case characters are converted
@@ -230,6 +230,12 @@ public class UniqueItems extends FlatFile
 			}
 		}
 		
+		//Prepend with §0 as long as we need to
+		while(idString.length() < 8)
+		{
+			idString = "§0" + idString;
+		}
+		
 		return UNIQUE_ID_KEY + idString; //TODO: Add ID
 	}
 	
@@ -253,13 +259,46 @@ public class UniqueItems extends FlatFile
 		
 		final int idCharLength = ID_CHARACTERS.length;
 		
-		for(char idChar : idString.toCharArray())
+		final char[] idStringChars = idString.toCharArray();
+		
+		for(int i = 0;i < idStringChars.length;i++)
 		{
-			for(int i = 0;i < idCharLength;i++)
+			char idChar = idStringChars[i];
+			
+			//See if this is our key
+			if(idChar == '§')
 			{
-				if(ID_CHARACTERS[i] == idChar)
+				if(idStringChars[i + 1] == '0' && idStringChars[i + 2] == '§' && idStringChars[i + 3] == '0')
 				{
-					result = (result * idCharLength) + i;
+					if(i + 11 >= idStringChars.length)
+					{
+						break; //Can't possibly hold our code
+					}
+					
+					i += 4;
+					
+					//Start reading our code
+					for(int j = 0;j < 8;j++)
+					{
+						idChar = idStringChars[i + j];
+						
+						//Filler
+						if(idChar == '§' || idChar == '0')
+						{
+							continue;
+						}
+						
+						int idCharIdx = 0;
+						for(char ID_CHARACTER : ID_CHARACTERS)
+						{
+							if(idChar == ID_CHARACTER)
+							{
+								result = (result * idCharLength) + idCharIdx;
+								break;
+							}
+							idCharIdx++;
+						}
+					}
 					break;
 				}
 			}
