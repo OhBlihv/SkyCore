@@ -9,26 +9,46 @@ import org.bukkit.Bukkit;
 public class PersistingRunnable
 {
 	
-	private int taskId;
-	private int executionCount = 0,
-				maxExecutions;
+	private final Persistence parent;
+	private final Persistence.PersistingType persistingType;
 	
-	public PersistingRunnable(long tickDelay, int executions, Runnable runnable)
+	private int taskId = -1;
+	private int executionCount = 0;
+	private final int maxExecutions;
+	
+	private final long tickDelay;
+	private final TextRunnable runnable;
+	
+	public PersistingRunnable(Persistence parent, Persistence.PersistingType persistingType,
+	                          long tickDelay, int executions, TextRunnable runnable)
 	{
-		//No executions necessary.
-		if(executions <= 0)
-		{
-			return;
-		}
+		this.parent = parent;
+		this.persistingType = persistingType;
 		
 		this.maxExecutions = executions;
+		
+		this.tickDelay = tickDelay;
+		this.runnable = runnable;
+	}
+	
+	public void startRunnable()
+	{
+		if(taskId != -1)
+		{
+			Bukkit.getScheduler().cancelTask(taskId);
+			taskId = -1;
+		}
 		
 		//Run immediately, then every 'tickDelay' ticks.
 		this.taskId = Bukkit.getScheduler().runTaskTimer(SkyCore.getPluginInstance(), () ->
 		{
 			try
 			{
-				runnable.run();
+				if(!runnable.run())
+				{
+					cancelRunnable();
+					return;
+				}
 				
 				if(++executionCount == maxExecutions)
 				{
@@ -50,6 +70,8 @@ public class PersistingRunnable
 			Bukkit.getScheduler().cancelTask(taskId);
 			taskId = -1;
 		}
+		
+		parent.removeRunnable(persistingType);
 	}
 	
 }

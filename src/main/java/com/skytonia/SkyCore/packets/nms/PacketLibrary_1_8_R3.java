@@ -1,7 +1,6 @@
 package com.skytonia.SkyCore.packets.nms;
 
 import com.skytonia.SkyCore.packets.PacketLibrary;
-import com.skytonia.SkyCore.packets.PacketUtil;
 import com.skytonia.SkyCore.packets.Persistence;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -33,7 +32,7 @@ public class PacketLibrary_1_8_R3 extends PacketLibrary
 		PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(new ChatComponentText(message), (byte) 2);
 		
 		//Action bar lasts about 2-3 seconds. Send an update after 2 seconds to ensure it does not disappear
-		PacketUtil.startPersistingTask(player.getUniqueId(), Persistence.PersistingType.ACTION_BAR, 40L, lifespan / 2,
+		startPersistingTask(player.getUniqueId(), Persistence.PersistingType.ACTION_BAR, 40L, lifespan / 2,
 		                    () -> sendPacket(playerConnection, packetPlayOutChat));
 	}
 	
