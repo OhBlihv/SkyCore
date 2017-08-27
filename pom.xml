@@ -47,7 +47,7 @@
 			<version>1.7.10-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
-			<systemPath>${project.basedir}/lib/spigot-1.7.10-tw.jar</systemPath>
+			<systemPath>${project.basedir}/../../lib/spigot-1.7.10-tw.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
@@ -55,7 +55,7 @@
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
-			<systemPath>${project.basedir}/lib/spigot-1.8.8.jar</systemPath>
+			<systemPath>${project.basedir}/../../lib/spigot-1.8.8.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
@@ -71,7 +71,7 @@
 			<version>1.10-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
-			<systemPath>${project.basedir}/lib/spigot-1.10.jar</systemPath>
+			<systemPath>${project.basedir}/../../lib/spigot-1.10.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
@@ -79,7 +79,7 @@
 			<version>1.11-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
-			<systemPath>${project.basedir}/lib/spigot-1.11.2.jar</systemPath>
+			<systemPath>${project.basedir}/../../lib/spigot-1.11.2.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
@@ -87,7 +87,7 @@
 			<version>1.12-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
-			<systemPath>${project.basedir}/lib/spigot-1.12.jar</systemPath>
+			<systemPath>${project.basedir}/../../lib/spigot-1.12.jar</systemPath>
 		</dependency>
 		
 		<!-- Redis -->
