@@ -1,7 +1,0 @@
-name: ParticlePlayground
-version: ${project.version}
-main: com.codenameflip.particleplayground.ParticlePlayground
-description: A test plugin for me to mess around with particle effects
-commands:
-  playParticle:
-
