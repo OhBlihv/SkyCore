@@ -13,4 +13,15 @@ public class Pair<A, B>
 	
 	public final B right;
 	
+	@Override
+	public int hashCode()
+	{
+		return left.hashCode() + right.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return obj instanceof Pair && left.equals(((Pair) obj).left) && right.equals(((Pair) obj).right);
+	}
 }

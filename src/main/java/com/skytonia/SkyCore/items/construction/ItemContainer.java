@@ -117,7 +117,8 @@ public class ItemContainer
 		EnchantStatus   enchantStatus = (EnchantStatus) getOverriddenValue(overriddenValues, ItemContainerVariable.ENCHANTED, this.enchantStatus);
 		Map<Enchantment, Integer> enchantmentMap =
 						(Map<Enchantment, Integer>) getOverriddenValue(overriddenValues, ItemContainerVariable.ENCHANTMENTS, this.enchantmentMap);
-		String          owner = (String) getOverriddenValue(overriddenValues, ItemContainerVariable.OWNER, this.owner);
+		String          owner = (String) getOverriddenValue(overriddenValues, ItemContainerVariable.OWNER, this.owner),
+						skullTexture = (String) getOverriddenValue(overriddenValues, ItemContainerVariable.SKULL_TEXTURE, this.skullTexture);
 		
 		ItemStack itemStack = new ItemStack(material, amount, (short) damage);
 		
