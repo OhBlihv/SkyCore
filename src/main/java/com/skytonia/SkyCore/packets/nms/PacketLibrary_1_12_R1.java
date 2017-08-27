@@ -30,7 +30,7 @@ public class PacketLibrary_1_12_R1 extends PacketLibrary
 	public void sendActionBar(Player player, String message, int lifespan)
 	{
 		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-		PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(new ChatComponentText(message), ChatMessageType.CHAT);
+		PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(new ChatComponentText(message), ChatMessageType.GAME_INFO);
 		
 		//Action bar lasts about 2-3 seconds. Send an update after 2 seconds to ensure it does not disappear
 		startPersistingTask(player.getUniqueId(), Persistence.PersistingType.ACTION_BAR, 40L, lifespan / 2,
