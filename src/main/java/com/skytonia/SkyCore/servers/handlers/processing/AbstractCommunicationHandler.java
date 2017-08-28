@@ -218,7 +218,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 						onlinePlayers = new String[]{};
 						staffList.clear();
 					}
-					
+
 					addOutgoingMessage(null, CHANNEL_INFO_REPL, MessageUtil.mergeArguments(
 						currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount), String.valueOf(maxPlayers),
 						MessageUtil.mergeArguments(staffList.toArray(new String[staffList.size()])), "|||",
@@ -385,7 +385,13 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	@Override
 	public void receiveMessage(InboundCommunicationMessage message) throws MessageException
 	{
-		switch(message.getChannel())
+		String channel = message.getChannel();
+		if(channel.contains(">"))
+		{
+			channel = channel.split("[>]")[1];
+		}
+
+		switch(channel)
 		{
 			case CHANNEL_MOVE_REQ:
 			{
@@ -530,6 +536,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				catch(NumberFormatException e)
 				{
 					BUtil.log("Unable to parse server player count string '" + playerCountString + "'. Defaulting to 0.");
+					BUtil.log(MessageUtil.mergeArguments(message.getMessageArgs()));
 				}
 				
 				int maxPlayers = 0;
@@ -540,6 +547,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				catch(NumberFormatException e)
 				{
 					BUtil.log("Unable to parse server max player count string '" + maxPlayersString + "'. Defaulting to 0.");
+					BUtil.log(MessageUtil.mergeArguments(message.getMessageArgs()));
 				}
 				
 				serverInfo.setServerStatus(serverStatus);

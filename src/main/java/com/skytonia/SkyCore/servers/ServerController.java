@@ -31,11 +31,19 @@ public class ServerController
 		{
 			case "TWSpigot":
 			case "SkySpigot":
-				BUtil.log("Initializing Server Messaging System"); break;
+				BUtil.log("Initializing Server Messaging System");
+				break;
 			default:
-				BUtil.log("Using Null Server Messaging System on unsupported software");
-				communicationHandler = new NullCommunicationHandler();
-				return;
+			{
+				if (!BUtil.getNMSVersion().equals("v1_12_R1"))
+				{
+					BUtil.log("Using Null Server Messaging System on unsupported software");
+					communicationHandler = new NullCommunicationHandler();
+					return;
+				}
+				BUtil.log("Initializing Server Messaging System");
+				break;
+			}
 		}
 		
 		/*

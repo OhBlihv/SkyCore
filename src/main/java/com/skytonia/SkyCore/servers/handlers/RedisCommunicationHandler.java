@@ -13,6 +13,7 @@ import com.skytonia.SkyCore.servers.listeners.ChannelSubscriber;
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
 import com.skytonia.SkyCore.servers.listeners.RedisChannelSubscriber;
 import com.skytonia.SkyCore.servers.util.MessageUtil;
+import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
@@ -51,6 +52,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		jedisPool = new JedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
 		
 		currentServer = commFile.getString("communication.redis.server");
+		BUtil.log("Current Server: " + currentServer);
 		
 		registerSubscription(this, true, CHANNEL_MOVE_REQ, CHANNEL_MOVE_REPL);
 		registerSubscription(this, false, CHANNEL_INFO_REPL);
@@ -72,7 +74,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	{
 		super.requestPlayerTransfer(player, serverName, movementAction);
 		
-		sendMessage(serverName, CHANNEL_MOVE_REQ, player.getName());
+		sendMessage(serverName, CHANNEL_MOVE_REQ, currentServer, player.getName());
 	}
 	
 	@Override
@@ -130,8 +132,12 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 			{
 				serverChannel = server + ">" + serverChannel;
 			}
-			
-			jedis.publish(serverChannel, MessageUtil.mergeArguments(message));
+
+			String[] messageArr = new String[message.length + 1];
+			System.arraycopy(message, 0, messageArr, 1, message.length);
+			messageArr[0] = currentServer;
+
+			jedis.publish(serverChannel, MessageUtil.mergeArguments(messageArr));
 		});
 	}
 	
