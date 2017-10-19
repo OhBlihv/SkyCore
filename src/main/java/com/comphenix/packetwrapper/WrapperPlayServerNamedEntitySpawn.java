@@ -117,33 +117,33 @@ public class WrapperPlayServerNamedEntitySpawn extends AbstractPacket {
 	 * @param position - the new position.
 	 */
 	public void setPosition(Vector position) {
-		setX(position.getX());
-		setY(position.getY());
-		setZ(position.getZ());
+		setX((int) position.getX());
+		setY((int) position.getY());
+		setZ((int) position.getZ());
 	}
 
 	public double getX() {
 		return handle.getDoubles().read(0);
 	}
 
-	public void setX(double value) {
-		handle.getDoubles().write(0, value);
+	public void setX(int value) {
+		handle.getIntegers().write(0, value);
 	}
 
-	public double getY() {
-		return handle.getDoubles().read(1);
+	public int getY() {
+		return handle.getIntegers().read(1);
 	}
 
-	public void setY(double value) {
-		handle.getDoubles().write(1, value);
+	public void setY(int value) {
+		handle.getIntegers().write(1, value);
 	}
 
-	public double getZ() {
-		return handle.getDoubles().read(2);
+	public int getZ() {
+		return handle.getIntegers().read(2);
 	}
 
-	public void setZ(double value) {
-		handle.getDoubles().write(2, value);
+	public void setZ(int value) {
+		handle.getIntegers().write(2, value);
 	}
 
 	/**

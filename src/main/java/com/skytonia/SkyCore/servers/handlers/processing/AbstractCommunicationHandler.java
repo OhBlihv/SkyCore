@@ -720,13 +720,18 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		List<String> unavailableHubs = new ArrayList<>();
 		for(String possibleHub : availableHubs)
 		{
-			if(!isDev && possibleHub.contains("dev") || possibleHub.contains("beta"))
+			if((isDev && (!possibleHub.contains("dev") && !possibleHub.contains("beta"))) ||
+			  (!isDev && possibleHub.contains("dev") && possibleHub.contains("beta")))
 			{
 				unavailableHubs.add(possibleHub);
 			}
 		}
-		
-		availableHubs.removeAll(unavailableHubs);
+
+		//Still need at least 1 available hub
+		if(unavailableHubs.size() != availableHubs.size())
+		{
+			availableHubs.removeAll(unavailableHubs);
+		}
 		
 		return availableHubs.get(random.nextInt(availableHubs.size()));
 	}

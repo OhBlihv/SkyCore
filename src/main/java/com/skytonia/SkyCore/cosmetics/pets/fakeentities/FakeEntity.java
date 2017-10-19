@@ -296,9 +296,9 @@ public class FakeEntity
 		
 		packet.setEntityID(entityId);
 		
-		packet.setX(currentX);
-		packet.setY(currentY);
-		packet.setZ(currentZ);
+		packet.setX((int) currentX);
+		packet.setY((int) currentY);
+		packet.setZ((int) currentZ);
 		
 		packet.setYaw((float) currentYaw);
 		packet.setPitch((float) currentPitch);

@@ -78,6 +78,10 @@ public class RedisManager
 			//Server channel format: '<server>_<channel>'
 			jedis.publish(CHANNEL_REGISTRATION, serverName + "|" + Bukkit.getIp() + ":" + Bukkit.getPort());
 		}
+		catch(Exception e)
+		{
+			BUtil.log("(LEGACY) Unable to connect to Redis.");
+		}
 	}
 	
 	public static void shutdown()

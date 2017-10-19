@@ -1,11 +1,14 @@
 package com.skytonia.SkyCore.movement;
 
+import com.skytonia.SkyCore.cosmetics.util.ParticleEffect;
 import com.skytonia.SkyCore.movement.handlers.LilypadMovementHandler;
 import com.skytonia.SkyCore.movement.handlers.RedisMovementHandler;
 import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.TimeUnit;
@@ -31,10 +34,17 @@ public class PlayerCount
 	
 	public static void updatePlayerCount(int players)
 	{
-		RedisManager.accessConnection((jedis) ->
+		try
 		{
-			jedis.set(RedisManager.getServerName() + PLAYER_COUNT_KEY, String.valueOf(players));
-		});
+			RedisManager.accessConnection((jedis) ->
+			{
+				jedis.set(RedisManager.getServerName() + PLAYER_COUNT_KEY, String.valueOf(players));
+			});
+		}
+		catch(Exception e)
+		{
+			//Silence - Deprecated
+		}
 	}
 	
 	private static boolean printedUnsupportedPlayerCount = false;

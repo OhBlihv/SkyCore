@@ -1,6 +1,6 @@
 package com.skytonia.SkyCore.tests;
 
-import com.skytonia.SkyCore.items.uniqueitems.UniqueItems;
+import com.skytonia.SkyCore.items.uniqueids.UniqueIds;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.TimeUtil;
 import org.junit.Assert;
@@ -23,8 +23,8 @@ public class UtilTest
 	{
 		for(int i = 0;i < 50;i++)
 		{
-			String idString = UniqueItems.getIdFor(i);
-			int idValue = UniqueItems.getValueFrom(idString);
+			String idString = UniqueIds.getIdFor(i);
+			int idValue = UniqueIds.getValueFrom(idString);
 			System.out.println("Expecting code for '" + i + "' (" + idString + ") = '" + idValue + "'");
 			Assert.assertEquals("Value for " + idString + " did not match '" + i + "' Actual (" + idValue + ")",
 			                    i, idValue);
@@ -295,7 +295,7 @@ public class UtilTest
 	@Test
 	public void uniqueItemTest()
 	{
-		/*UniqueItems uniqueItems = new UniqueItems(Arrays.asList("0008", "0034", "0001"));
+		/*UniqueIds uniqueItems = new UniqueIds(Arrays.asList("0008", "0034", "0001"));
 		
 		BUtil.log(uniqueItems.getNextId());
 		BUtil.log(uniqueItems.getNextId());

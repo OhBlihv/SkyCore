@@ -415,7 +415,15 @@ public enum ParticleEffect
 	 * <li>Displays a arched white particle for ~1/4 of a second
 	 * </ul>
 	 */
-	SWEEP_ATTACK("sweepAttack", 45, 9);
+	SWEEP_ATTACK("sweepAttack", 45, 9),
+ 	/**
+  	 * A particle effect which is displayed by unstable sand and gravel:
+  	 * <ul>
+  	 * <li>It looks like a small dust cloud
+  	 * <li>The offset values have no influence on this particle effect
+  	 * </ul>
+  	 */
+	 FALLING_DUST("fallingdust", 46, 10, ParticleProperty.REQUIRES_DATA);
 	
 	//Check if we're running a forge version
 	static boolean isForge = false;
@@ -603,7 +611,7 @@ public enum ParticleEffect
 	 */
 	private static boolean isDataCorrect(ParticleEffect effect, ParticleData data)
 	{
-		return ((effect == BLOCK_CRACK || effect == BLOCK_DUST) && data instanceof BlockData) || (effect == ITEM_CRACK && data instanceof ItemData);
+		return ((effect == BLOCK_CRACK || effect == BLOCK_DUST || effect == FALLING_DUST) && data instanceof BlockData) || (effect == ITEM_CRACK && data instanceof ItemData);
 	}
 	
 	/**
