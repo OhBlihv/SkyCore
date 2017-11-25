@@ -31,6 +31,24 @@ import java.util.Map;
  */
 public class GUIBuilder<T>
 {
+
+	@RequiredArgsConstructor
+	public static class GUIBuilderInfo
+	{
+
+		public final String guiTitle;
+
+		public final InventorySize guiSize;
+
+		public final String requiredPermission;
+
+		public final String noPermissionMessage;
+
+		public final GUISound openSound;
+
+		public final ItemStack fillerItem;
+
+	}
 	
 	@RequiredArgsConstructor
 	public static class GUIElementInfo
@@ -58,10 +76,20 @@ public class GUIBuilder<T>
 	
 	public T build(ConfigurationSection configurationSection)
 	{
+		return build(configurationSection);
+	}
+
+	public T build(GUIBuilderInfo guiBuilderInfo)
+	{
+		return build(guiBuilderInfo);
+	}
+
+	private T build(Object configurationObject)
+	{
 		InventorySize inventorySize;
 		
 		String 	requiredPermission,
-			noPermissionMessage;
+				noPermissionMessage;
 		
 		GUISound openSound = null;
 		
@@ -70,7 +98,7 @@ public class GUIBuilder<T>
 		Deque<GUIElementInfo> guiElements;
 		Deque<GUIVariable> guiVariables;
 		
-		if(configurationSection == null)
+		if(configurationObject == null)
 		{
 			guiTitle = "Inventory";
 			inventorySize = InventorySize.SIX_LINE;
@@ -81,8 +109,24 @@ public class GUIBuilder<T>
 			guiElements = new ArrayDeque<>();
 			guiVariables = new ArrayDeque<>();
 		}
-		else
+		else if(configurationObject instanceof GUIBuilderInfo)
 		{
+			GUIBuilderInfo guiBuilderInfo = (GUIBuilderInfo) configurationObject;
+
+			guiTitle = guiBuilderInfo.guiTitle;
+			inventorySize = guiBuilderInfo.guiSize;
+			requiredPermission = guiBuilderInfo.requiredPermission;
+			noPermissionMessage = guiBuilderInfo.noPermissionMessage;
+			openSound = guiBuilderInfo.openSound;
+			fillerItem = guiBuilderInfo.fillerItem;
+
+			guiElements = new ArrayDeque<>();
+			guiVariables = new ArrayDeque<>();
+		}
+		else if(configurationObject instanceof ConfigurationSection)
+		{
+			ConfigurationSection configurationSection = (ConfigurationSection) configurationObject;
+
 			guiTitle = BUtil.translateColours(configurationSection.getString("title", "Inventory"));
 			
 			{
@@ -166,6 +210,10 @@ public class GUIBuilder<T>
 			guiVariables = new ArrayDeque<>();
 			guiVariables.addAll(GUIVariables.getInstance().getAllRegisteredVariables());
 		}
+		else
+		{
+			throw new IllegalArgumentException("Unsupported GUI Configuration object '" + configurationObject.getClass().getSimpleName() + "'");
+		}
 		
 		try
 		{
@@ -179,7 +227,7 @@ public class GUIBuilder<T>
 			return constructor.newInstance(guiTitle, inventorySize,
 			                               requiredPermission, noPermissionMessage,
 			                               openSound, fillerItem, guiElements, guiVariables,
-			                               configurationSection);
+			                               configurationObject instanceof ConfigurationSection ? (ConfigurationSection) configurationObject : null);
 		}
 		catch(InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e)
 		{
