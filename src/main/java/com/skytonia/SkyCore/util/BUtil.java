@@ -314,7 +314,7 @@ public class BUtil
 		numeralMap.put(50, "L");
 		numeralMap.put(49, "XL");
 		numeralMap.put(10, "X");
-		numeralMap.put(9, "IV");
+		numeralMap.put(9, "IX");
 		numeralMap.put(5, "V");
 		numeralMap.put(4, "IV");
 		numeralMap.put(1, "I");

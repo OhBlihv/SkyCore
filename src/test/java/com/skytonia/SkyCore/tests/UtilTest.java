@@ -12,6 +12,8 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Created by Chris Brown (OhBlihv) on 11/28/2016.
  */
@@ -34,13 +36,16 @@ public class UtilTest
 	@Test
 	public void romanNumeralTest()
 	{
-		System.out.println(BUtil.toRomanNumerals(2016));
-		System.out.println(BUtil.toRomanNumerals(1400));
-		System.out.println(BUtil.toRomanNumerals(14));
-		System.out.println(BUtil.toRomanNumerals(206));
-		System.out.println(BUtil.toRomanNumerals(3));
-		System.out.println(BUtil.toRomanNumerals(4));
-		System.out.println(BUtil.toRomanNumerals(14));
+		assertEquals("I", BUtil.toRomanNumerals(1));
+		assertEquals("II", BUtil.toRomanNumerals(2));
+		assertEquals("III", BUtil.toRomanNumerals(3));
+		assertEquals("IV", BUtil.toRomanNumerals(4));
+		assertEquals("V", BUtil.toRomanNumerals(5));
+		assertEquals("VI", BUtil.toRomanNumerals(6));
+		assertEquals("VII", BUtil.toRomanNumerals(7));
+		assertEquals("VIII", BUtil.toRomanNumerals(8));
+		assertEquals("IX", BUtil.toRomanNumerals(9));
+		assertEquals("X", BUtil.toRomanNumerals(10));
 	}
 	
 	//@Test
