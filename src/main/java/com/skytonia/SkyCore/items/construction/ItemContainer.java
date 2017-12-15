@@ -15,18 +15,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.INBTBase;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.bukkit.Material.*;
 
@@ -64,6 +59,26 @@ public class ItemContainer
 	
 	@Getter
 	private final Color armorColor;
+
+	@Getter
+	private Map<String, INBTBase> nbtFlags = new HashMap<>();
+
+	public ItemContainer(Material material, int damage, int amount, String displayName, List<String> lore, EnchantStatus enchantStatus,
+	                     Map<Enchantment, Integer> enchantmentMap, String owner, String skullTexture, Color armorColor,
+	                     Map<String, INBTBase> nbtFlags)
+	{
+		this.material = material;
+		this.damage = damage;
+		this.amount = amount;
+		this.displayName = displayName;
+		this.lore = lore;
+		this.enchantStatus = enchantStatus;
+		this.enchantmentMap = enchantmentMap;
+		this.owner = owner;
+		this.skullTexture = skullTexture;
+		this.armorColor = armorColor;
+		this.nbtFlags = nbtFlags;
+	}
 	
 	private Object getOverriddenValue(Map<ItemContainerVariable, Object> overriddenValues, ItemContainerVariable itemVariable, Object defaultValue)
 	{
@@ -223,6 +238,14 @@ public class ItemContainer
 				ItemFlag.HIDE_DESTROYS,
 				ItemFlag.HIDE_PLACED_ON,
 				ItemFlag.HIDE_POTION_EFFECTS);
+		}
+
+		if(nbtFlags != null && !nbtFlags.isEmpty() && SkyCore.getCurrentVersion().isExact(SupportedVersion.ONE_EIGHT))
+		{
+			for(Map.Entry<String, INBTBase> entry : nbtFlags.entrySet())
+			{
+				StaticNMS.getNMSItemUtil().addNBTFlag(itemMeta, entry.getKey(), entry.getValue());
+			}
 		}
 		
 		itemStack.setItemMeta(itemMeta);

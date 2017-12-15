@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.INBTBase;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -58,6 +59,9 @@ public class ItemContainerConstructor
 		
 		@Getter
 		private String skullTexture = null;
+
+		@Getter
+		private Map<String, INBTBase> nbtFlags = new HashMap<>();
 		
 		public ItemContainerBuilder material(Material material)
 		{
@@ -121,13 +125,20 @@ public class ItemContainerConstructor
 			
 			return this;
 		}
+
+		public ItemContainerBuilder nbtFlag(String key, INBTBase nbtBase)
+		{
+			this.nbtFlags.put(key, nbtBase);
+
+			return this;
+		}
 		
 		public ItemContainer build()
 		{
 			return new ItemContainer(material, damage, amount,
 			                         displayName, lore,
 			                         enchantStatus, enchantments,
-			                         owner, skullTexture, null);
+			                         owner, skullTexture, null, nbtFlags);
 		}
 		
 	}
@@ -308,7 +319,7 @@ public class ItemContainerConstructor
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(isEnchanted), enchantmentMap,
-		                         owner, skullTexture, armorColor);
+		                         owner, skullTexture, armorColor, null);
 	}
 	
 	private static final Pattern PATTERN_SEPERATOR = Pattern.compile(":");
@@ -383,7 +394,7 @@ public class ItemContainerConstructor
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(enchanted), enchantmentMap,
-		                         owner, skullTexture, null);
+		                         owner, skullTexture, null, null);
 	}
 	
 }

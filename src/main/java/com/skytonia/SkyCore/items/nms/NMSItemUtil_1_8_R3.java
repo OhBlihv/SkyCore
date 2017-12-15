@@ -3,8 +3,11 @@ package com.skytonia.SkyCore.items.nms;
 import net.minecraft.server.v1_8_R3.NBTBase;
 import net.minecraft.server.v1_8_R3.NBTTagInt;
 import net.minecraft.server.v1_8_R3.NBTTagList;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaItem;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.INBTBase;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -55,5 +58,11 @@ public class NMSItemUtil_1_8_R3 implements NMSItemUtil
 		
 		return enchTag;
 	}
-	
+
+	@Override
+	public void addNBTFlag(ItemMeta itemMeta, String key, INBTBase value)
+	{
+		((CraftMetaItem) itemMeta).getNBTTag().put(key, value);
+	}
+
 }
