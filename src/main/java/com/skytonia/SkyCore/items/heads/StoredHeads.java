@@ -82,7 +82,11 @@ public class StoredHeads
 
 	MUSHROOM_COW= new StoredHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDBiYzYxYjk3NTdhN2I4M2UwM2NkMjUwN2EyMTU3OTEzYzJjZjAxNmU3YzA5NmE0ZDZjZjFmZTFiOGRiIn19fQ"),
 
-	MAGMA_CUBE  = new StoredHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg5NTdkNTAyM2M5MzdjNGM0MWFhMjQxMmQ0MzQxMGJkYTIzY2Y3OWE5ZjZhYjM2Yjc2ZmVmMmQ3YzQyOSJ9fX0=");
+	MAGMA_CUBE  = new StoredHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg5NTdkNTAyM2M5MzdjNGM0MWFhMjQxMmQ0MzQxMGJkYTIzY2Y3OWE5ZjZhYjM2Yjc2ZmVmMmQ3YzQyOSJ9fX0="),
+
+	IRON_GOLEM  = new StoredHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODkwOTFkNzllYTBmNTllZjdlZjk0ZDdiYmE2ZTVmMTdmMmY3ZDQ1NzJjNDRmOTBmNzZjNDgxOWE3MTQifX19")
+
+	;
 	
 	public static StoredHead toMobSkull(EntityType entityType)
 	{
@@ -106,6 +110,7 @@ public class StoredHeads
 			case SQUID:         return SQUID;
 			case MUSHROOM_COW:  return MUSHROOM_COW;
 			case MAGMA_CUBE:    return MAGMA_CUBE;
+			case IRON_GOLEM:    return IRON_GOLEM;
 			default: throw new IllegalArgumentException("EntityType -> MobSkull not found '" + entityType + "");
 		}
 	}
