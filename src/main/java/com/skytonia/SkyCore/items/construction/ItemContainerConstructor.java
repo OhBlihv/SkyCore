@@ -61,6 +61,9 @@ public class ItemContainerConstructor
 		private String skullTexture = null;
 
 		@Getter
+		private Color armorColor = null;
+
+		@Getter
 		private Map<String, INBTBase> nbtFlags = new HashMap<>();
 		
 		public ItemContainerBuilder material(Material material)
@@ -126,6 +129,13 @@ public class ItemContainerConstructor
 			return this;
 		}
 
+		public ItemContainerBuilder color(Color color)
+		{
+			this.armorColor = color;
+
+			return this;
+		}
+
 		public ItemContainerBuilder nbtFlag(String key, INBTBase nbtBase)
 		{
 			this.nbtFlags.put(key, nbtBase);
@@ -138,7 +148,7 @@ public class ItemContainerConstructor
 			return new ItemContainer(material, damage, amount,
 			                         displayName, lore,
 			                         enchantStatus, enchantments,
-			                         owner, skullTexture, null, nbtFlags);
+			                         owner, skullTexture, armorColor, nbtFlags);
 		}
 		
 	}
