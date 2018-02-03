@@ -109,6 +109,7 @@ public class MovementManager
 		{
 			if(!RedisManager.getServerName().isEmpty())
 			{
+				SkyCore.getPluginInstance().getServer().getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
 				tempMovementHandler = new RedisMovementHandler();
 				
 				RedisManager.registerSubscription(this::onMessage, CHANNEL_MOVE_PLAYER_REQ, CHANNEL_MOVE_PLAYER_REPLY);

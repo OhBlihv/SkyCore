@@ -15,10 +15,8 @@ import com.skytonia.SkyCore.servers.listeners.RedisChannelSubscriber;
 import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
+import lombok.Getter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -33,7 +31,8 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 {
 	
 	private static final String CHANNEL_REGISTRATION = "SC_Init";
-	
+
+	@Getter
 	private final JedisPool jedisPool;
 	
 	public RedisCommunicationHandler()

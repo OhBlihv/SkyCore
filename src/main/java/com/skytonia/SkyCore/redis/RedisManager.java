@@ -65,7 +65,8 @@ public class RedisManager
 		
 		if(SkyCore.isSkytonia())
 		{
-			jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
+			//jedisPool = new JedisPool(poolConfig, "184.164.136.211", 6379, 5000);
+			jedisPool = new JedisPool(poolConfig, "184.171.165.106", 6379, 5000);
 		}
 		else
 		{
