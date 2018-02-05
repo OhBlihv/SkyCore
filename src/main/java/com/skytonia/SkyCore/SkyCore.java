@@ -2,9 +2,6 @@ package com.skytonia.SkyCore;
 
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
-import com.skytonia.SkyCore.movement.MovementManager;
-import com.skytonia.SkyCore.movement.PlayerCount;
-import com.skytonia.SkyCore.redis.RedisManager;
 import com.skytonia.SkyCore.servers.ServerController;
 import com.skytonia.SkyCore.titles.TagController;
 import com.skytonia.SkyCore.util.BUtil;
@@ -105,19 +102,6 @@ public class SkyCore extends JavaPlugin implements Listener
 				}
 			}
 			
-			//TODO: Deprecated. Still existing alongside the new system to avoid issues
-			//Set up Redis/Jedis
-			try
-			{
-				new PlayerCount(this);   //Start Player Count Updater
-				MovementManager.getInstance();  //Register Listeners
-			}
-			catch(Exception e)
-			{
-				BUtil.logInfo("Could not set up Redis Connection");
-				e.printStackTrace();
-			}
-			
 			TagController.getInstance(); //Enable Tags
 		}
 		
@@ -137,16 +121,7 @@ public class SkyCore extends JavaPlugin implements Listener
 	@Override
 	public void onDisable()
 	{
-		PlayerCount.updatePlayerCount(0); //Show we're offline
-		
-		try
-		{
-			RedisManager.shutdown();
-		}
-		catch(Exception e)
-		{
-			//Silence any errors on shutdown
-		}
+
 	}
 	
 	@EventHandler
