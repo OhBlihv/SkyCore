@@ -32,30 +32,41 @@ public class StaticNMS
 	
 	private static boolean isForge = false;
 	@Getter
-	private static String serverName = "null";
+	private static String serverName;
 	static
 	{
-		String packageServerName = "null";
-		try //Forge is always the slowest D:
+		try
 		{
-			Class craftServerClass = Class.forName("org.bukkit.craftbukkit." + Bukkit.getServer().getClass().getPackage().getName().substring(23) + ".CraftServer");
-			Field serverNameField = craftServerClass.getDeclaredField("serverName");
-			serverNameField.setAccessible(true);
-			
-			packageServerName = (String) serverNameField.get(Bukkit.getServer());
-			
-			//Very primitive Forge check, only really tested with Thermos
-			if(packageServerName.equals("Cauldron"))
-			{
-				isForge = true;
-			}
+			serverName = Bukkit.getServer().getName();
 		}
 		catch(Exception e)
 		{
-			//Handled below if particleFactoryInstance is not set.
+			e.printStackTrace();
+			String packageServerName = "null";
+			try //Forge is always the slowest D:
+			{
+				Class craftServerClass = Class.forName("org.bukkit.craftbukkit." + Bukkit.getServer().getClass().getPackage().getName().substring(23) + ".CraftServer");
+				Field serverNameField = craftServerClass.getDeclaredField("serverName");
+				serverNameField.setAccessible(true);
+
+				packageServerName = (String) serverNameField.get(Bukkit.getServer());
+
+				//Very primitive Forge check, only really tested with Thermos
+				if(packageServerName.equals("Cauldron"))
+				{
+					isForge = true;
+				}
+			}
+			catch(Exception e2)
+			{
+				//Handled below if particleFactoryInstance is not set.
+				e.printStackTrace();
+			}
+
+			serverName = packageServerName;
 		}
-		
-		serverName = packageServerName;
+
+		BUtil.log("Server Name Registered as '" + serverName + "'");
 	}
 	
 	private static IParticlePacketFactory particleFactoryInstance = null;

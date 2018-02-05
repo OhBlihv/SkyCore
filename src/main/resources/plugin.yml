@@ -2,6 +2,6 @@ name: ${project.artifactId}
 version: ${project.version}
 author: OhBlihv
 main: ${project.groupId}.${project.artifactId}.${project.artifactId}
-softdepend: [ProtocolLib, ArkhamServerSync]
+softdepend: [ProtocolLib, LilyPad-Connect]
 commands:
     ${project.artifactId}:

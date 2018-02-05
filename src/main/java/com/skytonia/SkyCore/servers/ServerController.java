@@ -7,7 +7,6 @@ import com.skytonia.SkyCore.servers.handlers.LilypadRedisCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.NullCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.RedisCommunicationHandler;
 import com.skytonia.SkyCore.util.BUtil;
-import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -26,13 +25,16 @@ public class ServerController
 	public ServerController(SkyCore plugin)
 	{
 		this.plugin = plugin;
-		
-		switch(StaticNMS.getServerName())
+
+		switch(Bukkit.getServer().getName())
 		{
 			case "TWSpigot":
 			case "SkySpigot":
+			case "SkyPaper":
+			{
 				BUtil.log("Initializing Server Messaging System");
 				break;
+			}
 			default:
 			{
 				if (!BUtil.getNMSVersion().equals("v1_12_R1"))

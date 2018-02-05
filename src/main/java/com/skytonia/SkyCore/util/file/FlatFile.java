@@ -104,17 +104,29 @@ public class FlatFile
 		{
 			this.fileName = fileName;
 		}
-		
+
+		JavaPlugin tempOwningPlugin;
+		String tempPluginString;
+
 		if(owningPlugin != null)
 		{
-			pluginString = owningPlugin;
-			plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(owningPlugin);
+			tempPluginString = owningPlugin;
+			tempOwningPlugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(owningPlugin);
 		}
 		else
 		{
-			pluginString = BUtil.getCallingPlugin();
-			plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(pluginString);
+			tempPluginString = BUtil.getCallingPlugin();
+			tempOwningPlugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(tempPluginString);
 		}
+
+		if(tempOwningPlugin == null)
+		{
+			tempPluginString = "SkyCore";
+			tempOwningPlugin = SkyCore.getInstance();
+		}
+
+		this.pluginString = tempPluginString;
+		this.plugin = tempOwningPlugin;
 		
 		//Support extending classes
 		BUtil.logMessageAsPlugin("SkyCore", "Registered new " + getClass().getSimpleName() + " to: " + plugin + " (" + this.fileName + ")");
