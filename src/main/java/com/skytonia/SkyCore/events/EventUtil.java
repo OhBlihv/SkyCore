@@ -4,19 +4,19 @@ import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.util.BUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockEvent;
+import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.weather.WeatherEvent;
+import org.bukkit.event.world.WorldEvent;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * Created by Chris Brown (OhBlihv) on 1/22/2017.
@@ -71,87 +71,39 @@ public class EventUtil
 			if(world != null)
 			{
 				World eventWorld = null;
-				
-				//Attempt to directly get the world
+
+				if(event instanceof PlayerEvent)
 				{
-					Method worldMethod;
-					try
-					{
-						worldMethod = event.getClass().getMethod("getWorld");
-						
-						eventWorld = (World) worldMethod.invoke(event);
-					}
-					catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
-					{
-						//getWorld Not Found
-					}
+					eventWorld = ((PlayerEvent) event).getPlayer().getWorld();
+				}
+				else if(event instanceof EntityEvent)
+				{
+					eventWorld = ((EntityEvent) event).getEntity().getWorld();
+				}
+				else if(event instanceof BlockEvent)
+				{
+					eventWorld = ((BlockEvent) event).getBlock().getWorld();
+				}
+				else if(event instanceof WorldEvent)
+				{
+					eventWorld = ((WorldEvent) event).getWorld();
+				}
+				else if(event instanceof WeatherEvent)
+				{
+					eventWorld = ((WeatherEvent) event).getWorld();
+				}
+				else if(event instanceof InventoryInteractEvent)
+				{
+					eventWorld = ((InventoryInteractEvent) event).getWhoClicked().getWorld();
+				}
+				else
+				{
+					BUtil.log("Unsupported world-supporting event: '" + event.getClass().getSimpleName() + "'");
 				}
 				
-				//Search for getPlayer() to run through
-				if(eventWorld == null)
+				if(eventWorld == null || !eventWorld.getName().equals(world.getName()))
 				{
-					Method playerMethod;
-					try
-					{
-						try
-						{
-							playerMethod = event.getClass().getMethod("getPlayer");
-						}
-						catch(NoSuchMethodException e)
-						{
-							//Some events have their player method at 'getEntity'
-							playerMethod = event.getClass().getMethod("getEntity");
-						}
-						
-						eventWorld = ((Entity) playerMethod.invoke(event)).getWorld();
-					}
-					catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
-					{
-						//getWorld Not Found
-					}
-				}
-				
-				//Block-Based events
-				if(eventWorld == null)
-				{
-					Method blockMethod;
-					try
-					{
-						try
-						{
-							blockMethod = event.getClass().getMethod("getBlock");
-						}
-						catch(NoSuchMethodException e)
-						{
-							//Some events have their player method at 'getEntity'
-							blockMethod = event.getClass().getMethod("getSource");
-						}
-						
-						eventWorld = ((Block) blockMethod.invoke(event)).getWorld();
-					}
-					catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
-					{
-						//getWorld Not Found
-					}
-				}
-				
-				if(eventWorld == null)
-				{
-					BUtil.logInfo("World was enforced for event " + event.getClass().getSimpleName() + " but the world could not be found.");
-					for(Method method : event.getClass().getMethods())
-					{
-						BUtil.logInfo(method.getName() + "(" + Arrays.toString(method.getParameterTypes()) + ")");
-					}
-					BUtil.logInfo("-----------------------");
-					for(Method method : event.getClass().getDeclaredMethods())
-					{
-						BUtil.logInfo(method.getName() + "(" + Arrays.toString(method.getParameterTypes()) + ")");
-					}
-					return; //Ignore event.
-				}
-				
-				if(!eventWorld.getName().equals(world.getName()))
-				{
+					BUtil.log((eventWorld == null ? "event world null" : "'' " + eventWorld.getName() + "' != '" + world.getName() + "'"));
 					//No message. Just don't listen.
 					return;
 				}
