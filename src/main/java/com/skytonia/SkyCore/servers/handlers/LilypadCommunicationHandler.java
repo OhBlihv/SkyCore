@@ -55,7 +55,8 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		
 		try
 		{
-			lilypad.request(new MessageRequest(serverName, CHANNEL_MOVE_REQ, MessageUtil.mergeArguments(currentServer, player.getName())));
+			lilypad.request(new MessageRequest(serverName, CHANNEL_MOVE_REQ,
+				MessageUtil.mergeArguments(currentServer, player.getName(), player.getUniqueId().toString())));
 		}
 		catch(RequestException | UnsupportedEncodingException e)
 		{
@@ -68,9 +69,14 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 	{
 		try
 		{
+			//Alert the other server of an incoming player
+			sendMessage(new OutboundCommunicationMessage(
+				serverName, CHANNEL_MOVE_FORCE, MessageUtil.mergeArguments(player.getName(), player.getUniqueId().toString())
+			));
+
 			lilypad.request(new RedirectRequest(serverName, player.getName()));
 		}
-		catch(RequestException e)
+		catch(RequestException | MessageException e)
 		{
 			e.printStackTrace();
 		}

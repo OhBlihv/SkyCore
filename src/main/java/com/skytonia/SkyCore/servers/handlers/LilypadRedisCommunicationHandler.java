@@ -1,5 +1,8 @@
 package com.skytonia.SkyCore.servers.handlers;
 
+import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
+import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMessage;
+import com.skytonia.SkyCore.servers.util.MessageUtil;
 import lilypad.client.connect.api.Connect;
 import lilypad.client.connect.api.request.RequestException;
 import lilypad.client.connect.api.request.impl.RedirectRequest;
@@ -29,9 +32,14 @@ public class LilypadRedisCommunicationHandler extends RedisCommunicationHandler
 	{
 		try
 		{
+			//Alert the other server of an incoming player
+			sendMessage(new OutboundCommunicationMessage(
+				serverName, CHANNEL_MOVE_FORCE, MessageUtil.mergeArguments(player.getName(), player.getUniqueId().toString())
+			));
+
 			lilypad.request(new RedirectRequest(serverName, player.getName()));
 		}
-		catch(RequestException e)
+		catch(RequestException | MessageException e)
 		{
 			e.printStackTrace();
 		}

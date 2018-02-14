@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -66,8 +67,9 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	 * Player Movement
 	 */
 	
-	protected final String CHANNEL_MOVE_REQ  = "SC_MoveReq",
-						   CHANNEL_MOVE_REPL = "SC_MoveRep";
+	protected final String  CHANNEL_MOVE_FORCE = "SC_MoveForce",
+							CHANNEL_MOVE_REQ  = "SC_MoveReq",
+						    CHANNEL_MOVE_REPL = "SC_MoveRep";
 	
 	protected final MovementAction defaultAction = new MovementAction()
 	{
@@ -393,10 +395,26 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 
 		switch(channel)
 		{
+			case CHANNEL_MOVE_FORCE:
+			{
+				String  playerName = message.getMessageArgs()[0],
+						uuidString = message.getMessageArgs()[1];
+
+				final UUID playerUUID = UUID.fromString(uuidString);
+
+				//Ensure the player can join once their request has been accepted
+				incomingPlayers.add(playerName);
+
+				Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(message.getServer(), playerName, playerUUID));
+				break;
+			}
 			case CHANNEL_MOVE_REQ:
 			{
 				String serverName = message.getMessageArgs()[0],
-					   playerName = message.getMessageArgs()[1];
+					   playerName = message.getMessageArgs()[1],
+					   uuidString = message.getMessageArgs()[2];
+
+				final UUID playerUUID = UUID.fromString(uuidString);
 				
 				//No response is success.
 				String response = "";
@@ -410,7 +428,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					OfflinePlayer offlinePlayer = null;
 					try
 					{
-						offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+						offlinePlayer = Bukkit.getOfflinePlayer(playerUUID);
 						if(offlinePlayer == null)
 						{
 							throw new IllegalArgumentException();
@@ -427,7 +445,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					}
 				}
 				
-				PlayerServerChangeRequestEvent requestEvent = new PlayerServerChangeRequestEvent(playerName, response, !response.isEmpty());
+				PlayerServerChangeRequestEvent requestEvent = new PlayerServerChangeRequestEvent(playerName, playerUUID, response, !response.isEmpty());
 				Bukkit.getPluginManager().callEvent(requestEvent);
 				if(requestEvent.isCancelled())
 				{
@@ -447,7 +465,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					//Ensure the player can join once their request has been accepted
 					incomingPlayers.add(playerName);
 					
-					Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(playerName));
+					Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(message.getServer(), playerName, playerUUID));
 				}
 				
 				break;

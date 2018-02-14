@@ -56,7 +56,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		currentServer = commFile.getString("communication.redis.server");
 		BUtil.log("Current Server: " + currentServer);
 		
-		registerSubscription(this, true, CHANNEL_MOVE_REQ, CHANNEL_MOVE_REPL);
+		registerSubscription(this, true, CHANNEL_MOVE_FORCE, CHANNEL_MOVE_REQ, CHANNEL_MOVE_REPL);
 		registerSubscription(this, false, CHANNEL_INFO_REPL);
 		
 		SkyCore.getPluginInstance().getServer().getMessenger().registerOutgoingPluginChannel(SkyCore.getPluginInstance(), "BungeeCord");
@@ -76,12 +76,24 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	{
 		super.requestPlayerTransfer(player, serverName, movementAction);
 		
-		sendMessage(serverName, CHANNEL_MOVE_REQ, currentServer, player.getName());
+		sendMessage(serverName, CHANNEL_MOVE_REQ, currentServer, player.getName(), player.getUniqueId().toString());
 	}
 	
 	@Override
 	public void transferPlayer(Player player, String serverName)
 	{
+		//Alert the other server of an incoming player
+		try
+		{
+			sendMessage(new OutboundCommunicationMessage(
+				serverName, CHANNEL_MOVE_FORCE, MessageUtil.mergeArguments(player.getName(), player.getUniqueId().toString())
+			));
+		}
+		catch (MessageException e)
+		{
+			e.printStackTrace();
+		}
+
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		out.writeUTF("Connect");
 		out.writeUTF(serverName);

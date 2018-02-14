@@ -6,6 +6,8 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import java.util.UUID;
+
 /**
  * Created by Chris Brown (OhBlihv) on 2/28/2017.
  */
@@ -21,12 +23,16 @@ public class PlayerServerChangeRequestEvent extends Event implements Cancellable
 	
 	@Getter
 	private final String playerName;
+
+	@Getter
+	private final UUID playerUUID;
 	
-	public PlayerServerChangeRequestEvent(String playerName, String cancelReason, boolean cancelled)
+	public PlayerServerChangeRequestEvent(String playerName, UUID playerUUID, String cancelReason, boolean cancelled)
 	{
 		super(true);
 		
 		this.playerName = playerName;
+		this.playerUUID = playerUUID;
 		
 		if(cancelReason != null && !cancelReason.isEmpty())
 		{

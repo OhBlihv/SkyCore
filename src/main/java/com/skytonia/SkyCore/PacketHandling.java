@@ -39,7 +39,7 @@ public class PacketHandling implements Listener
 					}
 				}
 				
-				//packet.setNameTagVisibility("never");
+				packet.setNameTagVisibility("never");
 			}
 			
 		});

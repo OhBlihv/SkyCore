@@ -44,10 +44,10 @@ public class TagController implements Listener
 	
 	TagController()
 	{
-		if(true)
+		/*if(true)
 		{
 			return; //Disable.
-		}
+		}*/
 
 		//Pre-Register our DataWatchers on the main thread
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.AREA_EFFECT_CLOUD);
