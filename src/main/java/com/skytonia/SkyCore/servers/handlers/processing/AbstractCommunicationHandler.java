@@ -17,6 +17,7 @@ import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
 import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyRestart.SkyRestart;
+import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -719,6 +720,22 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	/*
 	 * Server Management
 	 */
+
+	public Pair<String, ServerInfo> getPlayerServer(String playerName)
+	{
+		for(Map.Entry<String, ServerInfo> entry : getAllServers())
+		{
+			for(String serverPlayer : entry.getValue().getPlayerList())
+			{
+				if(playerName.equalsIgnoreCase(serverPlayer))
+				{
+					return new Pair<>(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+
+		return null;
+	}
 	
 	@Override
 	public String getOnlineHub()

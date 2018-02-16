@@ -44,7 +44,15 @@ public class RedisChannelSubscriber extends ChannelSubscriber
 					
 					String[] messageArr = new String[messageSplit.length - 1];
 					System.arraycopy(messageSplit, 1, messageArr, 0, messageSplit.length - 1);
-					
+
+					{
+						String[] channelSplit = channel.split("[>]");
+						if(channelSplit.length > 1)
+						{
+							channel = channelSplit[1];
+						}
+					}
+
 					channelSubscription.onMessage(new InboundCommunicationMessage(messageSplit[0], channel, MessageUtil.mergeArguments(messageArr)));
 				}
 				catch(Throwable e)

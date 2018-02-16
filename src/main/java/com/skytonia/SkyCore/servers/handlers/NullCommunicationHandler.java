@@ -6,6 +6,7 @@ import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
 import com.skytonia.SkyCore.servers.handlers.processing.InboundCommunicationMessage;
 import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMessage;
 import com.skytonia.SkyCore.servers.listeners.ChannelSubscription;
+import javafx.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -37,7 +38,13 @@ public class NullCommunicationHandler implements CommunicationHandler
 	{
 		//
 	}
-	
+
+	@Override
+	public Pair<String, ServerInfo> getPlayerServer(String playerName)
+	{
+		return null;
+	}
+
 	@Override
 	public String getCurrentServer()
 	{
