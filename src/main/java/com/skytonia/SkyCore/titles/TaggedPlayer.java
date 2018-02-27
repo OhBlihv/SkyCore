@@ -19,7 +19,10 @@ import net.minecraft.server.v1_9_R2.Entity;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,6 +49,30 @@ public class TaggedPlayer
 	
 	@Getter
 	private final Entity entity;
+
+	@Getter
+	private String prefixIcon = "";
+	public void setPrefixIcon(String prefixIcon)
+	{
+		//Avoid null. Add an empty string instead if icon is not present.
+		if(prefixIcon == null)
+		{
+			prefixIcon = "";
+		}
+
+		if(this.prefixIcon == null || this.prefixIcon.isEmpty())
+		{
+			//Add as new
+			setLine(0, prefixIcon + getLine(0).getText());
+		}
+		else
+		{
+			//Replace the old icon
+			setLine(0, prefixIcon + getLine(0).getText().substring(1));
+		}
+
+		this.prefixIcon = prefixIcon;
+	}
 	
 	@Getter
 	private boolean online = true;
@@ -91,6 +118,7 @@ public class TaggedPlayer
 		{
 			try
 			{
+				//TODO: Cache?
 				PlayerCosmetics playerCosmetics = SkyCosmetics.getInstance().getPlayerManager().getCosmetics(entity.getUniqueID());
 				if(playerCosmetics != null)
 				{
@@ -112,27 +140,6 @@ public class TaggedPlayer
 		}
 		
 		return 0;
-	}
-	
-	public void updateLastRelocation()
-	{
-		lastRelocation = System.currentTimeMillis();
-	}
-	
-	public boolean isRecentlyRelocated()
-	{
-		if(lastRelocation != -1)
-		{
-			if(System.currentTimeMillis() - lastRelocation < 1000)
-			{
-				return true;
-			} else
-			{
-				lastRelocation = -1;
-			}
-		}
-		
-		return false;
 	}
 	
 	public void setSneaking(boolean sneaking)
@@ -246,18 +253,6 @@ public class TaggedPlayer
 		}
 	}
 	
-	public void clearNearbyPlayers()
-	{
-		for(ComparisonPlayer nearbyPlayer : nearbyPlayers.values())
-		{
-			nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
-		}
-		
-		update();
-		
-		nearbyPlayers.clear();
-	}
-	
 	public boolean update()
 	{
 		//Avoid updating if there are no players that require it
@@ -267,18 +262,18 @@ public class TaggedPlayer
 		}
 		
 		//Spawn Packets
-		List<AbstractPacket> spawnPackets = new ArrayList<>();
+		Deque<AbstractPacket> spawnPackets = new ArrayDeque<>();
 		
 		//Update Packets
-		List<AbstractPacket> updatePackets = new ArrayList<>();
+		Deque<AbstractPacket> updatePackets = new ArrayDeque<>();
 		
 		//Mount Packets
-		List<AbstractPacket> mountPackets = new ArrayList<>();
+		Deque<AbstractPacket> mountPackets = new ArrayDeque<>();
 		
 		//Destroy IDs/Packets
-		List<Integer> tagIds = new ArrayList<>();
-		
-		List<TagLine> tagsToRemove = new ArrayList<>();
+		Deque<Integer> tagIds = new ArrayDeque<>();
+
+		Deque<TagLine> tagsToRemove = new ArrayDeque<>();
 		
 		int lineHeight = 3,
 			contentLineNum = 0;
@@ -287,7 +282,7 @@ public class TaggedPlayer
 		
 		boolean hasSpacer = false;
 		int lastVehicleId = entity.getId();
-		List<TagLine> visibleTags = new ArrayList<>();
+		Deque<TagLine> visibleTags = new ArrayDeque<>();
 		if(getHatHeight() > 0)
 		{
 			visibleTags.add(spacerLine);
@@ -299,6 +294,25 @@ public class TaggedPlayer
 			tagIds.add(spacerLine.getTagId());
 		}
 		visibleTags.addAll(playerTags);
+
+		Map<DirtyPlayerType, Deque<ComparisonPlayer>> playerStatusMap = new EnumMap<>(DirtyPlayerType.class);
+		playerStatusMap.put(DirtyPlayerType.ADD, new ArrayDeque<>());
+		playerStatusMap.put(DirtyPlayerType.REMOVE, new ArrayDeque<>());
+		playerStatusMap.put(DirtyPlayerType.UPDATE, new ArrayDeque<>());
+		playerStatusMap.put(DirtyPlayerType.CLEAN, new ArrayDeque<>());
+
+		boolean anyVisibleTags = !hideTags;
+		//Search for at least one player who can see this player's tags
+		//to ensure they are not being generated for no use.
+		for(ComparisonPlayer player : nearbyPlayers.values())
+		{
+			if(player.getForcedVisibility())
+			{
+				anyVisibleTags = true;
+			}
+
+			playerStatusMap.get(player.getDirtyPlayerType()).add(player);
+		}
 		
 		List<Integer> lastPassengers = new ArrayList<>();
 		for(TagLine tagLine : visibleTags)
@@ -317,7 +331,7 @@ public class TaggedPlayer
 			}
 			else
 			{
-				if(!hideTags)
+				if(anyVisibleTags)
 				{
 					if(tagLine.getLineEntity().isAlive())
 					{
@@ -339,15 +353,15 @@ public class TaggedPlayer
 								if(hasSpacer)
 								{
 									yHeight += ((++lineHeight * amx) + amv);
+									break;
 								}
-								else
-								{
-									yHeight += ((++lineHeight * amx));
-								}
+							}
+							case 4:
+							case 5:
+							{
+								yHeight += ((++lineHeight * amx));
 								break;
 							}
-							case 4: yHeight += ((++lineHeight * amx)); break;
-							case 5: yHeight += ((++lineHeight * amx)); break;
 						}
 						
 						spawnPacket.setY(yHeight);
@@ -455,66 +469,72 @@ public class TaggedPlayer
 			}
 			destroyPacket.setEntityIds(destroyIds);
 		}
-		
-		boolean recentlyRelocated = isRecentlyRelocated();
-		
-		List<UUID> playersToRemove = new ArrayList<>();
-		for(ComparisonPlayer nearbyPlayer : nearbyPlayers.values())
+
+		for(Map.Entry<DirtyPlayerType, Deque<ComparisonPlayer>> entry : playerStatusMap.entrySet())
 		{
-			Player nearbyBukkitPlayer = nearbyPlayer.getPlayer();
-			if(!isOnline() || !nearbyBukkitPlayer.isOnline())
-			{
-				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
-			}
-			else if(recentlyRelocated)
-			{
-				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.ADD);
-			}
-			
-			switch(nearbyPlayer.getDirtyPlayerType())
+			switch(entry.getKey())
 			{
 				case ADD:
 				{
-					//Destroy any old titles before spawning in new ones
-					destroyPacket.sendPacket(nearbyBukkitPlayer);
-					
-					for(AbstractPacket packet : spawnPackets)
+					for(ComparisonPlayer player : entry.getValue())
 					{
-						packet.sendPacket(nearbyBukkitPlayer);
+						//Tags hidden by default
+						if(hideTags)
+						{
+							//Player overridden visibility
+							if(player.getForcedVisibility() == null || !player.getForcedVisibility())
+							{
+								continue;
+							}
+						}
+						else
+						{
+							//Player overridden invisibility
+							if(player.getForcedVisibility() != null && !player.getForcedVisibility())
+							{
+								continue;
+							}
+						}
+
+						//Destroy any old titles before spawning in new ones
+						player.sendPacket(destroyPacket);
+
+						player.sendPackets(spawnPackets, updatePackets, mountPackets);
+
+						if(!isOnline() || !player.isOnline())
+						{
+							player.setDirtyPlayerType(DirtyPlayerType.REMOVE);
+						}
+						else
+						{
+							player.setDirtyPlayerType(DirtyPlayerType.CLEAN);
+						}
 					}
-					
-					for(AbstractPacket packet : updatePackets)
-					{
-						packet.sendPacket(nearbyBukkitPlayer);
-					}
-					
-					for(AbstractPacket packet : mountPackets)
-					{
-						packet.sendPacket(nearbyBukkitPlayer);
-					}
-					
-					nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.CLEAN);
 					break;
 				}
 				case REMOVE:
 				{
-					destroyPacket.sendPacket(nearbyBukkitPlayer);
-					playersToRemove.add(nearbyBukkitPlayer.getUniqueId());
+					Deque<UUID> toRemovePlayers = new ArrayDeque<>();
+					for(ComparisonPlayer player : entry.getValue())
+					{
+						player.sendPacket(destroyPacket);
+						toRemovePlayers.add(player.getPlayer().getUniqueId());
+					}
+
+					nearbyPlayers.keySet().removeAll(toRemovePlayers);
 					break;
 				}
 				case UPDATE:
 				{
-					for(AbstractPacket packet : updatePackets)
+					for(ComparisonPlayer player : entry.getValue())
 					{
-						packet.sendPacket(nearbyBukkitPlayer);
+						player.sendPackets(updatePackets);
+						player.setDirtyPlayerType(DirtyPlayerType.CLEAN);
 					}
-					nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.CLEAN);
 					break;
 				}
 			}
 		}
-		
-		nearbyPlayers.keySet().removeAll(playersToRemove);
 		
 		return isOnline();
 	}

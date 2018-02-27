@@ -63,6 +63,7 @@ public class TagLine
 			if(lineEntity != EntityType.RABBIT)
 			{
 				setNewMetadata(EntityType.RABBIT);
+
 				metadata.setObject(12, 99);
 			}
 		}

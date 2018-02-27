@@ -4,7 +4,6 @@ import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -13,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerSpawnTrackerEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -44,11 +43,6 @@ public class TagController implements Listener
 	
 	TagController()
 	{
-		/*if(true)
-		{
-			return; //Disable.
-		}*/
-
 		//Pre-Register our DataWatchers on the main thread
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.AREA_EFFECT_CLOUD);
 		PetUtil.getDefaultWatcher(Bukkit.getWorlds().get(0), EntityType.SNOWBALL);
@@ -58,17 +52,9 @@ public class TagController implements Listener
 		
 		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
-			for(Player player : Bukkit.getOnlinePlayers())
-			{
-				//Enforce all players have their tags
-				getPlayerTag(player);
-			}
-			
 			for(Iterator<TaggedPlayer> tagItr = entityTagMap.values().iterator();tagItr.hasNext();)
 			{
 				TaggedPlayer taggedPlayer = tagItr.next();
-				
-				updateNearbyPlayers(taggedPlayer);
 				
 				if(!taggedPlayer.update())
 				{
@@ -78,30 +64,23 @@ public class TagController implements Listener
 			
 		}).runTimerASync(10, 10);
 	}
-	
-	private void updateNearbyPlayers(TaggedPlayer taggedPlayer)
+
+	@EventHandler
+	public void onPlayerTrackEvent(PlayerSpawnTrackerEvent event)
 	{
-		Entity entity = taggedPlayer.getEntity().getBukkitEntity();
-		Location entityLocation = entity.getLocation();
-		
-		for(Player playerLoop : Bukkit.getOnlinePlayers())
+		TaggedPlayer taggedPlayer = getPlayerTag(event.getPlayer());
+		if(taggedPlayer == null)
 		{
-			//Ignore host player
-			if(playerLoop == entity)
-			{
-				continue;
-			}
-			
-			//TODO: Configuration for Distance (20)
-			if(entityLocation.getWorld() == playerLoop.getWorld() && playerLoop.getLocation().distance(entityLocation) < 20)
-			{
-				taggedPlayer.addNearbyPlayer(playerLoop);
-			}
-			else
-			{
-				//TODO: loop through already nearby players and check their distance?
-				taggedPlayer.removeNearbyPlayer(playerLoop);
-			}
+			return;
+		}
+
+		if(event.isTracked())
+		{
+			taggedPlayer.addNearbyPlayer(event.getVisiblePlayer());
+		}
+		else
+		{
+			taggedPlayer.removeNearbyPlayer(event.getVisiblePlayer());
 		}
 	}
 	
@@ -148,7 +127,14 @@ public class TagController implements Listener
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
-		RunnableShorthand.forPlugin(plugin).with(() -> entityTagMap.get(event.getPlayer().getUniqueId()).setOnline(false)).runASync();
+		RunnableShorthand.forPlugin(plugin).with(() ->
+		{
+			TaggedPlayer taggedPlayer = entityTagMap.get(event.getPlayer().getUniqueId());
+			if(taggedPlayer != null)
+			{
+				taggedPlayer.setOnline(false);
+			}
+		}).runASync();
 	}
 	
 	@EventHandler
@@ -165,17 +151,6 @@ public class TagController implements Listener
 				}
 			}).runASync();
 		}
-	}
-	
-	@EventHandler
-	public void onPlayerTeleport(PlayerTeleportEvent event)
-	{
-		RunnableShorthand.forPlugin(plugin).with(() ->
-		{
-			TaggedPlayer taggedPlayer = getPlayerTag(event.getPlayer());
-			taggedPlayer.clearNearbyPlayers();
-			taggedPlayer.updateLastRelocation();
-		}).runASync();
 	}
 	
 }
