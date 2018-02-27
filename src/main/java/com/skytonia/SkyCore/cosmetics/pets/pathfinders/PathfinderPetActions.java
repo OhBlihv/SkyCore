@@ -15,8 +15,8 @@ import java.util.Random;
  */
 public class PathfinderPetActions extends PathfinderGoal
 {
-	
-	private enum PathfinderAction
+
+	public enum PathfinderAction
 	{
 		
 		NONE(false), //Used to select another action
@@ -34,7 +34,7 @@ public class PathfinderPetActions extends PathfinderGoal
 		
 	}
 	
-	protected static class ActivePathfinderAction
+	public static class ActivePathfinderAction
 	{
 		
 		private final PathfinderAction pathfinderAction;
@@ -61,27 +61,27 @@ public class PathfinderPetActions extends PathfinderGoal
 		
 	}
 	
-	private static final double MIN_RANGE = 2D,
+	static final double MIN_RANGE = 2D,
 								MAX_RANGE = 16;
 	
-	private final Random random = new Random();
+	final Random random = new Random();
 	
-	private final PetZombieSource entity;
-	private final EntityPlayer owningPlayer;
-	private final double speed;
+	final PetZombieSource entity;
+	final EntityPlayer owningPlayer;
+	final double speed;
 	
-	private int pathingDelay = 0;
-	private int jumpDelay = 0;
-	private int actionDelay = 0;
+	int pathingDelay = 0;
+	int jumpDelay = 0;
+	int actionDelay = 0;
 	
-	private static final int
+	static final int
 		DELAY_DEFAULT_PATHING = 3,
 		DELAY_DEFAULT_JUMP = 25,
 		DELAY_DEFAULT_ACTION = 50;
 	
-	private PathEntity path;
+	PathEntity path;
 	
-	private ActivePathfinderAction activePathfinder = null;
+	ActivePathfinderAction activePathfinder = null;
 	
 	public PathfinderPetActions(PetZombieSource var1, EntityPlayer owningPlayer, double speed)
 	{
@@ -258,7 +258,7 @@ public class PathfinderPetActions extends PathfinderGoal
 	 * Merged Pathfinder Methods
 	 */
 	
-	private static final int
+	static final int
 		TICK_LENGTH_LOOKATPLAYER = 15,
 		TICK_LENGTH_RANDOMLOOKAROUND = 5,
 		TICK_LENGTH_RANDOMWALKAROUND = 10;

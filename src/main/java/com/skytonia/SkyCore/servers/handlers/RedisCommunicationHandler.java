@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.servers.MovementAction;
+import com.skytonia.SkyCore.servers.events.PlayerChangeServerEvent;
 import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.processing.InboundCommunicationMessage;
@@ -16,6 +17,7 @@ import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -82,6 +84,9 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	@Override
 	public void transferPlayer(Player player, String serverName)
 	{
+		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
+		Bukkit.getPluginManager().callEvent(event);
+
 		//Alert the other server of an incoming player
 		try
 		{
