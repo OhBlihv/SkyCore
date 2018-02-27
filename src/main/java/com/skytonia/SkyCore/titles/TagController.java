@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerSpawnTrackerEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -89,6 +90,17 @@ public class TagController implements Listener
 	public void setPlayerTagStatus(Player player, boolean hidden)
 	{
 		getPlayerTag(player).setHideTags(hidden);
+	}
+
+	public void setPlayerVisibility(Player player, Player target, Boolean visibilityStatus)
+	{
+		TaggedPlayer taggedTarget = getPlayerTag(target);
+		ComparisonPlayer comparisonPlayer = taggedTarget.getNearbyPlayer(target.getUniqueId());
+		if(comparisonPlayer != null)
+		{
+			comparisonPlayer.setForcedVisibility(visibilityStatus);
+			taggedTarget.update(Collections.singletonList(comparisonPlayer));
+		}
 	}
 	
 	public TaggedPlayer getTagForEntity(Entity entity)

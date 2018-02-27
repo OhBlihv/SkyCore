@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
@@ -232,7 +233,12 @@ public class TaggedPlayer
 			}
 		}
 	}
-	
+
+	public ComparisonPlayer getNearbyPlayer(UUID uuid)
+	{
+		return nearbyPlayers.get(uuid);
+	}
+
 	public boolean addNearbyPlayer(Player player)
 	{
 		if(!nearbyPlayers.containsKey(player.getUniqueId()))
@@ -256,11 +262,16 @@ public class TaggedPlayer
 	public boolean update()
 	{
 		//Avoid updating if there are no players that require it
-		if(nearbyPlayers.isEmpty() || playerTags.isEmpty())
+		if (nearbyPlayers.isEmpty() || playerTags.isEmpty())
 		{
 			return true;
 		}
-		
+
+		return update(nearbyPlayers.values());
+	}
+
+	public boolean update(Collection<ComparisonPlayer> players)
+	{
 		//Spawn Packets
 		Deque<AbstractPacket> spawnPackets = new ArrayDeque<>();
 		
@@ -304,7 +315,7 @@ public class TaggedPlayer
 		boolean anyVisibleTags = !hideTags;
 		//Search for at least one player who can see this player's tags
 		//to ensure they are not being generated for no use.
-		for(ComparisonPlayer player : nearbyPlayers.values())
+		for(ComparisonPlayer player : players)
 		{
 			if(player.getForcedVisibility())
 			{
