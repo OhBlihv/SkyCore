@@ -249,7 +249,12 @@ public class TaggedPlayer
 		
 		return false;
 	}
-	
+
+	public Collection<ComparisonPlayer> getAllNearbyPlayers()
+	{
+		return nearbyPlayers.values();
+	}
+
 	public void removeNearbyPlayer(Player player)
 	{
 		ComparisonPlayer nearbyPlayer = nearbyPlayers.get(player.getUniqueId());
@@ -317,7 +322,7 @@ public class TaggedPlayer
 		//to ensure they are not being generated for no use.
 		for(ComparisonPlayer player : players)
 		{
-			if(player.getForcedVisibility())
+			if(player.getForcedVisibility() != null && player.getForcedVisibility())
 			{
 				anyVisibleTags = true;
 			}
