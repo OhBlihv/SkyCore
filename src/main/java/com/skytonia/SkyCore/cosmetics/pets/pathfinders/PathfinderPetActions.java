@@ -15,51 +15,6 @@ import java.util.Random;
  */
 public class PathfinderPetActions extends PathfinderGoal
 {
-
-	public enum PathfinderAction
-	{
-		
-		NONE(false), //Used to select another action
-		FOLLOW_PLAYER(false),
-		LOOK_AT_PLAYER(true),
-		RANDOM_LOOKAROUND(true),
-		RANDOM_WALKAROUND(true);
-		
-		final boolean isValid;
-		
-		PathfinderAction(boolean isValid)
-		{
-			this.isValid = isValid;
-		}
-		
-	}
-	
-	public static class ActivePathfinderAction
-	{
-		
-		private final PathfinderAction pathfinderAction;
-		
-		private int ticksLeft;
-		
-		public ActivePathfinderAction()
-		{
-			this.pathfinderAction = PathfinderAction.NONE;
-			this.ticksLeft = -1;
-		}
-		
-		public ActivePathfinderAction(PathfinderAction pathfinderAction, int actionLength)
-		{
-			this.pathfinderAction = pathfinderAction;
-			this.ticksLeft = actionLength;
-		}
-		
-		public boolean tick()
-		{
-			return pathfinderAction.isValid && --ticksLeft < 0;
-			
-		}
-		
-	}
 	
 	static final double MIN_RANGE = 2D,
 								MAX_RANGE = 16;
@@ -103,7 +58,7 @@ public class PathfinderPetActions extends PathfinderGoal
 			
 			c();
 			
-			if(path != null && activePathfinder.pathfinderAction != PathfinderAction.FOLLOW_PLAYER)
+			if(path != null && activePathfinder.getPathfinderAction() != PathfinderAction.FOLLOW_PLAYER)
 			{
 				//BUtil.logInfo("Started movement pathing. Actions cancelled. Ticks Left: (" + activePathfinder.ticksLeft + ")");
 				activePathfinder = new ActivePathfinderAction(PathfinderAction.FOLLOW_PLAYER, -1);
@@ -112,15 +67,15 @@ public class PathfinderPetActions extends PathfinderGoal
 			}
 		}
 		
-		if(path == null && (activePathfinder == null || activePathfinder.pathfinderAction == PathfinderAction.FOLLOW_PLAYER))
+		if(path == null && (activePathfinder == null || activePathfinder.getPathfinderAction() == PathfinderAction.FOLLOW_PLAYER))
 		{
 			activePathfinder = new ActivePathfinderAction();
 		}
 		
 		int rolledNumber = random.nextInt(100);
-		if(activePathfinder.pathfinderAction != PathfinderAction.FOLLOW_PLAYER && --actionDelay < 0)
+		if(activePathfinder.getPathfinderAction() != PathfinderAction.FOLLOW_PLAYER && --actionDelay < 0)
 		{
-			if(activePathfinder.pathfinderAction == PathfinderAction.NONE)
+			if(activePathfinder.getPathfinderAction() == PathfinderAction.NONE)
 			{
 				PathfinderAction selectedAction = null;
 				int actionLength = 200;
@@ -151,7 +106,7 @@ public class PathfinderPetActions extends PathfinderGoal
 				}
 			}
 			
-			switch(activePathfinder.pathfinderAction)
+			switch(activePathfinder.getPathfinderAction())
 			{
 				case LOOK_AT_PLAYER:
 				{
@@ -225,7 +180,7 @@ public class PathfinderPetActions extends PathfinderGoal
 		}
 		else
 		{
-			if(activePathfinder != null && activePathfinder.pathfinderAction == PathfinderAction.RANDOM_WALKAROUND)
+			if(activePathfinder != null && activePathfinder.getPathfinderAction() == PathfinderAction.RANDOM_WALKAROUND)
 			{
 				return distance >= (3 * MIN_RANGE);
 			}
