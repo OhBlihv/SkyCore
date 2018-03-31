@@ -15,28 +15,28 @@ import java.util.Random;
  */
 public class PathfinderPetActions extends PathfinderGoal
 {
-	
-	static final double MIN_RANGE = 2D,
-								MAX_RANGE = 16;
-	
-	final Random random = new Random();
-	
-	final PetZombieSource entity;
-	final EntityPlayer owningPlayer;
-	final double speed;
-	
-	int pathingDelay = 0;
-	int jumpDelay = 0;
-	int actionDelay = 0;
-	
-	static final int
+
+	protected static final double MIN_RANGE = 2D,
+								  MAX_RANGE = 16;
+
+	protected final Random random = new Random();
+
+	protected final PetZombieSource entity;
+	protected final EntityPlayer owningPlayer;
+	protected final double speed;
+
+	protected int pathingDelay = 0;
+	protected int jumpDelay = 0;
+	protected int actionDelay = 0;
+
+	protected static final int
 		DELAY_DEFAULT_PATHING = 3,
 		DELAY_DEFAULT_JUMP = 25,
 		DELAY_DEFAULT_ACTION = 50;
+
+	protected PathEntity path;
 	
-	PathEntity path;
-	
-	ActivePathfinderAction activePathfinder = null;
+	protected ActivePathfinderAction activePathfinder = null;
 	
 	public PathfinderPetActions(PetZombieSource var1, EntityPlayer owningPlayer, double speed)
 	{
@@ -58,7 +58,7 @@ public class PathfinderPetActions extends PathfinderGoal
 			
 			c();
 			
-			if(path != null && activePathfinder.getPathfinderAction() != PathfinderAction.FOLLOW_PLAYER)
+			if(path != null && activePathfinder != null && activePathfinder.getPathfinderAction() != PathfinderAction.FOLLOW_PLAYER)
 			{
 				//BUtil.logInfo("Started movement pathing. Actions cancelled. Ticks Left: (" + activePathfinder.ticksLeft + ")");
 				activePathfinder = new ActivePathfinderAction(PathfinderAction.FOLLOW_PLAYER, -1);

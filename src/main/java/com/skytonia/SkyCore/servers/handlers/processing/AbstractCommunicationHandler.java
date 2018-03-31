@@ -117,6 +117,23 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		
 		subscriptionMap = tempSubscriptionMap;
 	}
+
+	public void shutdown()
+	{
+		for(ChannelSubscriber subscriber : subscriptionMap.values())
+		{
+			try
+			{
+				subscriber.cancel();
+			}
+			catch(Throwable e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		subscriptionMap.clear();
+	}
 	
 	public void run()
 	{
@@ -394,6 +411,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			channel = channel.split("[>]")[1];
 		}
 
+		//BUtil.log("Received message: (" + channel + ") - <" + MessageUtil.mergeArguments(message.getMessageArgs()) + ">");
+
 		switch(channel)
 		{
 			case CHANNEL_MOVE_FORCE:
@@ -413,9 +432,19 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			{
 				String serverName = message.getMessageArgs()[0],
 					   playerName = message.getMessageArgs()[1],
-					   uuidString = message.getMessageArgs()[2];
+					   uuidString;
 
-				final UUID playerUUID = UUID.fromString(uuidString);
+				final UUID playerUUID;
+				if(message.getMessageArgs().length > 2)
+				{
+					uuidString = message.getMessageArgs()[2];
+
+					playerUUID = UUID.fromString(uuidString);
+				}
+				else
+				{
+					playerUUID = null;
+				}
 				
 				//No response is success.
 				String response = "";
@@ -424,7 +453,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				{
 					response = "FULL";
 				}
-				else if(Bukkit.hasWhitelist())
+				else if(Bukkit.hasWhitelist() && playerUUID != null)
 				{
 					OfflinePlayer offlinePlayer = null;
 					try
@@ -749,7 +778,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		boolean isDev;
 		{
 			String currentServer = getCurrentServer().toLowerCase();
-			isDev = currentServer.contains("dev") || currentServer.contains("beta");
+			isDev = currentServer.contains("dev-");
 		}
 		
 		List<String> unavailableHubs = new ArrayList<>();
@@ -760,8 +789,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				continue; //Can't send players to their current server
 			}
 
-			if((isDev && (!possibleHub.contains("dev") && !possibleHub.contains("beta"))) ||
-			  (!isDev && possibleHub.contains("dev") && possibleHub.contains("beta")))
+			if((isDev && !possibleHub.startsWith("dev")) ||
+			  (!isDev && possibleHub.startsWith("dev")))
 			{
 				unavailableHubs.add(possibleHub);
 			}

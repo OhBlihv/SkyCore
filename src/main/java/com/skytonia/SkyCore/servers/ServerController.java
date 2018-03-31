@@ -73,6 +73,8 @@ public class ServerController
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
+
 			if(hasLilypad)
 			{
 				communicationHandler = new LilypadCommunicationHandler();

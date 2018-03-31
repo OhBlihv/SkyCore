@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class RedisChannelSubscriber extends ChannelSubscriber
 {
+
+	private static int threadId = 0;
 	
 	@Getter
 	private final JedisPubSub subscription;
@@ -40,6 +42,13 @@ public class RedisChannelSubscriber extends ChannelSubscriber
 			{
 				try
 				{
+					if(!channels.contains(channel))
+					{
+						//BUtil.log("Ignoring channel '" + channel + "'");
+						return;
+					}
+					//BUtil.log("Listening to channel '" + channel + "'");
+
 					String[] messageSplit = MessageUtil.splitArguments(message);
 					
 					String[] messageArr = new String[messageSplit.length - 1];
@@ -65,11 +74,29 @@ public class RedisChannelSubscriber extends ChannelSubscriber
 		
 		if(subscriptionThread == null)
 		{
-			subscriptionThread = new Thread(() ->
+			subscriptionThread = new Thread(null, () ->
 			{
-				connection.subscribe(subscription, channels.toArray(new String[channels.size()]));
-				connection.close();
-			});
+				try
+				{
+					connection.subscribe(subscription, channels.toArray(new String[channels.size()]));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				finally
+				{
+					try
+					{
+						connection.close();
+					}
+					catch(Exception e)
+					{
+						//Already returned to pool/closed
+					}
+				}
+
+			}, "Redis-Subscription-Thread-" + (++threadId));
 		}
 		
 		this.subscriptionThread = subscriptionThread;

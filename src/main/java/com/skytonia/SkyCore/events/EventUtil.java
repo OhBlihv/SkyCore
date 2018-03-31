@@ -103,7 +103,7 @@ public class EventUtil
 				
 				if(eventWorld == null || !eventWorld.getName().equals(world.getName()))
 				{
-					BUtil.log((eventWorld == null ? "event world null" : "'' " + eventWorld.getName() + "' != '" + world.getName() + "'"));
+					//BUtil.log((eventWorld == null ? "event world null" : "'" + eventWorld.getName() + "' != '" + world.getName() + "'"));
 					//No message. Just don't listen.
 					return;
 				}

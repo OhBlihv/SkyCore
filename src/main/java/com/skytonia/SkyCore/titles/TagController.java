@@ -4,6 +4,7 @@ import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSpawnTrackerEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -81,7 +83,7 @@ public class TagController implements Listener
 		}
 		else
 		{
-			taggedPlayer.removeNearbyPlayer(event.getVisiblePlayer());
+			taggedPlayer.hideNearbyPlayer(event.getVisiblePlayer());
 		}
 	}
 	
@@ -133,7 +135,14 @@ public class TagController implements Listener
 	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
 	{
-		RunnableShorthand.forPlugin(plugin).with(() -> entityTagMap.get(event.getPlayer().getUniqueId()).setSneaking(/*!*/event.getPlayer().isSneaking())).runASync();
+		RunnableShorthand.forPlugin(plugin).with(() ->
+		{
+			TaggedPlayer taggedPlayer = entityTagMap.get(event.getPlayer().getUniqueId());
+			if(taggedPlayer != null)
+			{
+				taggedPlayer.setSneaking(/*!*/event.getPlayer().isSneaking());
+			}
+		}).runASync();
 	}
 	
 	@EventHandler
@@ -141,14 +150,38 @@ public class TagController implements Listener
 	{
 		RunnableShorthand.forPlugin(plugin).with(() ->
 		{
-			TaggedPlayer taggedPlayer = entityTagMap.get(event.getPlayer().getUniqueId());
-			if(taggedPlayer != null)
+			final UUID playerUUID = event.getPlayer().getUniqueId();
+			for(Map.Entry<UUID, TaggedPlayer> entry : entityTagMap.entrySet())
 			{
-				taggedPlayer.setOnline(false);
+				if(entry.getKey().equals(playerUUID))
+				{
+					entry.getValue().setOnline(false);
+				}
+				else
+				{
+					entry.getValue().removeNearbyPlayer(event.getPlayer());
+				}
 			}
 		}).runASync();
 	}
-	
+
+	@EventHandler
+	public void onPlayerWorldChange(PlayerChangedWorldEvent event)
+	{
+		RunnableShorthand.forPlugin(plugin).with(() ->
+		{
+			final World worldFrom = event.getFrom();
+			//Remove this player from all player tags in the world they've come from.
+			for(Map.Entry<UUID, TaggedPlayer> entry : entityTagMap.entrySet())
+			{
+				if(entry.getValue().getEntity().getBukkitEntity().getWorld() == worldFrom)
+				{
+					entry.getValue().removeNearbyPlayer(event.getPlayer());
+				}
+			}
+		}).runASync();
+	}
+
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event)
 	{

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,7 +48,8 @@ public class TaggedPlayer
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
 	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new ConcurrentHashMap<>();
-	
+	private final Map<UUID, ComparisonPlayer> unloadedPlayers = new ConcurrentHashMap<>();
+
 	@Getter
 	private final Entity entity;
 
@@ -124,7 +126,7 @@ public class TaggedPlayer
 				if(playerCosmetics != null)
 				{
 					WrappedBasicCosmetic cosmetic = playerCosmetics.getActiveCosmetic(CosmeticType.WEARABLE_HEAD);
-					if(cosmetic != null)
+					if(cosmetic != null && cosmetic.getCosmetic() instanceof WearableHeadCosmetic)
 					{
 						return ((WearableHeadCosmetic) cosmetic.getCosmetic()).getSpacerType().getHeight();
 					}
@@ -243,7 +245,18 @@ public class TaggedPlayer
 	{
 		if(!nearbyPlayers.containsKey(player.getUniqueId()))
 		{
-			nearbyPlayers.put(player.getUniqueId(), new ComparisonPlayer(player));
+			ComparisonPlayer nearbyPlayer = unloadedPlayers.remove(player.getUniqueId());
+			if(nearbyPlayer == null)
+			{
+				nearbyPlayer = new ComparisonPlayer(this, player);
+			}
+			else
+			{
+				//Re-set to 'ADD' as a fresh object would
+				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.ADD);
+			}
+
+			nearbyPlayers.put(player.getUniqueId(), nearbyPlayer);
 			return true;
 		}
 		
@@ -255,13 +268,18 @@ public class TaggedPlayer
 		return nearbyPlayers.values();
 	}
 
-	public void removeNearbyPlayer(Player player)
+	public void hideNearbyPlayer(Player player)
 	{
 		ComparisonPlayer nearbyPlayer = nearbyPlayers.get(player.getUniqueId());
 		if(nearbyPlayer != null)
 		{
 			nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
 		}
+	}
+
+	public void removeNearbyPlayer(Player player)
+	{
+		nearbyPlayers.remove(player.getUniqueId());
 	}
 	
 	public boolean update()
@@ -316,6 +334,7 @@ public class TaggedPlayer
 		playerStatusMap.put(DirtyPlayerType.REMOVE, new ArrayDeque<>());
 		playerStatusMap.put(DirtyPlayerType.UPDATE, new ArrayDeque<>());
 		playerStatusMap.put(DirtyPlayerType.CLEAN, new ArrayDeque<>());
+		playerStatusMap.put(DirtyPlayerType.NOT_VISIBLE, new ArrayDeque<>());
 
 		boolean anyVisibleTags = !hideTags;
 		//Search for at least one player who can see this player's tags
@@ -471,8 +490,19 @@ public class TaggedPlayer
 		{
 			mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
 		}
-		
-		playerTags.removeAll(tagsToRemove);
+
+		try
+		{
+			playerTags.removeAll(tagsToRemove);
+		}
+		catch(ArrayIndexOutOfBoundsException e)
+		{
+			e.printStackTrace();
+		}
+		catch(Exception e)
+		{
+			//Ignore
+		}
 		
 		WrapperPlayServerEntityDestroy destroyPacket = new WrapperPlayServerEntityDestroy();
 		{
@@ -530,14 +560,23 @@ public class TaggedPlayer
 				}
 				case REMOVE:
 				{
-					Deque<UUID> toRemovePlayers = new ArrayDeque<>();
+					Map<UUID, ComparisonPlayer> toRemovePlayers = new HashMap<>();
 					for(ComparisonPlayer player : entry.getValue())
 					{
 						player.sendPacket(destroyPacket);
-						toRemovePlayers.add(player.getPlayer().getUniqueId());
+						player.setDirtyPlayerType(DirtyPlayerType.NOT_VISIBLE);
+
+						toRemovePlayers.put(player.getPlayer().getUniqueId(), player);
 					}
 
-					nearbyPlayers.keySet().removeAll(toRemovePlayers);
+					/*
+					 * Avoid removing player's entirely, since they may have saved
+					 * visibility or other per-player information.
+					 *
+					 * Only unload when a player has left the server or world
+					 */
+					nearbyPlayers.keySet().removeAll(toRemovePlayers.keySet());
+					unloadedPlayers.putAll(toRemovePlayers);
 					break;
 				}
 				case UPDATE:
@@ -546,6 +585,16 @@ public class TaggedPlayer
 					{
 						player.sendPackets(updatePackets);
 						player.setDirtyPlayerType(DirtyPlayerType.CLEAN);
+					}
+
+					//Overflow, and allow all remaining players to receive mount packets
+					//break;
+				}
+				default:
+				{
+					for(ComparisonPlayer player : entry.getValue())
+					{
+						player.sendPackets(mountPackets);
 					}
 					break;
 				}

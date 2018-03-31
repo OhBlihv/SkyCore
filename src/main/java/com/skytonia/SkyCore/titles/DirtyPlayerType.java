@@ -6,9 +6,12 @@ package com.skytonia.SkyCore.titles;
 public enum DirtyPlayerType
 {
 	
-	ADD,        //Resends all titles
-	REMOVE,     //Removes all titles
-	UPDATE,     //Updates the content of the titles
-	CLEAN;      //No updates required
+	ADD,          //Resends all titles
+	REMOVE,       //Removes all titles
+	UPDATE,       //Updates the content of the titles
+	CLEAN,        //No updates required
+	NOT_VISIBLE,  //Tags despawned/Not in range for updates
+
+	;
 	
 }

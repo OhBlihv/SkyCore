@@ -14,6 +14,8 @@ import java.util.Deque;
 @RequiredArgsConstructor
 public class ComparisonPlayer
 {
+
+	private final TaggedPlayer parent;
 	
 	@Getter
 	private final Player player;
@@ -23,7 +25,6 @@ public class ComparisonPlayer
 	private DirtyPlayerType dirtyPlayerType = DirtyPlayerType.ADD;
 
 	@Getter
-	@Setter
 	/*
 	 * True = Visible
 	 * False = Invisible
@@ -50,6 +51,33 @@ public class ComparisonPlayer
 				packet.sendPacket(player);
 			}
 		}
+	}
+
+	public void setForcedVisibility(Boolean value)
+	{
+		if(parent.isHideTags())
+		{
+			//New value is 'visible', current value is 'none' or 'invisibile'
+			if((value != null && value) && (forcedVisibility == null || !forcedVisibility))
+			{
+				//Add tags - weren't previously visible
+				dirtyPlayerType = DirtyPlayerType.ADD;
+			}
+			else if(value == null || !value && forcedVisibility)
+			{
+				dirtyPlayerType = DirtyPlayerType.REMOVE;
+			}
+		}
+		else
+		{
+			//
+			if(value != null && !value && (forcedVisibility == null || forcedVisibility))
+			{
+				dirtyPlayerType = DirtyPlayerType.REMOVE;
+			}
+		}
+
+		forcedVisibility = value;
 	}
 	
 	@Override

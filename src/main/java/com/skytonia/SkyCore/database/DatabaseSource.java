@@ -1,6 +1,8 @@
 package com.skytonia.SkyCore.database;
 
+import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.RunnableShorthand;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.AccessLevel;
@@ -12,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Chris Brown (OhBlihv) on 25/09/2016.
@@ -46,7 +49,7 @@ public class DatabaseSource
 	                      String password) throws SQLException
 	{
 		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl("jdbc:mysql://" + server + ":" + port + "/" + database + "?autoReconnect=true&useSSL=false");
+		config.setJdbcUrl("jdbc:mysql://" + server + ":" + port + "/" + database + "?failOverReadOnly=false&maxReconnects=10&autoReconnect=true&useSSL=false");
 		config.setUsername(username);
 		config.setPassword(password);
 		
@@ -60,6 +63,19 @@ public class DatabaseSource
 		
 		//Attempt a test query
 		executeQuery("SELECT 1", null, null, null);
+
+		//Keep Alive
+		RunnableShorthand.forPlugin(SkyCore.getInstance()).with(() ->
+		{
+			try
+			{
+				executeQuery("SELECT 1", null, null, null);
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}).runTimerASync(15, TimeUnit.MINUTES, 15, TimeUnit.MINUTES);
 	}
 	
 	/**

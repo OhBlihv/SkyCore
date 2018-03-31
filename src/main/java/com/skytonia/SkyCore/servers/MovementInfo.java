@@ -51,7 +51,13 @@ public class MovementInfo
 	
 	public void failPlayer()
 	{
+		if(hasTimedOut())
+		{
+			responseMessage = "TIMEOUT";
+		}
+
 		cancelTimeout();
+
 		movementAction.onFail(player, targetServer, responseMessage);
 	}
 	
