@@ -26,7 +26,15 @@ public class NMSItemUtil_1_7_R4 implements NMSItemUtil
 		}
 		
 		net.minecraft.server.v1_7_R4.NBTTagCompound id = new net.minecraft.server.v1_7_R4.NBTTagCompound();
-		id.setString("id", EntityType.fromId(damage).getName());
+		{
+			EntityType entityType = EntityType.fromId(damage);
+			if(entityType == null)
+			{
+				throw new IllegalArgumentException("Entity does not exist with ID(" + damage + "). Ensure this entity exists within 1.7");
+			}
+
+			id.setString("id", entityType.getName());
+		}
 		tagCompound.set("EntityTag", id);
 		stack.setTag(tagCompound);
 		return org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack.asBukkitCopy(stack);

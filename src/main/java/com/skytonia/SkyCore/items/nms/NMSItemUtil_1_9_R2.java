@@ -23,7 +23,16 @@ public class NMSItemUtil_1_9_R2 implements NMSItemUtil
 		}
 		
 		NBTTagCompound id = new NBTTagCompound();
-		id.setString("id", EntityType.fromId(damage).getName());
+		{
+			EntityType entityType = EntityType.fromId(damage);
+			if(entityType == null)
+			{
+				throw new IllegalArgumentException("Entity does not exist with ID(" + damage + "). Ensure this entity exists within 1.9");
+			}
+
+			id.setString("id", entityType.getName());
+		}
+
 		tagCompound.set("EntityTag", id);
 		stack.setTag(tagCompound);
 		return CraftItemStack.asBukkitCopy(stack);
