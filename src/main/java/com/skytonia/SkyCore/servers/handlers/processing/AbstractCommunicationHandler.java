@@ -784,13 +784,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		List<String> unavailableHubs = new ArrayList<>();
 		for(String possibleHub : availableHubs)
 		{
-			if(possibleHub.equals(currentServer))
-			{
-				continue; //Can't send players to their current server
-			}
-
-			if((isDev && !possibleHub.startsWith("dev")) ||
-			  (!isDev && possibleHub.startsWith("dev")))
+			//Can't send players to their current server
+			//Or a dev server if they're on the prod network
+			if(possibleHub.equals(currentServer) ||
+				//
+				((isDev && !possibleHub.startsWith("dev")) ||
+			     (!isDev && possibleHub.startsWith("dev"))))
 			{
 				unavailableHubs.add(possibleHub);
 			}
