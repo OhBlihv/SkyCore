@@ -229,7 +229,8 @@ public class TaggedPlayer
 		for(ComparisonPlayer player : nearbyPlayers.values())
 		{
 			//All other types handle correctly even with dirty titles
-			if(player.getDirtyPlayerType() == DirtyPlayerType.CLEAN)
+			//NOTE: Force remove all dirty types.
+			//if(player.getDirtyPlayerType() == DirtyPlayerType.CLEAN)
 			{
 				player.setDirtyPlayerType(dirtyType);
 			}
