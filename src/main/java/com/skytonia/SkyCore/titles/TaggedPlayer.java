@@ -217,8 +217,44 @@ public class TaggedPlayer
 	{
 		return playerTags;
 	}
-	
-	/**
+
+	public void showToNonVisiblePlayers()
+	{
+		for(ComparisonPlayer comparisonPlayer : nearbyPlayers.values())
+		{
+			switch(comparisonPlayer.getDirtyPlayerType())
+			{
+				case NOT_VISIBLE_ACTIVE:
+				{
+					//Re-add if not visible
+					comparisonPlayer.setDirtyPlayerType(DirtyPlayerType.ADD);
+					break;
+				}
+				case NOT_VISIBLE_QUEUE:
+				{
+					//Set clean (no changes required) if player was ready to be marked NOT_VISIBLE_ACTIVE
+					comparisonPlayer.setDirtyPlayerType(DirtyPlayerType.CLEAN);
+				}
+			}
+		}
+	}
+
+	public void hideFromVisiblePlayers()
+	{
+		for(ComparisonPlayer comparisonPlayer : nearbyPlayers.values())
+		{
+			switch(comparisonPlayer.getDirtyPlayerType())
+			{
+				case NOT_VISIBLE_ACTIVE:
+				case NOT_VISIBLE_QUEUE:
+					break;
+				default:
+					comparisonPlayer.setDirtyPlayerType(DirtyPlayerType.NOT_VISIBLE_QUEUE);
+			}
+		}
+	}
+
+	/**--
 	 *
 	 * @param edit True If the lines were edited, False if the structure changed
 	 */
@@ -331,7 +367,6 @@ public class TaggedPlayer
 			playerStatusMap.put(DirtyPlayerType.ADD, new ArrayDeque<>());
 			playerStatusMap.put(DirtyPlayerType.UPDATE, new ArrayDeque<>());
 			playerStatusMap.put(DirtyPlayerType.CLEAN, new ArrayDeque<>());
-			playerStatusMap.put(DirtyPlayerType.NOT_VISIBLE, new ArrayDeque<>());
 		}
 		playerStatusMap.put(DirtyPlayerType.REMOVE, new ArrayDeque<>());
 
@@ -342,7 +377,7 @@ public class TaggedPlayer
 		for(ComparisonPlayer player : players)
 		{
 			DirtyPlayerType dirtyPlayerType = player.getDirtyPlayerType();
-			if(canRemove)
+			if(canRemove || dirtyPlayerType == DirtyPlayerType.NOT_VISIBLE_QUEUE)
 			{
 				//Enforce all as 'remove'
 				dirtyPlayerType = DirtyPlayerType.REMOVE;
@@ -596,9 +631,14 @@ public class TaggedPlayer
 					for(ComparisonPlayer player : entry.getValue())
 					{
 						player.sendPacket(destroyPacket);
-						//player.setDirtyPlayerType(DirtyPlayerType.NOT_VISIBLE);
 
 						toRemovePlayers.add(player.getPlayer().getUniqueId());
+
+						//Set the player as 'not visible'
+						if(player.getDirtyPlayerType() == DirtyPlayerType.NOT_VISIBLE_QUEUE)
+						{
+							player.setDirtyPlayerType(DirtyPlayerType.NOT_VISIBLE_ACTIVE);
+						}
 					}
 
 					nearbyPlayers.keySet().removeAll(toRemovePlayers);

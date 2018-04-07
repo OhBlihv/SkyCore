@@ -148,12 +148,12 @@ public class TagController implements Listener
 			{
 				if(entry.getKey() == playerUUID)
 				{
-					BUtil.log("Setting offline...");
+					//BUtil.log("Setting offline...");
 					entry.getValue().setOnline(false);
 				}
 				else
 				{
-					BUtil.log("Removing from other player's tag");
+					//BUtil.log("Removing from other player's tag");
 					entry.getValue().removeNearbyPlayer(player);
 				}
 			}

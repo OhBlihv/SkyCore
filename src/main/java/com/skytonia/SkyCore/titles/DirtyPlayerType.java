@@ -6,11 +6,12 @@ package com.skytonia.SkyCore.titles;
 public enum DirtyPlayerType
 {
 	
-	ADD,          //Resends all titles
-	REMOVE,       //Removes all titles
-	UPDATE,       //Updates the content of the titles
-	CLEAN,        //No updates required
-	NOT_VISIBLE,  //Tags despawned/Not in range for updates
+	ADD,                //Resends all titles
+	REMOVE,             //Removes all titles
+	UPDATE,             //Updates the content of the titles
+	CLEAN,              //No updates required
+	NOT_VISIBLE_QUEUE,  //Queued to remove all tags. Updated to NOT_VISIBLE_ACTIVE next update()
+	NOT_VISIBLE_ACTIVE, //Tags despawned/Not in range for updates
 
 	//TODO:
 	/*
@@ -21,5 +22,10 @@ public enum DirtyPlayerType
 	 */
 
 	;
+
+	public boolean isNotVisible()
+	{
+		return this == NOT_VISIBLE_QUEUE || this == NOT_VISIBLE_ACTIVE;
+	}
 	
 }
