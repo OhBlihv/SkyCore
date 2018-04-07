@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.util.Pool;
 
 import java.io.BufferedOutputStream;
@@ -76,6 +77,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		poolConfig.setTimeBetweenEvictionRunsMillis(60000); //60 seconds
 
 		jedisPool = new DebugJedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
+		//jedisPool = new JedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
 
 		currentServer = commFile.getString("communication.redis.server");
 		BUtil.log("Current Server: " + currentServer);
@@ -188,6 +190,17 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		try
 		{
 			jedisPool.close();
+		}
+		catch(JedisException e)
+		{
+			if(e.getCause() instanceof IllegalStateException)
+			{
+				//Ignore. Object already returned to pool.
+			}
+			else
+			{
+				e.printStackTrace();
+			}
 		}
 		catch(Exception e)
 		{
