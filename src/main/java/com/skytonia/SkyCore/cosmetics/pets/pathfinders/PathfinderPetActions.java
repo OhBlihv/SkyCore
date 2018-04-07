@@ -67,7 +67,7 @@ public class PathfinderPetActions extends PathfinderGoal
 			}
 		}
 		
-		if(path == null && (activePathfinder == null || activePathfinder.getPathfinderAction() == PathfinderAction.FOLLOW_PLAYER))
+		if(activePathfinder == null || (path == null && activePathfinder.getPathfinderAction() == PathfinderAction.FOLLOW_PLAYER))
 		{
 			activePathfinder = new ActivePathfinderAction();
 		}
