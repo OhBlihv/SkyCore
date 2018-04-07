@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
-			<version>2.7.8</version>
+			<version>3.0.0</version>
 		</dependency>
 		
 		<!-- Plugin Dependencies -->
@@ -136,6 +136,7 @@
 			<groupId>me.theminecoder.bug</groupId>
 			<artifactId>BukkitBugSnag</artifactId>
 			<version>LATEST</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>

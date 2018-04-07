@@ -2,6 +2,7 @@ package com.skytonia.SkyCore.titles;
 
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
+import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -18,7 +19,6 @@ import org.bukkit.event.player.PlayerSpawnTrackerEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -58,8 +58,9 @@ public class TagController implements Listener
 			for(Iterator<TaggedPlayer> tagItr = entityTagMap.values().iterator();tagItr.hasNext();)
 			{
 				TaggedPlayer taggedPlayer = tagItr.next();
-				
-				if(!taggedPlayer.update())
+
+				boolean remove = !taggedPlayer.update();
+				if(remove)
 				{
 					tagItr.remove();
 				}
@@ -83,26 +84,15 @@ public class TagController implements Listener
 		}
 		else
 		{
-			taggedPlayer.hideNearbyPlayer(event.getVisiblePlayer());
+			taggedPlayer.removeNearbyPlayer(event.getVisiblePlayer());
 		}
 	}
 	
 	//
-	
+
 	public void setPlayerTagStatus(Player player, boolean hidden)
 	{
 		getPlayerTag(player).setHideTags(hidden);
-	}
-
-	public void setPlayerVisibility(Player player, Player target, Boolean visibilityStatus)
-	{
-		TaggedPlayer taggedTarget = getPlayerTag(target);
-		ComparisonPlayer comparisonPlayer = taggedTarget.getNearbyPlayer(target.getUniqueId());
-		if(comparisonPlayer != null)
-		{
-			comparisonPlayer.setForcedVisibility(visibilityStatus);
-			taggedTarget.update(Collections.singletonList(comparisonPlayer));
-		}
 	}
 	
 	public TaggedPlayer getTagForEntity(Entity entity)
@@ -150,19 +140,24 @@ public class TagController implements Listener
 	{
 		RunnableShorthand.forPlugin(plugin).with(() ->
 		{
-			final UUID playerUUID = event.getPlayer().getUniqueId();
+			BUtil.log(event.getPlayer().getName() + " is leaving.");
+			final Player player = event.getPlayer();
+			final UUID playerUUID = player.getUniqueId();
+
 			for(Map.Entry<UUID, TaggedPlayer> entry : entityTagMap.entrySet())
 			{
-				if(entry.getKey().equals(playerUUID))
+				if(entry.getKey() == playerUUID)
 				{
+					BUtil.log("Setting offline...");
 					entry.getValue().setOnline(false);
 				}
 				else
 				{
-					entry.getValue().removeNearbyPlayer(event.getPlayer());
+					BUtil.log("Removing from other player's tag");
+					entry.getValue().removeNearbyPlayer(player);
 				}
 			}
-		}).runASync();
+		}).ensureASync();
 	}
 
 	@EventHandler

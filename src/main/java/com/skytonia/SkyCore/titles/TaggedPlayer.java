@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,7 +47,6 @@ public class TaggedPlayer
 	private final List<TagLine> playerTags = new ArrayList<>();
 	
 	private final Map<UUID, ComparisonPlayer> nearbyPlayers = new ConcurrentHashMap<>();
-	private final Map<UUID, ComparisonPlayer> unloadedPlayers = new ConcurrentHashMap<>();
 
 	@Getter
 	private final Entity entity;
@@ -79,8 +77,6 @@ public class TaggedPlayer
 	
 	@Getter
 	private boolean online = true;
-	
-	private long lastRelocation = -1;
 	
 	public TaggedPlayer(Entity player)
 	{
@@ -169,7 +165,9 @@ public class TaggedPlayer
 		if(!online)
 		{
 			setAllNearbyDirty(DirtyPlayerType.REMOVE);
-			update(); //Force an update to avoid the tags hovering for ~0.5 seconds
+
+			//TODO: Check if this is needed - should wait til next update() interval
+			//update(); //Force an update to avoid the tags hovering for ~0.5 seconds
 		}
 	}
 	
@@ -246,18 +244,7 @@ public class TaggedPlayer
 	{
 		if(!nearbyPlayers.containsKey(player.getUniqueId()))
 		{
-			ComparisonPlayer nearbyPlayer = unloadedPlayers.remove(player.getUniqueId());
-			if(nearbyPlayer == null)
-			{
-				nearbyPlayer = new ComparisonPlayer(this, player);
-			}
-			else
-			{
-				//Re-set to 'ADD' as a fresh object would
-				nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.ADD);
-			}
-
-			nearbyPlayers.put(player.getUniqueId(), nearbyPlayer);
+			nearbyPlayers.put(player.getUniqueId(), new ComparisonPlayer(player));
 			return true;
 		}
 		
@@ -269,24 +256,22 @@ public class TaggedPlayer
 		return nearbyPlayers.values();
 	}
 
-	public void hideNearbyPlayer(Player player)
-	{
-		ComparisonPlayer nearbyPlayer = nearbyPlayers.get(player.getUniqueId());
-		if(nearbyPlayer != null)
-		{
-			nearbyPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
-		}
-	}
-
 	public void removeNearbyPlayer(Player player)
 	{
-		nearbyPlayers.remove(player.getUniqueId());
+		//nearbyPlayers.remove(player.getUniqueId());
+		ComparisonPlayer comparisonPlayer = getNearbyPlayer(player.getUniqueId());
+		if(comparisonPlayer != null)
+		{
+			//Set remove for next update tick to ensure removal packets go through
+			comparisonPlayer.setDirtyPlayerType(DirtyPlayerType.REMOVE);
+		}
 	}
 	
 	public boolean update()
 	{
 		//Avoid updating if there are no players that require it
-		if (nearbyPlayers.isEmpty() || playerTags.isEmpty())
+		//But force an update if the player is offline
+		if (online && (nearbyPlayers.isEmpty() || playerTags.isEmpty()))
 		{
 			return true;
 		}
@@ -294,8 +279,18 @@ public class TaggedPlayer
 		return update(nearbyPlayers.values());
 	}
 
+	private int tick = 0;
+
 	public boolean update(Collection<ComparisonPlayer> players)
 	{
+		boolean canRemove = false;
+		if(!isOnline())
+		{
+			//BUtil.log("Is offline - forcing all to remove");
+			setAllNearbyDirty(DirtyPlayerType.REMOVE);
+			canRemove = true;
+		}
+
 		//Spawn Packets
 		Deque<AbstractPacket> spawnPackets = new ArrayDeque<>();
 		
@@ -331,29 +326,69 @@ public class TaggedPlayer
 		visibleTags.addAll(playerTags);
 
 		Map<DirtyPlayerType, Deque<ComparisonPlayer>> playerStatusMap = new EnumMap<>(DirtyPlayerType.class);
-		playerStatusMap.put(DirtyPlayerType.ADD, new ArrayDeque<>());
+		if(!canRemove) //Only create any non-removal queues if the player is still online
+		{
+			playerStatusMap.put(DirtyPlayerType.ADD, new ArrayDeque<>());
+			playerStatusMap.put(DirtyPlayerType.UPDATE, new ArrayDeque<>());
+			playerStatusMap.put(DirtyPlayerType.CLEAN, new ArrayDeque<>());
+			playerStatusMap.put(DirtyPlayerType.NOT_VISIBLE, new ArrayDeque<>());
+		}
 		playerStatusMap.put(DirtyPlayerType.REMOVE, new ArrayDeque<>());
-		playerStatusMap.put(DirtyPlayerType.UPDATE, new ArrayDeque<>());
-		playerStatusMap.put(DirtyPlayerType.CLEAN, new ArrayDeque<>());
-		playerStatusMap.put(DirtyPlayerType.NOT_VISIBLE, new ArrayDeque<>());
+
 
 		boolean anyVisibleTags = !hideTags;
 		//Search for at least one player who can see this player's tags
 		//to ensure they are not being generated for no use.
 		for(ComparisonPlayer player : players)
 		{
-			if(player.getForcedVisibility() != null && player.getForcedVisibility())
+			DirtyPlayerType dirtyPlayerType = player.getDirtyPlayerType();
+			if(canRemove)
 			{
-				anyVisibleTags = true;
+				//Enforce all as 'remove'
+				dirtyPlayerType = DirtyPlayerType.REMOVE;
+			}
+			playerStatusMap.get(dirtyPlayerType).add(player);
+		}
+
+		//Ensure we aren't ticking for no player updates
+		boolean isEmpty = false;
+		{
+			int emptySets = 0;
+			for(Map.Entry<DirtyPlayerType, Deque<ComparisonPlayer>> entry : playerStatusMap.entrySet())
+			{
+				if(entry.getKey() != DirtyPlayerType.CLEAN && entry.getValue().isEmpty())
+				{
+					emptySets++;
+				}
+				else if(entry.getKey() == DirtyPlayerType.CLEAN)
+				{
+					emptySets++;
+				}
 			}
 
-			playerStatusMap.get(player.getDirtyPlayerType()).add(player);
+			//if(emptySets == (playerStatusMap.size() - 1))
+			if(emptySets == (playerStatusMap.size()))
+			{
+				//BUtil.log("No updates this tick for (" + entity.getName() + ")");
+
+				if(++tick % 2 == 0)
+				{
+					//BUtil.log("Returning " + !canRemove + " (Can Remove: " + canRemove + " | Offline: " + !isOnline() + ")");
+					return !canRemove;
+				}
+
+				isEmpty = true;
+			}
+			/*else
+			{
+				BUtil.log("Providing updates to players. " + (playerStatusMap.size() - emptySets) + " non-empty sets.");
+			}*/
 		}
 		
 		List<Integer> lastPassengers = new ArrayList<>();
 		for(TagLine tagLine : visibleTags)
 		{
-			if(tagLine.getDirtyPlayerType() == DirtyPlayerType.REMOVE)
+			if(tagLine.getDirtyPlayerType() == DirtyPlayerType.REMOVE || !isOnline())
 			{
 				WrapperPlayServerEntityDestroy destroyPacket = new WrapperPlayServerEntityDestroy();
 				
@@ -369,116 +404,122 @@ public class TaggedPlayer
 			{
 				if(anyVisibleTags)
 				{
-					if(tagLine.getLineEntity().isAlive())
+					if(!isEmpty)
 					{
-						WrapperPlayServerSpawnEntityLiving spawnPacket = new WrapperPlayServerSpawnEntityLiving();
-						
-						spawnPacket.setEntityID(tagLine.getTagId());
-						
-						spawnPacket.setType(tagLine.getLineEntity());
-						
-						spawnPacket.setX(entity.locX);
-						
-						//AreaEffectClouds are only used on the first line. This spawns them on the right height
-						double yHeight = entity.locY;
-						switch(lineHeight)
+						if(tagLine.getLineEntity().isAlive())
 						{
-							//Spacer or initial
-							case 3:
+							WrapperPlayServerSpawnEntityLiving spawnPacket = new WrapperPlayServerSpawnEntityLiving();
+
+							spawnPacket.setEntityID(tagLine.getTagId());
+
+							spawnPacket.setType(tagLine.getLineEntity());
+
+							spawnPacket.setX(entity.locX);
+
+							//AreaEffectClouds are only used on the first line. This spawns them on the right height
+							double yHeight = entity.locY;
+							switch(lineHeight)
 							{
-								if(hasSpacer)
+								//Spacer or initial
+								case 3:
 								{
-									yHeight += ((++lineHeight * amx) + amv);
+									if(hasSpacer)
+									{
+										yHeight += ((++lineHeight * amx) + amv);
+										break;
+									}
+								}
+								case 4:
+								case 5:
+								{
+									yHeight += ((++lineHeight * amx));
 									break;
 								}
 							}
-							case 4:
-							case 5:
+
+							spawnPacket.setY(yHeight);
+							spawnPacket.setZ(entity.locZ);
+
+							WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
+
+							metadataPacket.setEntityID(tagLine.getTagId());
+
+							WrappedDataWatcher metadata = tagLine.getMetadata();
+
+							if(sneaking)
 							{
-								yHeight += ((++lineHeight * amx));
-								break;
+								metadata.setObject(0, (byte) SNEAKING_FLAG);
 							}
-						}
-						
-						spawnPacket.setY(yHeight);
-						spawnPacket.setZ(entity.locZ);
-						
-						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
-						
-						metadataPacket.setEntityID(tagLine.getTagId());
-						
-						WrappedDataWatcher metadata = tagLine.getMetadata();
-						
-						if(sneaking)
-						{
-							metadata.setObject(0, (byte) SNEAKING_FLAG);
-						}
-						else
-						{
-							metadata.setObject(0, (byte) 0);
-						}
-						
-						//Set Baby Rabbit
-						metadata.setObject(11, contentLineNum == 0);
-						
-						metadataPacket.setMetadata(metadata.getWatchableObjects());
-						spawnPacket.setMetadata(metadata);
-						
-						spawnPackets.add(spawnPacket);
-						
-						updatePackets.add(metadataPacket);
-						
-						contentLineNum++;
-					}
-					else
-					{
-						WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
-						
-						spawnPacket.setEntityID(tagLine.getTagId());
-						
-						int entityTypeId = tagLine.getLineEntity().getTypeId();
-						switch(tagLine.getLineEntity())
-						{
-							case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
-							case SNOWBALL: entityTypeId = 61; break;
-						}
-						
-						spawnPacket.setType(entityTypeId);
-						
-						spawnPacket.setX(entity.locX);
-						spawnPacket.setY(entity.locY + ((++lineHeight * amx) + amv));
-						spawnPacket.setZ(entity.locZ);
-						
-						spawnPackets.add(spawnPacket);
-						
-						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
-						
-						metadataPacket.setEntityID(tagLine.getTagId());
-						
-						WrappedDataWatcher metadata = tagLine.getMetadata();
-						
-						if(sneaking)
-						{
-							metadata.setObject(0, (byte) SNEAKING_FLAG);
+							else
+							{
+								metadata.setObject(0, (byte) 0);
+							}
+
+							//Set Baby Rabbit
+							metadata.setObject(11, contentLineNum == 0);
+
+							metadataPacket.setMetadata(metadata.getWatchableObjects());
+							spawnPacket.setMetadata(metadata);
+
+							spawnPackets.add(spawnPacket);
+
+							updatePackets.add(metadataPacket);
+
+							contentLineNum++;
 						}
 						else
 						{
-							metadata.setObject(0, (byte) 0);
+							WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity();
+
+							spawnPacket.setEntityID(tagLine.getTagId());
+
+							int entityTypeId = tagLine.getLineEntity().getTypeId();
+							switch(tagLine.getLineEntity())
+							{
+								case AREA_EFFECT_CLOUD: entityTypeId = 3; break;
+								case SNOWBALL: entityTypeId = 61; break;
+							}
+
+							spawnPacket.setType(entityTypeId);
+
+							spawnPacket.setX(entity.locX);
+							spawnPacket.setY(entity.locY + ((++lineHeight * amx) + amv));
+							spawnPacket.setZ(entity.locZ);
+
+							spawnPackets.add(spawnPacket);
+
+							WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
+
+							metadataPacket.setEntityID(tagLine.getTagId());
+
+							WrappedDataWatcher metadata = tagLine.getMetadata();
+
+							if(sneaking)
+							{
+								metadata.setObject(0, (byte) SNEAKING_FLAG);
+							}
+							else
+							{
+								metadata.setObject(0, (byte) 0);
+							}
+
+							metadataPacket.setMetadata(metadata.getWatchableObjects());
+
+							updatePackets.add(metadataPacket);
 						}
-						
-						metadataPacket.setMetadata(metadata.getWatchableObjects());
-						
-						updatePackets.add(metadataPacket);
 					}
-					
+
+					//Build mounted/passenger entity stack regardless of empty status
+
 					lastPassengers.add(tagLine.getTagId());
-					
+
 					if(!tagLine.getLineEntity().isAlive())
 					{
-						lastPassengers.add(tagLine.getTagId());
-						
+						//TODO: Check if this is required - Already above.
+						//lastPassengers.add(tagLine.getTagId());
+
 						mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
-						
+
 						lastVehicleId = tagLine.getTagId();
 					}
 				}
@@ -519,6 +560,8 @@ public class TaggedPlayer
 
 		for(Map.Entry<DirtyPlayerType, Deque<ComparisonPlayer>> entry : playerStatusMap.entrySet())
 		{
+			//BUtil.log("STATUS (" + entry.getKey() + ") for (" + entity.getName() + ") as (" + entry.getValue() + ")");
+
 			switch(entry.getKey())
 			{
 				case ADD:
@@ -528,19 +571,7 @@ public class TaggedPlayer
 						//Tags hidden by default
 						if(hideTags)
 						{
-							//Player overridden visibility
-							if(player.getForcedVisibility() == null || !player.getForcedVisibility())
-							{
-								continue;
-							}
-						}
-						else
-						{
-							//Player overridden invisibility
-							if(player.getForcedVisibility() != null && !player.getForcedVisibility())
-							{
-								continue;
-							}
+							continue;
 						}
 
 						//Destroy any old titles before spawning in new ones
@@ -561,23 +592,16 @@ public class TaggedPlayer
 				}
 				case REMOVE:
 				{
-					Map<UUID, ComparisonPlayer> toRemovePlayers = new HashMap<>();
+					Deque<UUID> toRemovePlayers = new ArrayDeque<>();
 					for(ComparisonPlayer player : entry.getValue())
 					{
 						player.sendPacket(destroyPacket);
-						player.setDirtyPlayerType(DirtyPlayerType.NOT_VISIBLE);
+						//player.setDirtyPlayerType(DirtyPlayerType.NOT_VISIBLE);
 
-						toRemovePlayers.put(player.getPlayer().getUniqueId(), player);
+						toRemovePlayers.add(player.getPlayer().getUniqueId());
 					}
 
-					/*
-					 * Avoid removing player's entirely, since they may have saved
-					 * visibility or other per-player information.
-					 *
-					 * Only unload when a player has left the server or world
-					 */
-					nearbyPlayers.keySet().removeAll(toRemovePlayers.keySet());
-					unloadedPlayers.putAll(toRemovePlayers);
+					nearbyPlayers.keySet().removeAll(toRemovePlayers);
 					break;
 				}
 				case UPDATE:
@@ -601,8 +625,9 @@ public class TaggedPlayer
 				}
 			}
 		}
-		
-		return isOnline();
+
+		//BUtil.log("2 Returning " + !canRemove + " (Can Remove: " + canRemove + " | Offline: " + !isOnline() + ")");
+		return !canRemove;
 	}
 	
 	public AbstractPacket getMountPacket(int lastVehicleId, List<Integer> passengerIds)

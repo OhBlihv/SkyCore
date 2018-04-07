@@ -12,6 +12,14 @@ public enum DirtyPlayerType
 	CLEAN,        //No updates required
 	NOT_VISIBLE,  //Tags despawned/Not in range for updates
 
+	//TODO:
+	/*
+	 * Per-line dirty types are required in future
+	 * If a line has it's content updated, and another line is added;
+	 * the content update will be ignored, and the new line will be added -
+	 * creating a mismatch between client and server - and more issues.
+	 */
+
 	;
 	
 }

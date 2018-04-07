@@ -15,22 +15,12 @@ import java.util.Deque;
 public class ComparisonPlayer
 {
 
-	private final TaggedPlayer parent;
-	
 	@Getter
 	private final Player player;
 	
 	@Getter
 	@Setter
 	private DirtyPlayerType dirtyPlayerType = DirtyPlayerType.ADD;
-
-	@Getter
-	/*
-	 * True = Visible
-	 * False = Invisible
-	 * null = No Change
-	 */
-	private Boolean forcedVisibility = null;
 
 	public boolean isOnline()
 	{
@@ -52,33 +42,6 @@ public class ComparisonPlayer
 			}
 		}
 	}
-
-	public void setForcedVisibility(Boolean value)
-	{
-		if(parent.isHideTags())
-		{
-			//New value is 'visible', current value is 'none' or 'invisibile'
-			if((value != null && value) && (forcedVisibility == null || !forcedVisibility))
-			{
-				//Add tags - weren't previously visible
-				dirtyPlayerType = DirtyPlayerType.ADD;
-			}
-			else if(value == null || !value && forcedVisibility)
-			{
-				dirtyPlayerType = DirtyPlayerType.REMOVE;
-			}
-		}
-		else
-		{
-			//
-			if(value != null && !value && (forcedVisibility == null || forcedVisibility))
-			{
-				dirtyPlayerType = DirtyPlayerType.REMOVE;
-			}
-		}
-
-		forcedVisibility = value;
-	}
 	
 	@Override
 	public int hashCode()
@@ -92,4 +55,9 @@ public class ComparisonPlayer
 		return obj instanceof Player && player.getUniqueId().equals(((Player) obj).getUniqueId());
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Comp::" + player.getName();
+	}
 }
