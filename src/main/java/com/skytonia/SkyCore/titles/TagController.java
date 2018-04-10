@@ -2,7 +2,6 @@ package com.skytonia.SkyCore.titles;
 
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
-import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.RunnableShorthand;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -140,7 +139,7 @@ public class TagController implements Listener
 	{
 		RunnableShorthand.forPlugin(plugin).with(() ->
 		{
-			BUtil.log(event.getPlayer().getName() + " is leaving.");
+			//BUtil.log(event.getPlayer().getName() + " is leaving.");
 			final Player player = event.getPlayer();
 			final UUID playerUUID = player.getUniqueId();
 

@@ -32,14 +32,16 @@ public class MiniPet extends BaseCosmetic
 	@Setter
 	@Getter
 	private ActiveCosmetic attachedCosmetic;
-	
+
+	@Getter
 	private final Player attachedPlayer;
 	
 	private final PlayerPetConfiguration petConfiguration;
-	
+
+	@Getter
 	private PetZombieSource petEntity;
 	
-	private final TaggedPlayer petTags;
+	private TaggedPlayer petTags = null;
 	
 	public MiniPet(Player attachedPlayer, PlayerPetConfiguration petConfiguration)
 	{
@@ -47,11 +49,14 @@ public class MiniPet extends BaseCosmetic
 		
 		this.attachedPlayer = attachedPlayer;
 		this.petConfiguration = petConfiguration;
-		
+	}
+
+	public void spawn()
+	{
 		World world = ((CraftWorld) attachedPlayer.getWorld()).getHandle();
-		
+
 		petEntity = new PetZombieSource(world, attachedPlayer, petConfiguration);
-		
+
 		Location spawnLocation = attachedPlayer.getLocation().add(0.25, 0, 0.25);
 		{
 			Location offsetSpawnLocation = spawnLocation.clone().add(1, 0, 1);
@@ -65,16 +70,16 @@ public class MiniPet extends BaseCosmetic
 				}
 			}
 		}
-		
+
 		petEntity.setLocation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
-		
+
 		world.addEntity(petEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
-		
+
 		petEntity.initialize();
-		
+
 		petTags = TagController.getInstance().getTagForEntity(petEntity.getBukkitEntity());
 		petTags.setLine(0, ""); //'Spacer'
-		
+
 		setPetName(petConfiguration.getPetName());
 	}
 	
@@ -112,8 +117,16 @@ public class MiniPet extends BaseCosmetic
 	@Override
 	public void removeCosmetic()
 	{
-		petTags.setOnline(false);
-		petEntity.die();
+		//In-case the pet didn't spawn correctly
+		if(petTags != null)
+		{
+			petTags.setOnline(false);
+		}
+
+		if(petEntity != null)
+		{
+			petEntity.die();
+		}
 	}
 	
 	@Override
