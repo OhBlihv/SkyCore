@@ -16,8 +16,7 @@ public class PacketUtil
 	
 	public static void sendTitle(Player player, String title, String subTitle, int persistTime, int fadeIn, int fadeOut)
 	{
-		//StaticNMS.getPacketLibrary().sendTitle(player, title, subTitle, persistTime, fadeIn, fadeOut);
-		player.sendTitle(title, subTitle, fadeIn, persistTime, fadeOut);
+		StaticNMS.getPacketLibrary().sendTitle(player, title, subTitle, persistTime, fadeIn, fadeOut);
 	}
 	
 }

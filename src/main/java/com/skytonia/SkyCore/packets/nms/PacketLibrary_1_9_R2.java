@@ -39,19 +39,26 @@ public class PacketLibrary_1_9_R2 extends PacketLibrary
 	public void sendTitle(Player player, String title, String subTitle, int persistTime, int fadeIn, int fadeOut)
 	{
 		PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-		
+
+		//Reset player titles first
+		sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.RESET, null, -1, -1, -1);
+
 		//Title is required to send subtitle. Send both when possible.
 		if(title == null)
 		{
 			title = "";
 		}
-		
-		if(subTitle == null)
+
+		if(persistTime != -1 && fadeIn != -1 && fadeOut != -1)
 		{
-			subTitle = "";
+			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TIMES, null, persistTime, fadeIn, fadeOut);
 		}
 		
-		sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle, persistTime, fadeIn, fadeOut);
+		if(subTitle != null)
+		{
+			sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subTitle, persistTime, fadeIn, fadeOut);
+		}
+
 		sendTitlePacket(playerConnection, PacketPlayOutTitle.EnumTitleAction.TITLE, title, persistTime, fadeIn, fadeOut);
 	}
 	
