@@ -354,10 +354,10 @@ public class ItemContainerConstructor
 		}
 		
 		String  displayName     =  BUtil.translateColours(FlatFile.getString(configurationMap, "displayname", null)),
-			owner           =  FlatFile.getString(configurationMap, "owner",   null),
-			skullTexture    =  FlatFile.getString(configurationMap, "texture", null);
+				owner           =  FlatFile.getString(configurationMap, "owner",   null),
+				skullTexture    =  FlatFile.getString(configurationMap, "texture", null);
 		int     damage = FlatFile.getInt(configurationMap, "damage", 0),
-			amount = FlatFile.getInt(configurationMap, "amount", 1);
+				amount = FlatFile.getInt(configurationMap, "amount", 1);
 		List<String> lore = FlatFile.getStringList(configurationMap, "lore");
 		
 		Map<Enchantment, Integer> enchantmentMap = null;

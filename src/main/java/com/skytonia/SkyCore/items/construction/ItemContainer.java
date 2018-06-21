@@ -434,7 +434,7 @@ public class ItemContainer
 		
 		if(displayName != null)
 		{
-			configurationSection.set("displayname", null);
+			configurationSection.set("displayname", displayName);
 		}
 		
 		if(lore != null)
