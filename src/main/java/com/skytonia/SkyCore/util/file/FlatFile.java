@@ -67,6 +67,11 @@ public class FlatFile
 	{
 		return new FlatFile(fileName, null);
 	}
+
+	public static FlatFile forFileName(String fileName, boolean suppressWarnings)
+	{
+		return new FlatFile(fileName, null, suppressWarnings);
+	}
 	
 	public static FlatFile getInstance()
 	{
@@ -96,6 +101,15 @@ public class FlatFile
 
 	protected FlatFile(String fileName, String owningPlugin)
 	{
+		this(fileName, owningPlugin, false);
+	}
+
+	private boolean suppressWarnings = false;
+
+	protected FlatFile(String fileName, String owningPlugin, boolean suppressWarnings)
+	{
+		this.suppressWarnings = suppressWarnings;
+
 		if(fileName == null)
 		{
 			this.fileName = "config.yml";
@@ -132,6 +146,8 @@ public class FlatFile
 		BUtil.logMessageAsPlugin("SkyCore", "Registered new " + getClass().getSimpleName() + " to: " + plugin + " (" + this.fileName + ")");
 		saveDefaultConfig();
 		getSave();
+
+		suppressWarnings = false;
 	}
 
 	public FileConfiguration getSave() 
@@ -180,8 +196,11 @@ public class FlatFile
 			    }
 			    catch(Exception e2)
 			    {
-			        BUtil.logError("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
-			        e.printStackTrace();
+			    	if(!suppressWarnings)
+				    {
+					    BUtil.logError("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
+					    e.printStackTrace();
+				    }
 			    }
 		    }
 		}
