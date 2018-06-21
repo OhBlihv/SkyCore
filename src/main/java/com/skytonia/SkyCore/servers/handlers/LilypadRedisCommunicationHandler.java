@@ -22,7 +22,6 @@ public class LilypadRedisCommunicationHandler extends RedisCommunicationHandler
 		super();
 		
 		lilypad = Bukkit.getServer().getServicesManager().getRegistration(Connect.class).getProvider();
-		//lilypad.registerEvents(this);
 		
 		currentServer = lilypad.getSettings().getUsername();
 	}

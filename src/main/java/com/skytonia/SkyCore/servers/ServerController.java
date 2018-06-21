@@ -82,15 +82,26 @@ public class ServerController
 			}
 			else
 			{
-				//TODO: Bungeecord Support
 				BUtil.log("Lilypad-Connect not found - Redis Handler failed with the following stack trace:");
 				e.printStackTrace();
-				
-				//throw new IllegalArgumentException("Redis/Lilypad not found. Cannot initiate cross-server communication.");
+
 				communicationHandler = new NullCommunicationHandler();
 				BUtil.log("Using NULL Handler.");
 				return; //Cannot be run as a thread
 			}
+		}
+
+		try
+		{
+			communicationHandler.registerChannels();
+		}
+		catch(Exception e)
+		{
+			BUtil.log(communicationHandler.getClass().getSimpleName() + " failed to register channels with the following stack trace:");
+			e.printStackTrace();
+
+			communicationHandler = new NullCommunicationHandler();
+			BUtil.log("Using NULL Handler.");
 		}
 		
 		((Thread) communicationHandler).start();

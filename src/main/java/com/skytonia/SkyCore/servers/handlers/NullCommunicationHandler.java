@@ -20,7 +20,13 @@ import java.util.Map;
  */
 public class NullCommunicationHandler implements CommunicationHandler
 {
-	
+
+	@Override
+	public void registerChannels()
+	{
+
+	}
+
 	@Override
 	public void requestPlayerTransfer(Player player, String serverName)
 	{

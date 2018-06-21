@@ -18,6 +18,12 @@ import java.util.Map;
  */
 public interface CommunicationHandler
 {
+
+	/*
+	 * Setup
+	 */
+
+	void registerChannels();
 	
 	/*
 	 * Player Movement

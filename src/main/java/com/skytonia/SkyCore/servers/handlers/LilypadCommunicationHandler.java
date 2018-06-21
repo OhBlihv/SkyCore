@@ -38,11 +38,16 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		super();
 		
 		lilypad = Bukkit.getServer().getServicesManager().getRegistration(Connect.class).getProvider();
-		lilypad.registerEvents(this);
 		
 		currentServer = lilypad.getSettings().getUsername();
 	}
-	
+
+	@Override
+	public void registerChannels()
+	{
+		lilypad.registerEvents(this);
+	}
+
 	@Override
 	public int getPlayerCount(String serverName)
 	{

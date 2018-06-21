@@ -290,9 +290,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				}
 				
 				executionStart = System.currentTimeMillis();
-				
-				Deque<CommunicationMessage> currentMessages = new ArrayDeque<>();
-				currentMessages.addAll(pendingMessages);
+
+				Deque<CommunicationMessage> currentMessages = new ArrayDeque<>(pendingMessages);
 				pendingMessages.clear();
 				
 				int sentMessages = currentMessages.size();
@@ -411,7 +410,10 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			channel = channel.split("[>]")[1];
 		}
 
-		//BUtil.log("Received message: (" + channel + ") - <" + MessageUtil.mergeArguments(message.getMessageArgs()) + ">");
+		if(!channel.equals("SC_InfoRep"))
+		{
+			BUtil.log("Received message: (" + channel + ") - <" + MessageUtil.mergeArguments(message.getMessageArgs()) + ">");
+		}
 
 		switch(channel)
 		{
@@ -425,6 +427,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				//Ensure the player can join once their request has been accepted
 				incomingPlayers.add(playerName);
 
+				BUtil.log(">>>>>>>> Calling PlayerEnterServerEvent");
 				Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(message.getServer(), playerName, playerUUID));
 				break;
 			}
@@ -489,12 +492,15 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				sendMessage(new OutboundCommunicationMessage(
 					serverName, CHANNEL_MOVE_REPL, MessageUtil.mergeArguments(serverName, playerName, response)
 				));
+
+				BUtil.log(">>>>> Received request for player to enter server '" + playerName + "' Cancelled: " + requestEvent.isCancelled());
 				
 				if(!requestEvent.isCancelled())
 				{
 					//Ensure the player can join once their request has been accepted
 					incomingPlayers.add(playerName);
-					
+
+					BUtil.log(">>>>>>>> Calling PlayerEnterServerEvent");
 					Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(message.getServer(), playerName, playerUUID));
 				}
 				
