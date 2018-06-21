@@ -364,10 +364,12 @@ public class BUtil
 		}
 		return lines;
 	}
+
+	private static final Pattern STRIP_COLOURS = Pattern.compile("[&|§](.)");
 	
 	public static String stripColours(String toFix)
 	{
-		return Pattern.compile("[&|§](.)").matcher(toFix).replaceAll("");
+		return toFix == null ? null : STRIP_COLOURS.matcher(toFix).replaceAll("");
 	}
 
 	public static String translateConsoleColours(String toFix)
