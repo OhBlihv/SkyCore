@@ -42,6 +42,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 /**
  * Created by Chris Brown (OhBlihv) on 5/25/2017.
@@ -497,7 +498,6 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					//Ensure the player can join once their request has been accepted
 					incomingPlayers.add(playerName);
 
-					BUtil.log(">>>>>>>> Calling PlayerEnterServerEvent");
 					Bukkit.getPluginManager().callEvent(new PlayerEnterServerEvent(message.getServer(), playerName, playerUUID));
 				}
 				
@@ -881,6 +881,18 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		}
 		
 		return serverInfo;
+	}
+
+	private final Pattern SERVER_PATTERN = Pattern.compile("((dev|prod)-)?((?<!hub)\\d+($)?)?");
+
+	/*
+	 * Strips any dev/prod prefixes and game server numbers,
+	 * while retaining hub numbers and capitalising all words for readability.
+	 */
+	@Override
+	public String getFormattedServerName(String serverName)
+	{
+		return BUtil.capitaliseAllFirst(SERVER_PATTERN.matcher(serverName).replaceAll(""));
 	}
 	
 	@Override

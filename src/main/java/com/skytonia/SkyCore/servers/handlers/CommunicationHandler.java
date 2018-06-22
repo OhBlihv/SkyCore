@@ -102,7 +102,14 @@ public interface CommunicationHandler
 	 * @return
 	 */
 	ServerInfo getServer(String serverName);
-	
+
+	/**
+	 *
+	 * @param serverName
+	 * @return
+	 */
+	String getFormattedServerName(String serverName);
+
 	/*
 	 * Messaging
 	 */

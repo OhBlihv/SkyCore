@@ -92,7 +92,13 @@ public class NullCommunicationHandler implements CommunicationHandler
 	{
 		return new ServerInfo();
 	}
-	
+
+	@Override
+	public String getFormattedServerName(String serverName)
+	{
+		return serverName;
+	}
+
 	@Override
 	public void receiveMessage(InboundCommunicationMessage message) throws MessageException
 	{

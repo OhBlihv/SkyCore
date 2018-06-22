@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -319,6 +320,15 @@ public class UtilTest
 		BUtil.log(uniqueItems.getNextId());
 		BUtil.log(uniqueItems.getNextId());
 		BUtil.log(uniqueItems.getNextId());*/
+	}
+
+	@Test
+	public void serverFormatTest()
+	{
+		final Pattern SERVER_FORMAT = Pattern.compile("(dev-)?(prod-)?((?<!hub)\\d+($)?)?");
+		final String servers = "dev-murder1\n" + "prod-housing\n" + "prod-parkour1\n" + "dev-murder2\n" + "prod-murder2\n" + "prod-hub1\n" + "dev-hub3";
+
+		BUtil.log(SERVER_FORMAT.matcher(servers).replaceAll(""));
 	}
 	
 }
