@@ -110,6 +110,8 @@ public interface CommunicationHandler
 	 */
 	String getFormattedServerName(String serverName);
 
+	String getFormattedCurrentServer();
+
 	/*
 	 * Messaging
 	 */

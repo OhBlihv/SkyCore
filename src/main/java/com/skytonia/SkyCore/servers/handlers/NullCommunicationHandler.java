@@ -100,6 +100,12 @@ public class NullCommunicationHandler implements CommunicationHandler
 	}
 
 	@Override
+	public String getFormattedCurrentServer()
+	{
+		return getCurrentServer();
+	}
+
+	@Override
 	public void receiveMessage(InboundCommunicationMessage message) throws MessageException
 	{
 		//

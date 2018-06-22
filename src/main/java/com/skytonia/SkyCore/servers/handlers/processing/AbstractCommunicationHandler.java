@@ -894,6 +894,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	{
 		return BUtil.capitaliseAllFirst(SERVER_PATTERN.matcher(serverName).replaceAll(""));
 	}
+
+	@Override
+	public String getFormattedCurrentServer()
+	{
+		return getFormattedServerName(getCurrentServer());
+	}
 	
 	@Override
 	public int getPlayerCount(String serverName)
