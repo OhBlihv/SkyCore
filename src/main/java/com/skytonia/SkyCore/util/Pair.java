@@ -1,17 +1,23 @@
 package com.skytonia.SkyCore.util;
 
-import lombok.RequiredArgsConstructor;
-
 /**
  * Created by Chris Brown (OhBlihv) on 4/18/2017.
  */
-@RequiredArgsConstructor
+@Deprecated
 public class Pair<A, B>
 {
 	
 	public final A left;
 	
 	public final B right;
+
+	public Pair(A left, B right)
+	{
+		this.left = left;
+		this.right = right;
+
+		BUtil.log("SkyCore PAIR is DEPRECATED and will be removed soon.");
+	}
 	
 	@Override
 	public int hashCode()
