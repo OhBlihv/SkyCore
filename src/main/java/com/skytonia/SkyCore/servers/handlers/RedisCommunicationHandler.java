@@ -176,6 +176,11 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		{
 			runnable.run(jedis);
 		}
+		catch (Exception e)
+		{
+			BUtil.log("Exception occurred during redis connection execution");
+			e.printStackTrace();
+		}
 	}
 	
 	public void sendMessage(String server, final String channel, String... message)

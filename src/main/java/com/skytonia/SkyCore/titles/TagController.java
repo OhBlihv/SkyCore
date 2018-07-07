@@ -79,7 +79,10 @@ public class TagController implements Listener
 
 		if(event.isTracked())
 		{
-			taggedPlayer.addNearbyPlayer(event.getVisiblePlayer());
+			RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
+			{
+				taggedPlayer.addNearbyPlayer(event.getVisiblePlayer());
+			}).runTaskLater(10);
 		}
 		else
 		{

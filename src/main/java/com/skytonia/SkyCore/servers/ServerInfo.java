@@ -5,7 +5,9 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Chris Brown (OhBlihv) on 5/24/2017.
@@ -25,7 +27,7 @@ public class ServerInfo
 	@Setter
 	private int maxPlayers = 0;
 	
-	private final List<String> staffList = new ArrayList<>();
+	private final Set<String> staffList = new HashSet<>();
 	
 	@Getter
 	private final List<String> playerList = new ArrayList<>();
@@ -50,7 +52,7 @@ public class ServerInfo
 		this.staffList.addAll(staffList);
 	}
 	
-	public List<String> getStaff()
+	public Set<String> getStaff()
 	{
 		return staffList;
 	}

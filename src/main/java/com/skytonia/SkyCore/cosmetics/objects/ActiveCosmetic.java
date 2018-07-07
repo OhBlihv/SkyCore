@@ -156,7 +156,7 @@ public class ActiveCosmetic
 			
 			boolean inRange = true;
 			
-			Location playerLocation;
+			Location playerLocation = null;
 			if(!player.isOnline() || (playerLocation = player.getLocation()).getWorld() != cosmeticLocation.getWorld() || getDistance(playerLocation, cosmeticLocation) > viewDistance)
 			{
 				inRange = false;

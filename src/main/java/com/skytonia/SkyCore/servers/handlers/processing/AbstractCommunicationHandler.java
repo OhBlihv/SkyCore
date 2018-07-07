@@ -179,13 +179,11 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				}
 			
 				/*
-				 * Update server info/player counts every 2 seconds
+				 * Update server info/player counts every second
 				 */
-				if(tick % 40 == 0)
+				if(tick % 20 == 0)
 				{
 					ServerStatus serverStatus = ServerStatus.ONLINE;
-					int onlinePlayerCount = Bukkit.getOnlinePlayers().size(),
-						maxPlayers = Bukkit.getMaxPlayers();
 					
 					if(Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers())
 					{
@@ -213,37 +211,42 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 						currentServerInfo = new ServerInfo();
 						serverMap.put(currentServer, currentServerInfo);
 					}
-					
-					currentServerInfo.setPlayerCount(Bukkit.getOnlinePlayers().size());
+
 					currentServerInfo.setMaxPlayers(Bukkit.getMaxPlayers());
 					currentServerInfo.setLastUpdate(System.currentTimeMillis());
 					
 					//Updated from other plugins
-					List<String> staffList = currentServerInfo.getStaff();
-					String[] onlinePlayers;
-					
+					Set<String> staffList = currentServerInfo.getStaff();
+					Deque<String> onlinePlayers = new ArrayDeque<>();
+
 					currentServerInfo.getPlayerList().clear();
 					if(serverStatus.joinable || serverStatus == ServerStatus.LOCAL_SERVER)
 					{
-						onlinePlayers = new String[Bukkit.getOnlinePlayers().size()];
-						int i = -1;
 						for(Player player : Bukkit.getOnlinePlayers())
 						{
-							onlinePlayers[++i] = player.getName();
+							if(player.getName().contains("-"))
+							{
+								continue;
+							}
+
+							onlinePlayers.add(player.getName());
 						}
-						
-						currentServerInfo.getPlayerList().addAll(Arrays.asList(onlinePlayers));
+
+						currentServerInfo.getPlayerList().addAll(onlinePlayers);
 					}
 					else
 					{
-						onlinePlayers = new String[]{};
 						staffList.clear();
 					}
 
+					currentServerInfo.setPlayerCount(onlinePlayers.size());
+
 					addOutgoingMessage(null, CHANNEL_INFO_REPL, MessageUtil.mergeArguments(
-						currentServer, serverStatus.name(), String.valueOf(onlinePlayerCount), String.valueOf(maxPlayers),
+						currentServer, serverStatus.name(),
+						String.valueOf(currentServerInfo.getPlayerCount()),
+						String.valueOf(currentServerInfo.getMaxPlayers()),
 						MessageUtil.mergeArguments(staffList.toArray(new String[staffList.size()])), "|||",
-						MessageUtil.mergeArguments(onlinePlayers))
+						MessageUtil.mergeArguments(onlinePlayers.toArray(new String[onlinePlayers.size()])))
 					);
 					
 					//Update us to local server once we've updated our status
@@ -255,12 +258,13 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				}
 			
 				/*
-				 * Timeout servers which have not responded in 10 seconds
+				 * Timeout servers which have not responded in 2 seconds
 				 */
 				if(tick % 60 == 0)
 				{
-					long expireTime = System.currentTimeMillis() - 10000L,
-						removalTime = System.currentTimeMillis() - 3600000L;
+					long expireTime = System.currentTimeMillis() - 2000L,
+						//Remove servers after 1 minute
+						removalTime = System.currentTimeMillis() - 600000L;
 					for(Iterator<Map.Entry<String, ServerInfo>> entryItr = serverMap.entrySet().iterator();entryItr.hasNext();)
 					{
 						Map.Entry<String, ServerInfo> entry = entryItr.next();
