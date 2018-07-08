@@ -8,6 +8,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntity;
 import com.comphenix.packetwrapper.WrapperPlayServerSpawnEntityLiving;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.skytonia.SkyCore.cosmetics.pets.PetUtil;
+import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyPerms.SkyPerms;
 import lombok.Getter;
 import lombok.Setter;
@@ -463,8 +464,8 @@ public class TaggedPlayer
 						metadataPacket.setMetadata(metadata.getWatchableObjects());
 						spawnPacket.setMetadata(metadata);
 
+						//Add all packets together
 						spawnPackets.add(spawnPacket);
-
 						updatePackets.add(metadataPacket);
 
 						contentLineNum++;
@@ -487,8 +488,6 @@ public class TaggedPlayer
 						spawnPacket.setY(entity.locY + ((++lineHeight * amx) + amv));
 						spawnPacket.setZ(entity.locZ);
 
-						spawnPackets.add(spawnPacket);
-
 						WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata();
 
 						metadataPacket.setEntityID(tagLine.getTagId());
@@ -498,19 +497,29 @@ public class TaggedPlayer
 						metadata.setObject(0, (byte) (sneaking ? SNEAKING_FLAG : 0));
 						metadataPacket.setMetadata(metadata.getWatchableObjects());
 
+						//Add all packets together
+						spawnPackets.add(spawnPacket);
 						updatePackets.add(metadataPacket);
 					}
+
+					//Build mounted/passenger entity stack regardless of empty status
+					lastPassengers.add(tagLine.getTagId());
+
+					if(!tagLine.getLineEntity().isAlive())
+					{
+						mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
+
+						lastVehicleId = tagLine.getTagId();
+					}
 				}
-
-				//Build mounted/passenger entity stack regardless of empty status
-				lastPassengers.add(tagLine.getTagId());
-
-				mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
-
-				lastVehicleId = tagLine.getTagId();
 			}
 			
 			tagIds.add(tagLine.getTagId());
+		}
+
+		if(!lastPassengers.isEmpty())
+		{
+			mountPackets.add(getMountPacket(lastVehicleId, lastPassengers));
 		}
 
 		try
@@ -529,7 +538,7 @@ public class TaggedPlayer
 		WrapperPlayServerEntityDestroy destroyPacket = new WrapperPlayServerEntityDestroy();
 		{
 			int[] destroyIds = new int[tagIds.size()];
-			
+
 			int i = 0;
 			for(int destroyId : tagIds)
 			{
