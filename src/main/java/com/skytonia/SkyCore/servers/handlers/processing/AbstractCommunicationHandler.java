@@ -156,6 +156,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					Iterator<Map.Entry<String, MovementInfo>> entryItr = movementMap.entrySet().iterator();
 					while(entryItr.hasNext())
 					{
+						boolean remove = false;
 						try
 						{
 							Map.Entry<String, MovementInfo> entry = entryItr.next();
@@ -164,14 +165,19 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 							if(movementInfo.hasTimedOut())
 							{
 								movementInfo.failPlayer();
-								entryItr.remove();
+								remove = true;
 							}
 							else if(movementInfo.getInitialTimestamp() == -1 || !entry.getValue().getPlayer().isOnline())
 							{
-								entryItr.remove();
+								remove = true;
 							}
 						}
 						catch(Throwable e)
+						{
+							remove = true;
+						}
+
+						if(remove)
 						{
 							entryItr.remove();
 						}
@@ -494,7 +500,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				}
 				
 				sendMessage(new OutboundCommunicationMessage(
-					serverName, CHANNEL_MOVE_REPL, MessageUtil.mergeArguments(serverName, playerName, response)
+					serverName, CHANNEL_MOVE_REPL, MessageUtil.mergeArguments(getCurrentServer(), playerName, response)
 				));
 
 				if(!requestEvent.isCancelled())
