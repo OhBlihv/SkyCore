@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSpawnTrackerEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -66,6 +67,36 @@ public class TagController implements Listener
 			}
 			
 		}).runTimerASync(10, 10);
+	}
+
+	@EventHandler
+	public void onPlayerCommandPreProcess(PlayerCommandPreprocessEvent event)
+	{
+		if(event.getPlayer().isOp() && event.getMessage().startsWith("/taghide"))
+		{
+			event.setCancelled(true);
+			final Player player = event.getPlayer();
+
+			for(TaggedPlayer taggedPlayer : entityTagMap.values())
+			{
+				ComparisonPlayer compPlayer = taggedPlayer.getNearbyPlayer(player.getUniqueId());
+				if(compPlayer == null)
+				{
+					continue;
+				}
+
+				if(compPlayer.getDirtyPlayerType().isNotVisible())
+				{
+					compPlayer.setDirtyPlayerType(DirtyPlayerType.INDIV_ADD_QUEUE);
+				}
+				else
+				{
+					compPlayer.setDirtyPlayerType(DirtyPlayerType.INDIV_REMOVE_QUEUE);
+				}
+			}
+
+			player.sendMessage("Toggled tags");
+		}
 	}
 
 	@EventHandler
