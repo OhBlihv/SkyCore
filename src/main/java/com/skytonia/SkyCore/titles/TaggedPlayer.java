@@ -229,7 +229,7 @@ public class TaggedPlayer
 		{
 			//All other types handle correctly even with dirty titles
 			//NOTE: Force remove all dirty types.
-			//if(player.getDirtyPlayerType() == DirtyPlayerType.CLEAN)
+			if(player.getDirtyPlayerType().isVisible())
 			{
 				player.setDirtyPlayerType(dirtyType);
 			}
@@ -604,9 +604,6 @@ public class TaggedPlayer
 				{
 					for(ComparisonPlayer player : entry.getValue())
 					{
-						//Destroy any old titles before spawning in new ones
-						player.sendPacket(destroyPacket);
-
 						player.sendPackets(updatePackets);
 						player.setDirtyPlayerType(DirtyPlayerType.CLEAN);
 					}

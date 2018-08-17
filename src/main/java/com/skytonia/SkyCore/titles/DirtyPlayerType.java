@@ -31,6 +31,11 @@ public enum DirtyPlayerType
 		return this == INDIV_REMOVE_QUEUE || this == INDIV_HIDDEN;
 	}
 
+	public boolean isVisible()
+	{
+		return this == ADD || this == UPDATE || this == CLEAN || this == INDIV_ADD_QUEUE || this == INDIV_REMOVE_QUEUE;
+	}
+
 	public boolean isIndividual()
 	{
 		return this == INDIV_ADD_QUEUE || this == INDIV_REMOVE_QUEUE || this == INDIV_HIDDEN;
