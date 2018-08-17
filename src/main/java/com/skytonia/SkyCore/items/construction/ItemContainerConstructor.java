@@ -234,7 +234,7 @@ public class ItemContainerConstructor
 	{
 		if(configurationSection == null)
 		{
-			BUtil.logError("One of the gui-item's configuration sections is invalid! Please check your configs for any blank sections.");
+			BUtil.log("One of the gui-item's configuration sections is invalid! Please check your configs for any blank sections.");
 			throw new IllegalArgumentException("Invalid Configuration Section");
 		}
 		
@@ -264,7 +264,7 @@ public class ItemContainerConstructor
 			{
 				if(checkedErrors.contains(ItemContainerVariable.MATERIAL))
 				{
-					BUtil.logError(GUIUtil.getErrorMessage(configurationSection, "material", materialString));
+					BUtil.log(GUIUtil.getErrorMessage(configurationSection, "material", materialString));
 				}
 				
 				//Still override the material for now, even if we aren't asked to
@@ -321,8 +321,8 @@ public class ItemContainerConstructor
 			}
 			catch(IllegalArgumentException e)
 			{
-				BUtil.logInfo("Could not parse armour colour " + colourString + ". Is it in the correct format?");
-				BUtil.logInfo(e.getMessage());
+				BUtil.log("Could not parse armour colour " + colourString + ". Is it in the correct format?");
+				BUtil.log(e.getMessage());
 				armorColor = Color.WHITE;
 			}
 		}
@@ -343,13 +343,13 @@ public class ItemContainerConstructor
 	{
 		if(configurationMap == null || configurationMap.isEmpty())
 		{
-			BUtil.logError("One of the gui-item's configuration sections is invalid! Please check your configs for any blank sections.");
+			BUtil.log("One of the gui-item's configuration sections is invalid! Please check your configs for any blank sections.");
 			throw new IllegalArgumentException("Invalid Configuration Section");
 		}
 		Material material = FlatFile.getMaterial(configurationMap, "material", null);
 		if(material == null)
 		{
-			BUtil.logError("Material: '" + FlatFile.getString(configurationMap, "material", "null") + "' is not a valid material");
+			BUtil.log("Material: '" + FlatFile.getString(configurationMap, "material", "null") + "' is not a valid material");
 			return null;
 		}
 		
@@ -376,7 +376,7 @@ public class ItemContainerConstructor
 						Enchantment enchantment = Enchantment.getByName(PATTERN_SEPERATOR.split(enchantmentLine)[0]);
 						if(enchantment == null)
 						{
-							BUtil.logError("Enchantment '" + enchantmentLine + "' is not a valid enchantment configuration. Check your config.");
+							BUtil.log("Enchantment '" + enchantmentLine + "' is not a valid enchantment configuration. Check your config.");
 							continue;
 						}
 						
@@ -386,7 +386,7 @@ public class ItemContainerConstructor
 						}
 						catch(NumberFormatException e)
 						{
-							BUtil.logError("Enchantment " + enchantment.getName() + " has an invalid level");
+							BUtil.log("Enchantment " + enchantment.getName() + " has an invalid level");
 						}
 					}
 					

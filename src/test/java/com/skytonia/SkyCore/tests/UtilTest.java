@@ -2,7 +2,9 @@ package com.skytonia.SkyCore.tests;
 
 import com.skytonia.SkyCore.items.uniqueids.UniqueIds;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.JSONContentParser;
 import com.skytonia.SkyCore.util.TimeUtil;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,6 +22,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class UtilTest
 {
+
+	@Test
+	public void jsonParserTest()
+	{
+		JSONContentParser parser = new JSONContentParser(
+			BUtil.translateColours("&e&l(!) &e&lUNSCRAMBLE: &e{hov;Hover to see the word! ;{scrambled-word}}&7Be the first to unscramble this word!"));
+			//.replace("{scrambled-word}", "asdf123"));
+
+		BaseComponent[] components = parser.parseLines();
+
+		BUtil.log("Result:");
+		String resultingString = "";
+		for(BaseComponent component : components)
+		{
+			resultingString += component.getColor().toString() +
+				(component.isBold() ? "§l" : "") +
+				component.toPlainText();
+
+			if(resultingString.endsWith("\n"))
+			{
+				BUtil.log(resultingString);
+				resultingString = "";
+			}
+		}
+
+		if(!resultingString.isEmpty())
+		{
+			BUtil.log(resultingString);
+		}
+
+		/*assertEquals(Arrays.toString(parser.parseLines()),
+					 Arrays.toString(new JSONContentParser(parser.parseLines()).parseLines()));*/
+	}
 	
 	@Test
 	public void uniqueIdGenerationTest()
@@ -104,7 +139,7 @@ public class UtilTest
 			displayId -= 1; //Lazy fix for skipping #7 and #13
 		}*/
 		
-		//BUtil.logInfo("I: " + serverInstance + " G: " + gameId + " = " + displayId);
+		//BUtil.log("I: " + serverInstance + " G: " + gameId + " = " + displayId);
 		
 		return displayId;
 	}

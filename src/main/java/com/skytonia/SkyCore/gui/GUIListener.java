@@ -28,7 +28,7 @@ public class GUIListener implements Listener
 		if(event.getInventory() != null && event.getInventory().getTitle() != null &&
 			   isInventoryModified(event.getInventory().getTitle()))
 		{
-			BUtil.logInfo("Blocking: " + event.getInventory().getTitle());
+			BUtil.log("Blocking: " + event.getInventory().getTitle());
 			event.setCancelled(true);
 		}
 	}

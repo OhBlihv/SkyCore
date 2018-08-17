@@ -31,7 +31,7 @@ public class LocationUtil
 	{
 		if(configurationSection == null || configurationSection.getKeys(false).isEmpty())
 		{
-			BUtil.logInfo("Configuration Section: " + (configurationSection == null ? "NULL" : configurationSection.getCurrentPath()) + " is NULL or empty!");
+			BUtil.log("Configuration Section: " + (configurationSection == null ? "NULL" : configurationSection.getCurrentPath()) + " is NULL or empty!");
 			return DEFAULT_LOCATION;
 		}
 		
@@ -45,14 +45,14 @@ public class LocationUtil
 			}
 			else
 			{
-				BUtil.logError("World name '" + worldName + "' does not correspond to a valid world on this server. (" + configurationSection.getCurrentPath() + ")");
+				BUtil.log("World name '" + worldName + "' does not correspond to a valid world on this server. (" + configurationSection.getCurrentPath() + ")");
 				return DEFAULT_LOCATION;
 			}
 		}
 		else
 		{
 			world = Bukkit.getWorlds().get(0);
-			BUtil.logError("No world defined in '" + configurationSection.getCurrentPath() + "'. Defaulting to " + world.getName() + ". Please define a world next time.");
+			BUtil.log("No world defined in '" + configurationSection.getCurrentPath() + "'. Defaulting to " + world.getName() + ". Please define a world next time.");
 		}
 		double  x = configurationSection.getDouble("x", 0D),
 			y = configurationSection.getDouble("y", 128D),
@@ -109,7 +109,7 @@ public class LocationUtil
 		catch(NumberFormatException e)
 		{
 			//TODO:
-			BUtil.logError("Invalid location given by '" + locationString + "'. Returning default location.");
+			BUtil.log("Invalid location given by '" + locationString + "'. Returning default location.");
 		}
 		
 		return DEFAULT_LOCATION;

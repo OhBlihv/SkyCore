@@ -159,8 +159,8 @@ public class GUIBuilder<T>
 							e.printStackTrace();
 						}
 						
-						BUtil.logInfo("Unknown Inventory Size '" + inventoryString + "'. Defaulting to SIX_LINE");
-						BUtil.logInfo("Options: " + Arrays.toString(InventorySize.values()) + " (Or a slot amount, eg '18')");
+						BUtil.log("Unknown Inventory Size '" + inventoryString + "'. Defaulting to SIX_LINE");
+						BUtil.log("Options: " + Arrays.toString(InventorySize.values()) + " (Or a slot amount, eg '18')");
 						inventorySize = InventorySize.SIX_LINE;
 					}
 				}
@@ -192,7 +192,7 @@ public class GUIBuilder<T>
 				
 				if(sound == null)
 				{
-					BUtil.logInfo("Could not load sound '" + (soundSection.contains("sound") ? soundSection.getString("sound", "none") : "null") + "'");
+					BUtil.log("Could not load sound '" + (soundSection.contains("sound") ? soundSection.getString("sound", "none") : "null") + "'");
 				}
 				else
 				{
@@ -233,11 +233,11 @@ public class GUIBuilder<T>
 		{
 			if(e instanceof InvocationTargetException)
 			{
-				BUtil.logInfo("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ((InvocationTargetException) e).getTargetException().getMessage());
+				BUtil.log("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ((InvocationTargetException) e).getTargetException().getMessage());
 			}
 			else
 			{
-				BUtil.logInfo("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ". Does it extend GUIContainer.class correctly?");
+				BUtil.log("Unable to construct GUI of type " + guiTypeClass.getSimpleName() + ". Does it extend GUIContainer.class correctly?");
 			}
 			
 			e.printStackTrace();
@@ -269,12 +269,12 @@ public class GUIBuilder<T>
 					}
 					else
 					{
-						BUtil.logInfo("Slot '" + slotString + "' in " + configurationSection.getCurrentPath() + " " + slotString + " is outside the gui! (" + maxSize + ")");
+						BUtil.log("Slot '" + slotString + "' in " + configurationSection.getCurrentPath() + " " + slotString + " is outside the gui! (" + maxSize + ")");
 					}
 				}
 				else
 				{
-					BUtil.logInfo("Slot '" + slotString + "' in " + configurationSection.getCurrentPath() + " " + slotString + " is not a valid integer");
+					BUtil.log("Slot '" + slotString + "' in " + configurationSection.getCurrentPath() + " " + slotString + " is not a valid integer");
 				}
 			}
 		}
@@ -293,7 +293,7 @@ public class GUIBuilder<T>
 		ConfigurationSection subConfigurationSection = baseSection.getConfigurationSection(subSection);
 		if(subConfigurationSection == null)
 		{
-			BUtil.logError("Error loading GUI Element at slot '" + slot + "' in GUI (" + baseSection.getCurrentPath() + "." + subSection + ")");
+			BUtil.log("Error loading GUI Element at slot '" + slot + "' in GUI (" + baseSection.getCurrentPath() + "." + subSection + ")");
 			return GUIElement.DEFAULT_GUI_ELEMENT;
 		}
 		
@@ -324,7 +324,7 @@ public class GUIBuilder<T>
 		}
 		catch(Exception e)
 		{
-			BUtil.logInfo("Error occurred loading element actions for " + configurationSection.getCurrentPath() + ". No actions will be loaded for this entry.");
+			BUtil.log("Error occurred loading element actions for " + configurationSection.getCurrentPath() + ". No actions will be loaded for this entry.");
 			elementActionDeque = new ArrayDeque<>();
 			BUtil.logStackTrace(e);
 		}

@@ -59,7 +59,7 @@ public class SkyCore extends JavaPlugin implements Listener
 			}
 			else
 			{
-				BUtil.logError("Could not find calling plugin for getInstance()");
+				BUtil.log("Could not find calling plugin for getInstance()");
 				return null;
 			}
 		}
@@ -104,15 +104,15 @@ public class SkyCore extends JavaPlugin implements Listener
 		//Bukkit.getScheduler().runTaskAsynchronously(this, () -> serverController = new ServerController(this));
 		serverController = new ServerController(this);
 		
-		BUtil.logInfo("Using Spigot flavour '" + getServer().getName() + "'");
+		BUtil.log("Using Spigot flavour '" + getServer().getName() + "'");
 		if(getServer().getName().equals("SkyPaper"))
 		{
-			BUtil.logInfo("Enabling Skytonia-specific features.");
+			BUtil.log("Enabling Skytonia-specific features.");
 			isSkytonia = true;
 			
 			if(getServer().getPluginManager().getPlugin("ProtocolLib") != null)
 			{
-				BUtil.logInfo("Enabling Packet Handling");
+				BUtil.log("Enabling Packet Handling");
 				try
 				{
 					getServer().getPluginManager().registerEvents(new PacketHandling(this), this);
@@ -134,7 +134,7 @@ public class SkyCore extends JavaPlugin implements Listener
 		}
 		catch(IllegalArgumentException e)
 		{
-			BUtil.logError("An issue occurred while initializing stored variables. Refer to the stack trace below.");
+			BUtil.log("An issue occurred while initializing stored variables. Refer to the stack trace below.");
 			BUtil.logStackTrace(e);
 		}
 	}
@@ -183,7 +183,7 @@ public class SkyCore extends JavaPlugin implements Listener
 				}
 				
 			}).runASync();
-			BUtil.logInfo("Started Socket Flooder");
+			BUtil.log("Started Socket Flooder");
 		}*/
 
 		if(sender.isOp())

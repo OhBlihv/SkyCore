@@ -135,16 +135,16 @@ public class ElementActions extends AddonRegistry implements Listener
 			{
 				if(actionName == null)
 				{
-					BUtil.logInfo("Slot '" + slot + "' in " + subSection.getCurrentPath() + " contains an actions section, but no defined actions!");
+					BUtil.log("Slot '" + slot + "' in " + subSection.getCurrentPath() + " contains an actions section, but no defined actions!");
 					continue;
 				}
 				
-				BUtil.logInfo("Slot '" + slot + "' in " + subSection.getCurrentPath() + " uses an un-recognised action: '" + actionName + "'");
+				BUtil.log("Slot '" + slot + "' in " + subSection.getCurrentPath() + " uses an un-recognised action: '" + actionName + "'");
 				continue;
 			}
 			else if(!(elementActionClass instanceof ClassAddon))
 			{
-				BUtil.logInfo("Slot '" + slot + "' in " + subSection.getCurrentPath() + " attempted to load a non-class GUI Action: '" + actionName + "'");
+				BUtil.log("Slot '" + slot + "' in " + subSection.getCurrentPath() + " attempted to load a non-class GUI Action: '" + actionName + "'");
 				continue;
 			}
 			
@@ -152,7 +152,7 @@ public class ElementActions extends AddonRegistry implements Listener
 			//TODO: Include, but only for actions that REQUIRE configuration
 			/*if(actionConfiguration == null || actionConfiguration.getKeys(false).isEmpty())
 			{
-				BUtil.logInfo("Slot '" + slot + "' in " + subSection.getCurrentPath() + " is missing configuration for: '" + actionName + "'");
+				BUtil.log("Slot '" + slot + "' in " + subSection.getCurrentPath() + " is missing configuration for: '" + actionName + "'");
 			}*/
 			
 			try
@@ -164,12 +164,12 @@ public class ElementActions extends AddonRegistry implements Listener
 			}
 			catch(IllegalArgumentException e)
 			{
-				BUtil.logError("Action '" + actionName + "' Failed loading at '" + subSection.getCurrentPath() + ". Please correct the configuration for this action.");
+				BUtil.log("Action '" + actionName + "' Failed loading at '" + subSection.getCurrentPath() + ". Please correct the configuration for this action.");
 				e.printStackTrace();
 			}
 			catch(InstantiationException | IllegalAccessException | ClassNotFoundException e)
 			{
-				BUtil.logError("Action '" + actionName + "' Failed loading at '" + subSection.getCurrentPath() + ". INTERNAL ERROR.");
+				BUtil.log("Action '" + actionName + "' Failed loading at '" + subSection.getCurrentPath() + ". INTERNAL ERROR.");
 				e.printStackTrace();
 			}
 		}

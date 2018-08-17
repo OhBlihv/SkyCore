@@ -40,7 +40,7 @@ public class BatchQuery<T>
 			}
 			catch(SQLException e)
 			{
-				BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+				BUtil.log("Unhandled SQL Exception on Query: " + sqlQuery);
 				e.printStackTrace();
 			}
 			catch(Exception e)
@@ -95,13 +95,13 @@ public class BatchQuery<T>
 					}
 					catch(SQLException e)
 					{
-						BUtil.logError("Unhandled SQL Exception on Query: " + sqlQuery);
+						BUtil.log("Unhandled SQL Exception on Query: " + sqlQuery);
 						e.printStackTrace();
 						//continue;
 					}
 					catch(Exception e)
 					{
-						BUtil.logError("Unhandled Exception:");
+						BUtil.log("Unhandled Exception:");
 						BUtil.logStackTrace(e);
 						return;
 					}
@@ -137,7 +137,7 @@ public class BatchQuery<T>
 				}
 				catch(Exception e)
 				{
-					BUtil.logError("Unhandled Exception:");
+					BUtil.log("Unhandled Exception:");
 					BUtil.logStackTrace(e);
 				}
 			}

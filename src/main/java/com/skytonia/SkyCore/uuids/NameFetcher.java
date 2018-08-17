@@ -106,7 +106,7 @@ public class NameFetcher implements Callable<Map<UUID, String>>
 				
 				if(name == null)
 				{
-					BUtil.logError("Could not parse uuid '" + uuid.toString() + "' to name!");
+					BUtil.log("Could not parse uuid '" + uuid.toString() + "' to name!");
 					continue;
 				}
 				
@@ -121,7 +121,7 @@ public class NameFetcher implements Callable<Map<UUID, String>>
 			{
 				if(name == null)
 				{
-					BUtil.logInfo("Could not find name of account with uuid: '"	+ uuid.toString() + "'");
+					BUtil.log("Could not find name of account with uuid: '"	+ uuid.toString() + "'");
 				}
 			}
 			

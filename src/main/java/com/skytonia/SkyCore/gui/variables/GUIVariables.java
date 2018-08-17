@@ -55,8 +55,8 @@ public class GUIVariables extends AddonRegistry
 		//TODO: Ensure this holds.
 		if(!(skyAddon instanceof ObjectAddon)/* || !skyAddon.getAddon().getClass().isAssignableFrom(GUIVariable.class)*/)
 		{
-			//BUtil.logInfo("1: " + !(skyAddon instanceof ObjectAddon));
-			//BUtil.logInfo("2: " + !skyAddon.getAddon().getClass().isAssignableFrom(GUIVariable.class) + " | " + skyAddon.getAddon().getClass().getSimpleName());
+			//BUtil.log("1: " + !(skyAddon instanceof ObjectAddon));
+			//BUtil.log("2: " + !skyAddon.getAddon().getClass().isAssignableFrom(GUIVariable.class) + " | " + skyAddon.getAddon().getClass().getSimpleName());
 			
 			throw new IllegalArgumentException("Class '" + skyAddon.getAddon().getClass().getSimpleName() + "' attempted to be registered, but was not an extending class of GUIVariable.");
 		}

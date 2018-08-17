@@ -40,7 +40,7 @@ public class SoundAction extends ElementAction
 		
 		if(sound == null)
 		{
-			BUtil.logInfo("Could not load sound '" + (configurationSection.contains("sound") ? configurationSection.getString("sound", "none") : "null") + "'");
+			BUtil.log("Could not load sound '" + (configurationSection.contains("sound") ? configurationSection.getString("sound", "none") : "null") + "'");
 			//Default to the first sound. This must simply be a valid sound since the issue is already indicated in console.
 			this.sound = new GUISound(Sound.values()[0], 10F, 1F);
 		}

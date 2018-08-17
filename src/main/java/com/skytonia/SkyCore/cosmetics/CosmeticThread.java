@@ -141,7 +141,7 @@ public class CosmeticThread extends Thread
 			long sleepTime = WAIT_MILLIS - (System.currentTimeMillis() - lastStartTick);
 			if(sleepTime <= 0)
 			{
-				BUtil.logInfo("Target Sleep Time <= 0! Expect Performance Drop on Cosmetics (Value=" + sleepTime + ")");
+				BUtil.log("Target Sleep Time <= 0! Expect Performance Drop on Cosmetics (Value=" + sleepTime + ")");
 			}
 			else
 			{

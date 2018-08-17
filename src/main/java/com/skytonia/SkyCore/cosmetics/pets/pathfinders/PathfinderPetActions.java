@@ -60,7 +60,7 @@ public class PathfinderPetActions extends PathfinderGoal
 			
 			if(path != null && activePathfinder != null && activePathfinder.getPathfinderAction() != PathfinderAction.FOLLOW_PLAYER)
 			{
-				//BUtil.logInfo("Started movement pathing. Actions cancelled. Ticks Left: (" + activePathfinder.ticksLeft + ")");
+				//BUtil.log("Started movement pathing. Actions cancelled. Ticks Left: (" + activePathfinder.ticksLeft + ")");
 				activePathfinder = new ActivePathfinderAction(PathfinderAction.FOLLOW_PLAYER, -1);
 				
 				actionDelay = 0; //Reset the action cooldown in order to start actions immediately once free
@@ -102,7 +102,7 @@ public class PathfinderPetActions extends PathfinderGoal
 				if(selectedAction != null)
 				{
 					activePathfinder = new ActivePathfinderAction(selectedAction, actionLength);
-					//BUtil.logInfo("Selected '" + selectedAction + "'");
+					//BUtil.log("Selected '" + selectedAction + "'");
 				}
 			}
 			
@@ -127,7 +127,7 @@ public class PathfinderPetActions extends PathfinderGoal
 			
 			if(activePathfinder.tick())
 			{
-				//BUtil.logInfo("Pathfinder " + activePathfinder.pathfinderAction + " expired... (" + activePathfinder.ticksLeft + ")");
+				//BUtil.log("Pathfinder " + activePathfinder.pathfinderAction + " expired... (" + activePathfinder.ticksLeft + ")");
 				activePathfinder = null;
 			}
 			

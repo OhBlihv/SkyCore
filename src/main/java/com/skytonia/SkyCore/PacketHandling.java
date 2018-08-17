@@ -109,15 +109,15 @@ public class PacketHandling implements Listener
 						int randomNumber = random.nextInt(gameProfiles.size());
 						Collection<WrappedSignedProperty> selectedTexture = gameProfiles.get(randomNumber);
 						
-						//BUtil.logInfo(playerData.getProfile().getName() + " is using " + randomNumber);
+						//BUtil.log(playerData.getProfile().getName() + " is using " + randomNumber);
 						
 						playerData.getProfile().getProperties().removeAll("textures");
 						playerData.getProfile().getProperties().putAll("textures", selectedTexture);
 						
 						/*int skinNum = random.nextInt(randomisedSkins.length);
 						
-						BUtil.logInfo("-------------------------------");
-						BUtil.logInfo(playerData.getProfile().getProperties().toString());
+						BUtil.log("-------------------------------");
+						BUtil.log(playerData.getProfile().getProperties().toString());
 						fooledPlayerData.getProfile().getProperties().put("textures", new WrappedSignedProperty("textures",
 						                                                                                        Base64.getEncoder().encodeToString(
 							    ("{\"timestamp\":" + System.currentTimeMillis() + 000 + "," +
@@ -125,9 +125,9 @@ public class PacketHandling implements Listener
 								     "\"profileName\":\"" + playerData.getProfile().getName() + "\"," +
 								     "\"textures\":{\"SKIN\":{\"url\":\"" + randomisedSkins[skinNum] + "\"}}}").getBytes()
 						    ), randomisedSignatures[skinNum]));
-						BUtil.logInfo("---------------------------");
-						BUtil.logInfo(fooledPlayerData.getProfile().getProperties().toString());
-						BUtil.logInfo("---------------------------");*/
+						BUtil.log("---------------------------");
+						BUtil.log(fooledPlayerData.getProfile().getProperties().toString());
+						BUtil.log("---------------------------");*/
 						
 						//fooledData.add(fooledPlayerData);
 					}

@@ -47,6 +47,7 @@ public class FlatFile
 	
 	private static FlatFileHandler fileHandler = null;
 
+	@Getter
 	protected File saveFile = null;
 	protected FileConfiguration save = null;
 	
@@ -198,7 +199,7 @@ public class FlatFile
 			    {
 			    	if(!suppressWarnings)
 				    {
-					    BUtil.logError("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
+					    BUtil.log("Could not set up " + fileName + " registered to plugin '" + pluginString + "'. Is the plugin/fileName correct?");
 					    e.printStackTrace();
 				    }
 			    }
@@ -218,7 +219,7 @@ public class FlatFile
 	    }
 	    catch (IOException ex) 
 	    {
-	    	BUtil.logError("Could not save config to " + saveFile);
+	    	BUtil.log("Could not save config to " + saveFile);
 	    }
 	}
 	
@@ -307,7 +308,7 @@ public class FlatFile
 	{
 		if(configurationSection == null)
 		{
-			BUtil.logError("Configuration Section linked null!");
+			BUtil.log("Configuration Section linked null!");
 			
 			new Exception().printStackTrace();
 			
@@ -326,7 +327,7 @@ public class FlatFile
 		
 		if(world == null)
 		{
-			BUtil.logError("Could not find world named '" + configurationSection.getString("world") + "'");
+			BUtil.log("Could not find world named '" + configurationSection.getString("world") + "'");
 			return LocationUtil.DEFAULT_LOCATION;
 		}
 		
@@ -403,7 +404,7 @@ public class FlatFile
 				return toReturn;
 			}
 
-			BUtil.logError("Invalid material: " + object);
+			BUtil.log("Invalid material: " + object);
 		}
 		return def;
 	}

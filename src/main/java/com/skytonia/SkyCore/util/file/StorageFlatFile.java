@@ -17,7 +17,7 @@ public abstract class StorageFlatFile extends FlatFile
 		
 		if(saveTicks <= 300L)
 		{
-			BUtil.logInfo("(" + fileName + ") given saveTicks below 15 seconds '" + saveTicks + " ticks'");
+			BUtil.log("(" + fileName + ") given saveTicks below 15 seconds '" + saveTicks + " ticks'");
 			saveTicks = 300L;
 		}
 		

@@ -3,6 +3,8 @@ package com.skytonia.SkyCore.util;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.firework.CustomEntityFirework;
 import com.skytonia.SkyCore.firework.FireworkType;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -126,7 +128,7 @@ public class BUtil
 			return toReturn;
 		}
 
-		BUtil.logError("Invalid material: " + materialString);
+		BUtil.log("Invalid material: " + materialString);
 		return Material.POTATO_ITEM;
 	}
 
@@ -265,21 +267,6 @@ public class BUtil
 	{
 		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
-			/*if(entity instanceof Player)
-			{
-				try
-				{
-					org.phantomapi.util.P.tp((Player) entity, location);
-				}
-				catch(Throwable e)
-				{
-					entity.teleport(location, cause);
-				}
-			}
-			else
-			{
-				entity.teleport(location, cause);
-			}*/
 			entity.teleport(location, cause);
 		}).ensureSync();
 	}
@@ -432,7 +419,7 @@ public class BUtil
 		{
 			if(lines != null)
 			{
-				BUtil.logError("Placeholder length does not match content length! Returning plain lines:\n" + lines.toString());
+				BUtil.log("Placeholder length does not match content length! Returning plain lines:\n" + lines.toString());
 			}
 			return lines;
 		}
@@ -498,7 +485,7 @@ public class BUtil
 
 		if(charAfterIsEnd)
 		{
-			return string.substring(startIndex, string.length());
+			return string.substring(startIndex);
 		}
 		else
 		{
@@ -714,16 +701,38 @@ public class BUtil
 	{
 		logMessageAsPlugin(getCallingPlugin(), "INFO: " + message);
 	}
-	
+
+	@Getter
+	@Setter
+	private static boolean hasPrintedLogDeprecation = false;
+
 	@Deprecated
 	public static void logInfo(String message)
 	{
+		if(!hasPrintedLogDeprecation)
+		{
+			log("-----------------------------------------------------");
+			log("#logInfo is DEPRECATED and will be removed in a future release!");
+			log("-----------------------------------------------------");
+
+			hasPrintedLogDeprecation = true;
+		}
+
 		logMessage("INFO: " + message);
 	}
 	
 	@Deprecated
 	public static void logError(String message)
 	{
+		if(!hasPrintedLogDeprecation)
+		{
+			log("-----------------------------------------------------");
+			log("#logError is DEPRECATED and will be removed in a future release!");
+			log("-----------------------------------------------------");
+
+			hasPrintedLogDeprecation = true;
+		}
+
 		logMessage("ERROR: " + message);
 	}
 	

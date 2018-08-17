@@ -63,7 +63,7 @@ public class PacketLibrary_1_13_R1 extends PacketLibrary
 	private void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message,
 	                             int persistTime, int fadeIn, int fadeOut)
 	{
-		//BUtil.logInfo("Printing " + titleAction.name() + " with '" + "{\"text\": \"" + message + "\"}" + "'");
+		//BUtil.log("Printing " + titleAction.name() + " with '" + "{\"text\": \"" + message + "\"}" + "'");
 		playerConnection.sendPacket(new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE,
 			IChatBaseComponent.ChatSerializer.a("{\"text\": \" \"}"),
 			fadeIn, persistTime, fadeOut));

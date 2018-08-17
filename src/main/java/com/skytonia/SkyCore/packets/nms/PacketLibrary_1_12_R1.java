@@ -43,7 +43,7 @@ public class PacketLibrary_1_12_R1 extends PacketLibrary
 		
 		//PacketPlayOutTitle timesPacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, persistTime, fadeOut);
 		//playerConnection.sendPacket(timesPacket);
-		//BUtil.logInfo("Sent times packet as " + persistTime + ", " + fadeIn + ", " + fadeOut);
+		//BUtil.log("Sent times packet as " + persistTime + ", " + fadeIn + ", " + fadeOut);
 		
 		//Title is required to send subtitle. Send both when possible.
 		if(title == null)
@@ -63,7 +63,7 @@ public class PacketLibrary_1_12_R1 extends PacketLibrary
 	private void sendTitlePacket(PlayerConnection playerConnection, PacketPlayOutTitle.EnumTitleAction titleAction, String message,
 	                             int persistTime, int fadeIn, int fadeOut)
 	{
-		//BUtil.logInfo("Printing " + titleAction.name() + " with '" + "{\"text\": \"" + message + "\"}" + "'");
+		//BUtil.log("Printing " + titleAction.name() + " with '" + "{\"text\": \"" + message + "\"}" + "'");
 		playerConnection.sendPacket(new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE,
 		                                                   IChatBaseComponent.ChatSerializer.a("{\"text\": \" \"}"),
 		                                                   persistTime, fadeIn, fadeOut));

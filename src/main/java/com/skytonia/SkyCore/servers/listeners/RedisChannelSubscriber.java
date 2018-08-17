@@ -66,7 +66,7 @@ public class RedisChannelSubscriber extends ChannelSubscriber
 				}
 				catch(Throwable e)
 				{
-					BUtil.logInfo("Unable to handle message on channel '" + channel + "' with '" + message + "'");
+					BUtil.log("Unable to handle message on channel '" + channel + "' with '" + message + "'");
 					e.printStackTrace();
 				}
 			}

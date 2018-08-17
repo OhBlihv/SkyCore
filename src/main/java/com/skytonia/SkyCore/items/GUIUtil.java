@@ -116,7 +116,7 @@ public class GUIUtil
 		catch(ClassNotFoundException | NoSuchMethodException e)
 		{
 			e.printStackTrace();
-			BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
+			BUtil.log("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
 			return false;
 		}
 	}
@@ -138,7 +138,7 @@ public class GUIUtil
 		{
 			if(!initEnchantmentNMS())
 			{
-				BUtil.logInfo("Could not initialize NMS");
+				BUtil.log("Could not initialize NMS");
 				return itemStack; //Return the item without enchantment effects
 			}
 			
@@ -169,7 +169,7 @@ public class GUIUtil
 			catch(ClassCastException | IllegalAccessException | InvocationTargetException | InstantiationException e)
 			{
 				e.printStackTrace();
-				BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
+				BUtil.log("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
 				return itemStack;
 			}
 		}
@@ -205,7 +205,7 @@ public class GUIUtil
 		catch(InvocationTargetException | IllegalAccessException | InstantiationException e)
 		{
 			e.printStackTrace();
-			BUtil.logError("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
+			BUtil.log("Your minecraft version seems to be modded. Enchantment effects will not be supported in this version.");
 			return item;
 		}
 	}
@@ -227,7 +227,7 @@ public class GUIUtil
 			Enchantment enchantment = Enchantment.getByName(split[0]);
 			if(enchantment == null)
 			{
-				BUtil.logError("Loaded invalid Enchantment: '" + split[0] + "'");
+				BUtil.log("Loaded invalid Enchantment: '" + split[0] + "'");
 				continue;
 			}
 			enchantMap.put(enchantment, Integer.parseInt(split[1]));
@@ -390,14 +390,14 @@ public class GUIUtil
 		ItemStack[] mergedStacks = new ItemStack[itemStacks.size() + 1];
 		for(ItemStack item : itemStacks)
 		{
-			//BUtil.logInfo("Processing: " + item.toString());
+			//BUtil.log("Processing: " + item.toString());
 			//Items shouldn't be over their stack size
 			if(item.getAmount() >= stackSize)
 			{
 				ItemStack tempItem = mergedStacks[currentStackCount];
 				mergedStacks[currentStackCount++] = item;
 				mergedStacks[currentStackCount] = tempItem;
-				//BUtil.logInfo("Over Stack Size!");
+				//BUtil.log("Over Stack Size!");
 				continue;
 			}
 
@@ -406,12 +406,12 @@ public class GUIUtil
 			if(currentStack == null)
 			{
 				mergedStacks[currentStackCount] = item;
-				//BUtil.logInfo("Replacing Null Object");
+				//BUtil.log("Replacing Null Object");
 				continue;
 			}
 
 			int newAmount = currentStack.getAmount() + item.getAmount();
-			//BUtil.logInfo("New Amount " + newAmount + " | Current Stack: " + currentStack.getAmount() + " | Item " + item.getAmount());
+			//BUtil.log("New Amount " + newAmount + " | Current Stack: " + currentStack.getAmount() + " | Item " + item.getAmount());
 			if(newAmount <= stackSize)
 			{
 				mergedStacks[currentStackCount].setAmount(newAmount);
@@ -425,7 +425,7 @@ public class GUIUtil
 				int tempLeftOver = newAmount - stackSize;
 				mergedStacks[currentStackCount++].setAmount(newAmount - tempLeftOver);
 				leftOver += tempLeftOver;
-				//BUtil.logInfo("Adding " + tempLeftOver + " to leftOver equalling " + leftOver);
+				//BUtil.log("Adding " + tempLeftOver + " to leftOver equalling " + leftOver);
 			}
 		}
 
@@ -511,7 +511,7 @@ public class GUIUtil
 			}
 		}
 
-		//BUtil.logInfo("Vertical Slots: " + Arrays.toString(verticalSlots));
+		//BUtil.log("Vertical Slots: " + Arrays.toString(verticalSlots));
 		return verticalSlots;
 	}
 	

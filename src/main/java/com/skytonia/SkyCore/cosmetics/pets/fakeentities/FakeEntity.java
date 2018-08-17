@@ -248,11 +248,11 @@ public class FakeEntity
 				deltaY = (currentY - y),
 				deltaZ = (currentZ - z);
 		
-		BUtil.logInfo("DeltaX=" + deltaX + " DeltaZ=" + deltaZ);
+		BUtil.log("DeltaX=" + deltaX + " DeltaZ=" + deltaZ);
 		
 		if(deltaX == 0.0D && deltaY == 0.0D && deltaZ == 0.0D)
 		{
-			BUtil.logInfo("Nothing.");
+			BUtil.log("Nothing.");
 			return null;
 		}
 		
@@ -275,7 +275,7 @@ public class FakeEntity
 			packet.setPitch((float) currentPitch);
 			
 			abstractPacket = packet;
-			BUtil.logInfo("Movement.");
+			BUtil.log("Movement.");
 		}*/
 			
 		updateTargetLocation(this.currentWorld, x, y, z, yaw, pitch);
@@ -283,7 +283,7 @@ public class FakeEntity
 		//Process teleport after we've updated the location for all
 		if(abstractPacket == null)
 		{
-			BUtil.logInfo("Teleporting.");
+			BUtil.log("Teleporting.");
 			abstractPacket = getTeleportPacket();
 		}
 		

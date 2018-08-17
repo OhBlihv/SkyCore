@@ -49,13 +49,13 @@ public class CommandAction extends ElementAction
 			{
 				String finalCommand = commandContainer.getCommand().replaceAll("\\{player\\}", player.getName());
 				//TODO: Re-enable these with a toggle-able debug
-				//BUtil.logInfo("Executing as CONSOLE: " + finalCommand);
+				//BUtil.log("Executing as CONSOLE: " + finalCommand);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
 			}
 			else //Change this if more executors come up. But I doubt it
 			{
 				String finalCommand = "/" + commandContainer.getCommand().replaceAll("\\{player\\}", player.getName());
-				//BUtil.logInfo("Executing as PLAYER: " + finalCommand);
+				//BUtil.log("Executing as PLAYER: " + finalCommand);
 				player.chat(finalCommand);
 			}
 		}
@@ -69,7 +69,7 @@ public class CommandAction extends ElementAction
 		
 		if(configurationSection.getKeys(false).isEmpty())
 		{
-			BUtil.logError( "No commands defined for COMMAND action. Configure as such: \n" +
+			BUtil.log( "No commands defined for COMMAND action. Configure as such: \n" +
 				                "actions: COMMAND\n" +
 				                "options:\n" +
 				                "   COMMAND:\n" +
@@ -87,7 +87,7 @@ public class CommandAction extends ElementAction
 					
 					if(!configurationSection.isConfigurationSection(commandName) || !commandSection.contains("execute-as"))
 					{
-						BUtil.logInfo("'" + commandName + "' command does not contain an explicit execute-as, and has been ignored.");
+						BUtil.log("'" + commandName + "' command does not contain an explicit execute-as, and has been ignored.");
 						continue;
 					}
 					
