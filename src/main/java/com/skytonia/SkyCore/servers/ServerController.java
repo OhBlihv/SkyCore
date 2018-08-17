@@ -9,6 +9,7 @@ import com.skytonia.SkyCore.util.BUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
  * Created by Chris Brown (OhBlihv) on 5/16/2017.
@@ -48,15 +49,16 @@ public class ServerController
 		}
 		catch(Exception e)
 		{
-			if(hasLilypad)
+			//Avoid skipping off Lilypad if a redis error occurs
+			if(hasLilypad || e instanceof JedisConnectionException)
 			{
 				communicationHandler = new LilypadCommunicationHandler();
 				BUtil.log("Initialised Lilypad Communication Handler");
 			}
 			else
 			{
-				BUtil.log("Lilypad-Connect not found - Redis Handler failed with the following stack trace:");
-				e.printStackTrace();
+				BUtil.log("Lilypad-Connect not found - Redis Handler failed with the following message:");
+				BUtil.log(e.getMessage());
 
 				BUtil.log("The server messaging system required a working setup of:");
 				BUtil.log("- Bungeecord + Redis");
