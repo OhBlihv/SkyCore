@@ -44,9 +44,8 @@ import java.util.Set;
  */
 public class SkyCore extends JavaPlugin implements Listener
 {
-	
-	@Getter
-	private static SkyCore instance = null;
+
+	private static JavaPlugin instance = null;
 	public static JavaPlugin getPluginInstance()
 	{
 		//We're shaded!
@@ -57,7 +56,7 @@ public class SkyCore extends JavaPlugin implements Listener
 			Plugin plugin = Bukkit.getPluginManager().getPlugin(callingPlugin);
 			if(plugin != null)
 			{
-				return (JavaPlugin) plugin;
+				instance = (JavaPlugin) plugin;
 			}
 			else
 			{
@@ -65,10 +64,8 @@ public class SkyCore extends JavaPlugin implements Listener
 				return null;
 			}
 		}
-		else
-		{
-			return instance;
-		}
+
+		return instance;
 	}
 	
 	private static SupportedVersion currentVersion = null;
@@ -194,7 +191,7 @@ public class SkyCore extends JavaPlugin implements Listener
 		{
 			String fileName = "redis-connections-" + (System.currentTimeMillis() / 1000L) + ".debug";
 
-			File debugFile = new File(SkyCore.getInstance().getDataFolder(), fileName);
+			File debugFile = new File(SkyCore.getPluginInstance().getDataFolder(), fileName);
 			try(PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(debugFile))))
 			{
 				Map<?, PooledObject<Jedis>> allObjects;

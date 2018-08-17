@@ -65,7 +65,7 @@ public class DatabaseSource
 		executeQuery("SELECT 1", null, null, null);
 
 		//Keep Alive
-		RunnableShorthand.forPlugin(SkyCore.getInstance()).with(() ->
+		RunnableShorthand.forPlugin(SkyCore.getPluginInstance()).with(() ->
 		{
 			try
 			{

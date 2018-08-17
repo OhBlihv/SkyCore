@@ -137,14 +137,14 @@ public class FlatFile
 		if(tempOwningPlugin == null)
 		{
 			tempPluginString = "SkyCore";
-			tempOwningPlugin = SkyCore.getInstance();
+			tempOwningPlugin = SkyCore.getPluginInstance();
 		}
 
 		this.pluginString = tempPluginString;
 		this.plugin = tempOwningPlugin;
 		
 		//Support extending classes
-		BUtil.logMessageAsPlugin("SkyCore", "Registered new " + getClass().getSimpleName() + " to: " + plugin + " (" + this.fileName + ")");
+		BUtil.logMessageAsPlugin(SkyCore.getPluginInstance().getName(), "Registered new " + getClass().getSimpleName() + " to: " + plugin + " (" + this.fileName + ")");
 		saveDefaultConfig();
 		getSave();
 
