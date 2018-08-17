@@ -332,7 +332,12 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 						catch(Throwable e)
 						{
 							BUtil.log("Unable to send message " + message.toString());
-							e.printStackTrace();
+
+							//Skip Lilypad 'Offline' spam.
+							if(!e.getMessage().equals("Lilypad Inaccessible. (Offline?)"))
+							{
+								e.printStackTrace();
+							}
 							
 							sentMessages--;
 						}
