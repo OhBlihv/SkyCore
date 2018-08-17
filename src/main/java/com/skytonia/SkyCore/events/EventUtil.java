@@ -25,23 +25,33 @@ public class EventUtil
 {
 	
 	private static final Plugin plugin = SkyCore.getPluginInstance();
-	
+
+	@SafeVarargs
 	public static <T extends Event> RegisteredListener<T> cancelEvents(Class<T>... events)
 	{
 		return cancelEvents(null, events);
 	}
 	
+	@SafeVarargs
 	public static <T extends Event> RegisteredListener<T> cancelEvents(World world, Class<T>... events)
 	{
 		return registerEvent(world, EventPriority.LOWEST, true, events).cancel();
 	}
-	
+
+	public static <T extends Event> RegisteredListener<T> cancelEvents(World world, Class<T> event)
+	{
+		return registerEvent(world, EventPriority.LOWEST, true, event).cancel();
+	}
+
+	@SafeVarargs
 	public static <T extends Event> RegisteredListener<T> registerEvent(final EventPriority priority, final boolean ignoreCancelled, final Class<T>... events)
 	{
 		return registerEvent(null, priority, ignoreCancelled, events);
 	}
-	
-	public static <T extends Event> RegisteredListener<T> registerEvent(final World world, final EventPriority priority, final boolean ignoreCancelled, final Class<T>... events)
+
+	@SafeVarargs
+	public static <T extends Event> RegisteredListener<T> registerEvent(final World world, final EventPriority priority, final boolean ignoreCancelled,
+	                                                                    final Class<T>... events)
 	{
 		RegisteredListener<T> registeredListener = new RegisteredListener<>(events, new Listener() {});
 		
