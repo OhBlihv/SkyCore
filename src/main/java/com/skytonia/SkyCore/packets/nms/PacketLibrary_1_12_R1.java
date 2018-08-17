@@ -2,7 +2,6 @@ package com.skytonia.SkyCore.packets.nms;
 
 import com.skytonia.SkyCore.packets.PacketLibrary;
 import com.skytonia.SkyCore.packets.Persistence;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_12_R1.ChatComponentText;
 import net.minecraft.server.v1_12_R1.ChatMessageType;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;

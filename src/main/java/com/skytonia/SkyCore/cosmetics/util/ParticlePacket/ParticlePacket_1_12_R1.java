@@ -64,7 +64,7 @@ public class ParticlePacket_1_12_R1 extends ParticlePacket
 			                                                packetData                                      //k) Particle Data
 		);
 		
-		serverVersion = 11;
+		serverVersion = 12;
 	}
 	
 	@Override
