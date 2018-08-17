@@ -86,7 +86,7 @@ public class ServerController
 				e.printStackTrace();
 
 				communicationHandler = new NullCommunicationHandler();
-				BUtil.log("Using NULL Handler.");
+				BUtil.log("Using Stub Handler.");
 				return; //Cannot be run as a thread
 			}
 		}
@@ -94,6 +94,8 @@ public class ServerController
 		try
 		{
 			communicationHandler.registerChannels();
+
+			((Thread) communicationHandler).start();
 		}
 		catch(Exception e)
 		{
@@ -101,10 +103,8 @@ public class ServerController
 			e.printStackTrace();
 
 			communicationHandler = new NullCommunicationHandler();
-			BUtil.log("Using NULL Handler.");
+			BUtil.log("Using Stub Handler.");
 		}
-		
-		((Thread) communicationHandler).start();
 	}
 	
 }
