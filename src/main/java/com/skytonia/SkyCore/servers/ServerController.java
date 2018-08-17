@@ -11,11 +11,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * Created by Chris Brown (OhBlihv) on 5/16/2017.
  */
 public class ServerController
 {
+
+	private enum HandlerCapability
+	{
+
+		REDIS,
+		LILYPAD
+
+	}
 	
 	@Getter
 	private static CommunicationHandler communicationHandler = null;
@@ -23,7 +34,7 @@ public class ServerController
 	public ServerController()
 	{
 		BUtil.log("Initializing Server Messaging System");
-		
+
 		/*
 		 * Priority - Redis, Lilypad, BungeeCord
 		 */
@@ -32,43 +43,53 @@ public class ServerController
 			Plugin connectPlugin = Bukkit.getPluginManager().getPlugin("LilyPad-Connect");
 			hasLilypad = connectPlugin != null && connectPlugin.isEnabled();
 		}
-		
-		//Redis
+
+		//Assume Redis, but there is no simple way to test for this without explicitly connecting later on.
+		Set<HandlerCapability> capabilities = EnumSet.of(HandlerCapability.REDIS);
+		if(hasLilypad)
+		{
+		    capabilities.add(HandlerCapability.LILYPAD);
+		}
+
+		initialiseHandler(capabilities);
+	}
+
+	private void initialiseHandler(Set<HandlerCapability> capabilities)
+	{
 		try
 		{
-			if(hasLilypad)
+			//Lilypad + Redis Hybrid
+			if(capabilities.contains(HandlerCapability.LILYPAD) && capabilities.contains(HandlerCapability.REDIS))
 			{
 				communicationHandler = new LilypadRedisCommunicationHandler();
-				BUtil.log("Initialised Redis/Lilypad Communication Handler");
 			}
-			else
+			//Bungee + Redis
+			else if(capabilities.contains(HandlerCapability.REDIS))
 			{
 				communicationHandler = new RedisCommunicationHandler();
-				BUtil.log("Initialised Redis Communication Handler");
+			}
+			//Standalone Lilypad
+			else if(capabilities.contains(HandlerCapability.LILYPAD))
+			{
+				communicationHandler = new LilypadCommunicationHandler();
 			}
 		}
 		catch(Exception e)
 		{
-			//Avoid skipping off Lilypad if a redis error occurs
-			if(hasLilypad || e instanceof JedisConnectionException)
-			{
-				communicationHandler = new LilypadCommunicationHandler();
-				BUtil.log("Initialised Lilypad Communication Handler");
-			}
-			else
-			{
-				BUtil.log("Lilypad-Connect not found - Redis Handler failed with the following message:");
-				BUtil.log(e.getMessage());
+			//
+		}
 
-				BUtil.log("The server messaging system required a working setup of:");
-				BUtil.log("- Bungeecord + Redis");
-				BUtil.log("- Lilypad + Redis");
-				BUtil.log("- Lilypad");
-				BUtil.log("The messaging system cannot fully run on any other setup and will fail to launch.");
+		if(communicationHandler == null || capabilities.isEmpty())
+		{
+			BUtil.log("The server messaging system requires a working setup of:");
+			BUtil.log("- Lilypad + Redis");
+			BUtil.log("- Bungeecord + Redis");
+			BUtil.log("- Lilypad");
+			BUtil.log("The messaging system cannot fully run on any other setup and will fail to launch.");
 
-				communicationHandler = new NullCommunicationHandler();
-				BUtil.log("Using empty handler.");
-			}
+			communicationHandler = new NullCommunicationHandler();
+			BUtil.log("Using empty handler.");
+			return;
 		}
 
 		try
@@ -76,14 +97,26 @@ public class ServerController
 			communicationHandler.registerChannels();
 
 			((Thread) communicationHandler).start();
+
+			BUtil.log("Using " + String.join(" ", communicationHandler.getClass().getSimpleName().split("(?=[A-Z])")));
 		}
 		catch(Exception e)
 		{
-			BUtil.log(communicationHandler.getClass().getSimpleName() + " failed to register channels with the following stack trace:");
-			e.printStackTrace();
+			if(capabilities.isEmpty())
+			{
+				BUtil.log(communicationHandler.getClass().getSimpleName() + " failed to register channels with the following stack trace:");
+				e.printStackTrace();
+			}
+			else
+			{
+				if(e instanceof JedisConnectionException)
+				{
+					capabilities.remove(HandlerCapability.REDIS);
+				}
+				//TODO: Find general causes of other handlers
+			}
 
-			communicationHandler = new NullCommunicationHandler();
-			BUtil.log("Using empty handler.");
+			initialiseHandler(capabilities);
 		}
 	}
 	

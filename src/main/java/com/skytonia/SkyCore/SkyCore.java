@@ -3,6 +3,8 @@ package com.skytonia.SkyCore;
 import com.skytonia.SkyCore.gui.actions.ElementActions;
 import com.skytonia.SkyCore.gui.variables.GUIVariables;
 import com.skytonia.SkyCore.servers.ServerController;
+import com.skytonia.SkyCore.servers.handlers.CommunicationHandler;
+import com.skytonia.SkyCore.servers.handlers.NullCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.RedisCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.debug.DebugJedisPool;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
@@ -140,13 +142,17 @@ public class SkyCore extends JavaPlugin implements Listener
 	@Override
 	public void onDisable()
 	{
-		try
+		final CommunicationHandler commHandler = ServerController.getCommunicationHandler();
+		if(commHandler != null && !(commHandler instanceof NullCommunicationHandler))
 		{
-			((AbstractCommunicationHandler) ServerController.getCommunicationHandler()).shutdown();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
+			try
+			{
+				((AbstractCommunicationHandler) ServerController.getCommunicationHandler()).shutdown();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
