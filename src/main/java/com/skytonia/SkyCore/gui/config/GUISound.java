@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
  * Created by Chris Brown (OhBlihv) on 26/09/2016.
  */
 @RequiredArgsConstructor
-public  class GUISound
+public class GUISound
 {
 	
 	private final Sound sound;

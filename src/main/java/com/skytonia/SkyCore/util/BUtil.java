@@ -40,9 +40,6 @@ import java.util.stream.Collectors;
 
 public class BUtil
 {
-	
-	//Get either SkyCore OR the hosting plugin
-	private static Plugin pluginInstance = null;
 
 	private static boolean useConsoleColours = false;
 	private static final Random random = new Random();
@@ -338,16 +335,20 @@ public class BUtil
 	
 	public static String capitaliseFirst(String string)
 	{
-		return Character.toTitleCase(string.charAt(0)) + string.substring(1, string.length());
+		return Character.toTitleCase(string.charAt(0)) + string.substring(1);
 	}
 	
 	public static String capitaliseAllFirst(String string)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		
-		String[] split = string.split(" ");
-		for(String splitWord : split)
+
+		for(String splitWord : string.split("[ ]"))
 		{
+			if(splitWord.isEmpty())
+			{
+				continue;
+			}
+
 			stringBuilder.append(capitaliseFirst(splitWord)).append(" ");
 		}
 		
