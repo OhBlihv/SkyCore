@@ -1,7 +1,6 @@
 package com.skytonia.SkyCore.servers.handlers;
 
 import com.skytonia.SkyCore.servers.MovementAction;
-import com.skytonia.SkyCore.servers.events.PlayerChangeServerEvent;
 import com.skytonia.SkyCore.servers.handlers.exception.MessageException;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMessage;
@@ -73,11 +72,10 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 	@Override
 	public void transferPlayer(Player player, String serverName)
 	{
+		super.transferPlayer(player, serverName);
+
 		try
 		{
-			PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
-			Bukkit.getPluginManager().callEvent(event);
-
 			//Alert the other server of an incoming player
 			sendMessage(new OutboundCommunicationMessage(
 				serverName, CHANNEL_MOVE_FORCE, MessageUtil.mergeArguments(player.getName(), player.getUniqueId().toString())

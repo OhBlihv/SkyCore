@@ -53,7 +53,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	/*
 	 * Messaging
 	 */
-	
+
 	protected final Multimap<String, ChannelSubscriber> subscriptionMap;
 	
 	private final CopyOnWriteArrayList<CommunicationMessage> pendingMessages = new CopyOnWriteArrayList<>();
@@ -515,7 +515,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 			}
 			case CHANNEL_MOVE_REPL:
 			{
-				String targetServer = message.getMessageArgs()[0],
+				String targetServer = message.getServer(),
 					   playerName   = message.getMessageArgs()[1],
 					   response     = "";
 				
@@ -698,7 +698,17 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 		
 		movementInfo.failPlayer();
 	}
-	
+
+	@Override
+	public void transferPlayer(Player player, String serverName)
+	{
+		if(!movementMap.containsKey(player.getName()))
+		{
+			PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
+			Bukkit.getPluginManager().callEvent(event);
+		}
+	}
+
 	@Override
 	public void requestPlayerTransfer(Player player, String serverName)
 	{

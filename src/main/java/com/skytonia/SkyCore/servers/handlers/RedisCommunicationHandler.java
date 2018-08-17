@@ -4,7 +4,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.servers.MovementAction;
-import com.skytonia.SkyCore.servers.events.PlayerChangeServerEvent;
 import com.skytonia.SkyCore.servers.handlers.debug.DebugJedisPool;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.processing.InboundCommunicationMessage;
@@ -121,8 +120,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	@Override
 	public void transferPlayer(Player player, String serverName)
 	{
-		PlayerChangeServerEvent event = new PlayerChangeServerEvent(player, serverName);
-		Bukkit.getPluginManager().callEvent(event);
+		super.transferPlayer(player, serverName);
 
 		//Alert the other server of an incoming player
 		sendMessage(new OutboundCommunicationMessage(
