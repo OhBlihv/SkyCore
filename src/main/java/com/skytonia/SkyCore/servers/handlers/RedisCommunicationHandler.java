@@ -4,7 +4,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.servers.MovementAction;
-import com.skytonia.SkyCore.servers.handlers.debug.DebugJedisPool;
 import com.skytonia.SkyCore.servers.handlers.processing.AbstractCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.processing.InboundCommunicationMessage;
 import com.skytonia.SkyCore.servers.handlers.processing.OutboundCommunicationMessage;
@@ -19,6 +18,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -34,7 +34,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	private static final String CHANNEL_REGISTRATION = "SC_Init";
 
 	@Getter
-	private final DebugJedisPool jedisPool;
+	private final JedisPool jedisPool;
 	
 	public RedisCommunicationHandler()
 	{
@@ -57,8 +57,8 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		poolConfig.setNumTestsPerEvictionRun(10);
 		poolConfig.setTimeBetweenEvictionRunsMillis(60000); //60 seconds
 
-		jedisPool = new DebugJedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
-		//jedisPool = new JedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
+		//jedisPool = new DebugJedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
+		jedisPool = new JedisPool(poolConfig, commFile.getString("communication.redis.host"), commFile.getInt("communication.redis.port"), 5000);
 
 		//Only overwrite if we don't already have a name to use
 		currentServer = commFile.getString("communication.redis.server");

@@ -99,10 +99,8 @@ public class SkyCore extends JavaPlugin implements Listener
 		instance = this;
 		
 		getServer().getPluginManager().registerEvents(this, this);
-		
-		//Initialize ASync to avoid lockups while searching for Redis and other issues
-		//Bukkit.getScheduler().runTaskAsynchronously(this, () -> serverController = new ServerController(this));
-		serverController = new ServerController(this);
+
+		serverController = new ServerController();
 		
 		BUtil.log("Using Spigot flavour '" + getServer().getName() + "'");
 		if(getServer().getName().equals("SkyPaper"))

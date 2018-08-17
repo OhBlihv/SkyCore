@@ -1,6 +1,5 @@
 package com.skytonia.SkyCore.servers;
 
-import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.servers.handlers.CommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.LilypadCommunicationHandler;
 import com.skytonia.SkyCore.servers.handlers.LilypadRedisCommunicationHandler;
@@ -17,36 +16,12 @@ import org.bukkit.plugin.Plugin;
 public class ServerController
 {
 	
-	private final SkyCore plugin;
-	
 	@Getter
 	private static CommunicationHandler communicationHandler = null;
 	
-	public ServerController(SkyCore plugin)
+	public ServerController()
 	{
-		this.plugin = plugin;
-
-		switch(Bukkit.getServer().getName())
-		{
-			case "TWSpigot":
-			case "SkySpigot":
-			case "SkyPaper":
-			{
-				BUtil.log("Initializing Server Messaging System");
-				break;
-			}
-			default:
-			{
-				if (!BUtil.getNMSVersion().equals("v1_12_R1"))
-				{
-					BUtil.log("Using Null Server Messaging System on unsupported software");
-					communicationHandler = new NullCommunicationHandler();
-					return;
-				}
-				BUtil.log("Initializing Server Messaging System");
-				break;
-			}
-		}
+		BUtil.log("Initializing Server Messaging System");
 		
 		/*
 		 * Priority - Redis, Lilypad, BungeeCord
@@ -73,8 +48,6 @@ public class ServerController
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-
 			if(hasLilypad)
 			{
 				communicationHandler = new LilypadCommunicationHandler();
@@ -85,9 +58,14 @@ public class ServerController
 				BUtil.log("Lilypad-Connect not found - Redis Handler failed with the following stack trace:");
 				e.printStackTrace();
 
+				BUtil.log("The server messaging system required a working setup of:");
+				BUtil.log("- Bungeecord + Redis");
+				BUtil.log("- Lilypad + Redis");
+				BUtil.log("- Lilypad");
+				BUtil.log("The messaging system cannot fully run on any other setup and will fail to launch.");
+
 				communicationHandler = new NullCommunicationHandler();
-				BUtil.log("Using Stub Handler.");
-				return; //Cannot be run as a thread
+				BUtil.log("Using empty handler.");
 			}
 		}
 
@@ -103,7 +81,7 @@ public class ServerController
 			e.printStackTrace();
 
 			communicationHandler = new NullCommunicationHandler();
-			BUtil.log("Using Stub Handler.");
+			BUtil.log("Using empty handler.");
 		}
 	}
 	
