@@ -14,15 +14,19 @@ import com.skytonia.SkyCore.servers.listeners.RedisChannelSubscriber;
 import com.skytonia.SkyCore.servers.util.MessageUtil;
 import com.skytonia.SkyCore.util.BUtil;
 import com.skytonia.SkyCore.util.file.FlatFile;
+import javafx.util.Pair;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -130,7 +134,7 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		out.writeUTF("Connect");
 		out.writeUTF(serverName);
-		
+
 		player.sendPluginMessage(SkyCore.getPluginInstance(), "BungeeCord", out.toByteArray());
 	}
 	
@@ -139,7 +143,36 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	{
 		sendMessage(message.getServer(), message.getChannel(), message.getMessage());
 	}
-	
+
+	@Override
+	public Deque<Pair<OutboundCommunicationMessage, Exception>> sendMessages(Deque<OutboundCommunicationMessage> messages)
+	{
+		Deque<Pair<OutboundCommunicationMessage, Exception>> failedMessages = new ArrayDeque<>();
+
+		accessConnection((jedis) ->
+		{
+			try(Pipeline pipeline = jedis.pipelined())
+			{
+				for(OutboundCommunicationMessage message : messages)
+				{
+					try
+					{
+						sendMessageOnChannel(pipeline, message.getServer(), message.getChannel(), message.getMessage());
+					}
+					catch(Exception e)
+					{
+						failedMessages.add(new Pair<>(message, e));
+					}
+				}
+
+				pipeline.sync();
+			}
+
+		});
+
+		return failedMessages;
+	}
+
 	@Override
 	public void registerSubscription(ChannelSubscription subscriber, boolean prefixWithServerName, String... channels)
 	{
@@ -185,24 +218,52 @@ public class RedisCommunicationHandler extends AbstractCommunicationHandler impl
 	{
 		accessConnection((jedis) ->
 		{
-			String serverChannel = channel;
-			if(server != null)
-			{
-				serverChannel = server + ">" + serverChannel;
-			}
-
-			String[] messageArr = new String[message.length + 1];
-			System.arraycopy(message, 0, messageArr, 1, message.length);
-			messageArr[0] = currentServer;
-
-			jedis.publish(serverChannel, MessageUtil.mergeArguments(messageArr));
+			sendMessageOnChannel(jedis, server, channel, message);
 		});
+	}
+
+	private void sendMessageOnChannel(Jedis jedis, String server, final String channel, String... message)
+	{
+		prepareMessageSend((serverChannel, messageArr) ->
+		{
+			jedis.publish(serverChannel, MessageUtil.mergeArguments(messageArr));
+		}, server, channel, message);
+	}
+
+	private void sendMessageOnChannel(Pipeline jedis, String server, final String channel, String... message)
+	{
+		prepareMessageSend((serverChannel, messageArr) ->
+		{
+			jedis.publish(serverChannel, MessageUtil.mergeArguments(messageArr));
+		}, server, channel, message);
+	}
+
+	private void prepareMessageSend(RedisSendRunnable redisSendRunnable, String server, final String channel, String... message)
+	{
+		String serverChannel = channel;
+		if(server != null)
+		{
+			serverChannel = server + ">" + serverChannel;
+		}
+
+		String[] messageArr = new String[message.length + 1];
+		System.arraycopy(message, 0, messageArr, 1, message.length);
+		messageArr[0] = currentServer;
+
+		redisSendRunnable.run(serverChannel, messageArr);
 	}
 	
 	@Override
 	public void onMessage(InboundCommunicationMessage message)
 	{
 		addMessage(message);
+	}
+
+	private interface RedisSendRunnable
+	{
+
+		void run(String serverChannel, String[] messageArr);
+
 	}
 
 }

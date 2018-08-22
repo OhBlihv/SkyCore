@@ -306,41 +306,37 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				pendingMessages.clear();
 				
 				int sentMessages = currentMessages.size();
-				
-				for(CommunicationMessage message : currentMessages)
+
 				{
-					if(message.getDirection() == CommunicationDirection.INBOUND)
+					Deque<OutboundCommunicationMessage> pendingSendMessages = new ArrayDeque<>();
+
+					for(CommunicationMessage message : currentMessages)
 					{
-						try
+						if(message.getDirection() == CommunicationDirection.INBOUND)
 						{
-							receiveMessage((InboundCommunicationMessage) message);
+							try
+							{
+								receiveMessage((InboundCommunicationMessage) message);
+							}
+							catch(Throwable e)
+							{
+								BUtil.log("Unable to receive message " + message.toString());
+								e.printStackTrace();
+
+								sentMessages--;
+							}
 						}
-						catch(Throwable e)
+						else //if(message.getDirection() == CommunicationDirection.OUTBOUND)
 						{
-							BUtil.log("Unable to receive message " + message.toString());
-							e.printStackTrace();
-							
-							sentMessages--;
+							pendingSendMessages.add((OutboundCommunicationMessage) message);
 						}
 					}
-					else //if(message.getDirection() == CommunicationDirection.OUTBOUND)
-					{
-						try
-						{
-							sendMessage((OutboundCommunicationMessage) message);
-						}
-						catch(Throwable e)
-						{
-							BUtil.log("Unable to send message " + message.toString());
 
-							//Skip Lilypad 'Offline' spam.
-							if(!e.getMessage().equals("Lilypad Inaccessible. (Offline?)"))
-							{
-								e.printStackTrace();
-							}
-							
-							sentMessages--;
-						}
+					//Returns a deque of failed messages.
+					//Adding the size of this will decrement the properly sent messages counter
+					if(!pendingSendMessages.isEmpty())
+					{
+						sentMessages -= sendMessages(pendingSendMessages).size();
 					}
 				}
 				
@@ -358,7 +354,8 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 				long catchup = (executionEnd - executionStart);
 				if(catchup > 49)
 				{
-					BUtil.log("Communications Thread behind 20tps target! Last execution took " + (50 - catchup) + "ms longer than expected.");
+					//TODO: Only print if this is significantly behind?
+					BUtil.log("Communications Thread behind 20tps target! Last execution took " + Math.abs(50 - catchup) + "ms longer than expected.");
 				}
 				else
 				{
@@ -416,7 +413,32 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	}
 	
 	public abstract void sendMessage(OutboundCommunicationMessage message) throws MessageException;
-	
+
+	/**
+	 *
+	 * @param messages
+	 * @return A pair of the message and exception encountered for each failed message
+	 * @throws MessageException
+	 */
+	public Deque<Pair<OutboundCommunicationMessage, Exception>> sendMessages(Deque<OutboundCommunicationMessage> messages) throws MessageException
+	{
+		Deque<Pair<OutboundCommunicationMessage, Exception>> failedMessages = new ArrayDeque<>();
+
+		for(OutboundCommunicationMessage message : messages)
+		{
+			try
+			{
+				sendMessage(message);
+			}
+			catch(Exception e)
+			{
+				failedMessages.add(new Pair<>(message, e));
+			}
+		}
+
+		return failedMessages;
+	}
+
 	@Override
 	public void receiveMessage(InboundCommunicationMessage message) throws MessageException
 	{
