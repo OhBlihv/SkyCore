@@ -26,11 +26,15 @@ public class UtilTest
 	@Test
 	public void jsonParserTest()
 	{
-		JSONContentParser parser = new JSONContentParser(
-			BUtil.translateColours("&e&l(!) &e&lUNSCRAMBLE: &e{hov;Hover to see the word! ;{scrambled-word}}&7Be the first to unscramble this word!"));
-			//.replace("{scrambled-word}", "asdf123"));
+		//final String original = BUtil.translateColours("&e&l(!) &e&lUNSCRAMBLE: &e{hov;Hover to see the word!;{scrambled-word}} &7Be the first to unscramble this word!");
+		final String original = BUtil.translateColours("&e&l(!) &e&lUNSCRAMBLE: &eHover to see the word! &7Be the first to unscramble this word!");
+
+		JSONContentParser parser = new JSONContentParser(original);
 
 		BaseComponent[] components = parser.parseLines();
+
+		BUtil.log("Original:");
+		BUtil.log(original);
 
 		BUtil.log("Result:");
 		String resultingString = "";
@@ -42,7 +46,7 @@ public class UtilTest
 
 			if(resultingString.endsWith("\n"))
 			{
-				BUtil.log(resultingString);
+				BUtil.log(">" + resultingString + "<");
 				resultingString = "";
 			}
 		}
@@ -52,8 +56,10 @@ public class UtilTest
 			BUtil.log(resultingString);
 		}
 
-		/*assertEquals(Arrays.toString(parser.parseLines()),
-					 Arrays.toString(new JSONContentParser(parser.parseLines()).parseLines()));*/
+		assertEquals(original, resultingString);
+
+		//assertEquals(Arrays.toString(parser.parseLines()),
+		//			 Arrays.toString(new JSONContentParser(parser.parseLines()).parseLines()));
 	}
 	
 	@Test

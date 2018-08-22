@@ -65,6 +65,7 @@ public class JSONContentParser extends VariableReplacer
 			if(lastContent.endsWith("\n"))
 			{
 				content.add(lastContent.substring(0, lastContent.length() - 1));
+
 				lastContent = "";
 			}
 		}
@@ -75,7 +76,7 @@ public class JSONContentParser extends VariableReplacer
 			content.add(lastContent.replace("\n", ""));
 		}
 
-		BUtil.log(content.toString());
+		//BUtil.log(content.toString());
 
 		return content;
 	}
@@ -180,15 +181,17 @@ public class JSONContentParser extends VariableReplacer
 		formatMap.put(FormatType.COLOUR, "§f");
 
 		Deque<BaseComponent> components = new ArrayDeque<>();
-		for(String line : content)
+		for(Iterator<String> contentItr = content.iterator();contentItr.hasNext();)
 		{
-			parseLine(components, line);
+			String line = contentItr.next();
+
+			parseLine(components, line, contentItr.hasNext());
 		}
 
 		return components.toArray(new BaseComponent[]{});
 	}
 
-	private void parseLine(Deque<BaseComponent> components, String line)
+	private void parseLine(Deque<BaseComponent> components, String line, boolean hasNext)
 	{
 		//BUtil.log("Parsing Line '" + line + "'");
 
@@ -233,7 +236,10 @@ public class JSONContentParser extends VariableReplacer
 		}
 
 		//Ensure each line is separated properly
-		components.add(new TextComponent("\n"));
+		if(hasNext)
+		{
+			components.add(new TextComponent("\n"));
+		}
 	}
 
 	private Deque<BaseComponent> updateEvents(String line)
