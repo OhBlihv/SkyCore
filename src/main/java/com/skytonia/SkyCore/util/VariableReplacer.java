@@ -11,18 +11,25 @@ public class VariableReplacer
 
 	public VariableReplacer(String content)
 	{
-		this.content = new ArrayList<>(Arrays.asList(content));
+		this(Arrays.asList(content));
 	}
 
 	public VariableReplacer(List<String> content)
 	{
 		//Ensure we're not modifying the original object
-		this.content = new ArrayList<>(content);
+		if(content != null && !content.isEmpty())
+		{
+			this.content = new ArrayList<>(content);
+		}
+		else
+		{
+			this.content = new ArrayList<>();
+		}
 	}
 
 	public VariableReplacer replace(String variable, String replacementContent)
 	{
-		if(variable == null || replacementContent == null)
+		if(content.isEmpty() || variable == null || replacementContent == null)
 		{
 			return this;
 		}
