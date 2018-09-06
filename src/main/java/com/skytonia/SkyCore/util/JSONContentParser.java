@@ -257,7 +257,14 @@ public class JSONContentParser extends VariableReplacer
 
 			//Use the first entry in the component array, as the hover component
 			//only takes up one component max.
-			BaseComponent hoverComponent = new ComponentBuilder(line.substring(matcher.end(2), matcher.start(3)))
+			String lineContent = line.substring(matcher.end(2), matcher.start(3));
+			//Add any trailing content after the variable to the line content
+			if(matcher.end(4) < line.length())
+			{
+				lineContent += line.substring(matcher.end(4));
+			}
+
+			BaseComponent hoverComponent = new ComponentBuilder(lineContent)
 				.event(new HoverEvent(
 					HoverEvent.Action.SHOW_TEXT,
 					new ComponentBuilder(line.substring(matcher.end(3), matcher.start(4))).create()
