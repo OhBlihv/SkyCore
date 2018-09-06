@@ -5,6 +5,7 @@ import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_10_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_11_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_12_R1;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_13_R1;
+import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_13_R2;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_7_R4;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_8_R3;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacketFactory_1_9_R2;
@@ -12,6 +13,7 @@ import com.skytonia.SkyCore.items.nms.NMSItemUtil;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_11_R1;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_12_R1;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_13_R1;
+import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_13_R2;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_7_R4;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_8_R3;
 import com.skytonia.SkyCore.items.nms.NMSItemUtil_1_9_R2;
@@ -19,6 +21,7 @@ import com.skytonia.SkyCore.packets.PacketLibrary;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_11_R1;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_12_R1;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_13_R1;
+import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_13_R2;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_7_R4;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_8_R3;
 import com.skytonia.SkyCore.packets.nms.PacketLibrary_1_9_R2;
@@ -92,6 +95,7 @@ public class StaticNMS
 				case "v1_11_R1": particleFactoryInstance = new ParticlePacketFactory_1_11_R1(); break;
 				case "v1_12_R1": particleFactoryInstance = new ParticlePacketFactory_1_12_R1(); break;
 				case "v1_13_R1": particleFactoryInstance = new ParticlePacketFactory_1_13_R1(); break;
+				case "v1_13_R2": particleFactoryInstance = new ParticlePacketFactory_1_13_R2(); break;
 				default: //Check if we're running forge
 				{
 					/*if(isForge)
@@ -132,6 +136,7 @@ public class StaticNMS
 				case "v1_11_R1": packetLibrary = new PacketLibrary_1_11_R1(); break;
 				case "v1_12_R1": packetLibrary = new PacketLibrary_1_12_R1(); break;
 				case "v1_13_R1": packetLibrary = new PacketLibrary_1_13_R1(); break;
+				case "v1_13_R2": packetLibrary = new PacketLibrary_1_13_R2(); break;
 				default: //Check if we're running forge
 				{
 					/*if(isForge)
@@ -172,6 +177,7 @@ public class StaticNMS
 				case "v1_11_R1": nmsItemUtil = new NMSItemUtil_1_11_R1(); break;
 				case "v1_12_R1": nmsItemUtil = new NMSItemUtil_1_12_R1(); break;
 				case "v1_13_R1": nmsItemUtil = new NMSItemUtil_1_13_R1(); break;
+				case "v1_13_R2": nmsItemUtil = new NMSItemUtil_1_13_R2(); break;
 				default: //Check if we're running forge
 				{
 					/*if(isForge)
