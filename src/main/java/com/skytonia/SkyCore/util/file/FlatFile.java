@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -225,7 +226,13 @@ public class FlatFile
 	
 	public Set<String> getChildren(String path)
 	{
-		return save.getConfigurationSection(path).getKeys(false);
+		ConfigurationSection configurationSection = save.getConfigurationSection(path);
+		if(configurationSection == null)
+		{
+			return new HashSet<>();
+		}
+
+		return configurationSection.getKeys(false);
 	}
 
 	public String getString(String path)
@@ -250,12 +257,20 @@ public class FlatFile
 	
 	public List<String> getStringList(String path)
 	{
-		return save.getStringList(path);
+		List<String> stringList = save.getStringList(path);
+
+		//Path may not exist. Avoid throwing errors
+		if(stringList == null)
+		{
+			stringList = new ArrayList<>();
+		}
+
+		return stringList;
 	}
 	
 	public List<String> getFormattedStringList(String path)
 	{
-		return BUtil.translateColours(save.getStringList(path));
+		return BUtil.translateColours(getStringList(path));
 	}
 	
 	public int getInt(String path)
