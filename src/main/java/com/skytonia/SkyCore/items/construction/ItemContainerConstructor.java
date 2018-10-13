@@ -315,15 +315,33 @@ public class ItemContainerConstructor
 		if(configurationSection.contains("color"))
 		{
 			String colourString = configurationSection.getString("color");
-			try
+			if(colourString.contains(":"))
 			{
-				armorColor = Color.fromRGB(Integer.parseInt(colourString, 16));
+				String[] split = colourString.split("[:]");
+
+				try
+				{
+					armorColor = Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+				}
+				catch(Exception e)
+				{
+					BUtil.log("Could not parse armour colour " + colourString + ". Is it in the format \"RED:GREEN:BLUE\"?");
+					e.printStackTrace();
+					armorColor = Color.WHITE;
+				}
 			}
-			catch(IllegalArgumentException e)
+			else
 			{
-				BUtil.log("Could not parse armour colour " + colourString + ". Is it in the correct format?");
-				BUtil.log(e.getMessage());
-				armorColor = Color.WHITE;
+				try
+				{
+					armorColor = Color.fromRGB(Integer.parseInt(colourString, 16));
+				}
+				catch(IllegalArgumentException e)
+				{
+					BUtil.log("Could not parse armour colour " + colourString + ". Is it in the correct format?");
+					BUtil.log(e.getMessage());
+					armorColor = Color.WHITE;
+				}
 			}
 		}
 		
