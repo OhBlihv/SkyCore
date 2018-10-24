@@ -2,7 +2,7 @@ package com.skytonia.SkyCore.items;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import org.bukkit.Material;
+import com.skytonia.SkyCore.util.StaticNMS;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -17,7 +17,7 @@ public class HeadUtil
 	
 	public static ItemStack getHead(String texture)
 	{
-		ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+		ItemStack itemStack = new ItemStack(StaticNMS.getNMSItemUtil().getSkullMaterial(), 1, (short) 3);
 		
 		itemStack = setHeadTexture(itemStack, texture);
 		

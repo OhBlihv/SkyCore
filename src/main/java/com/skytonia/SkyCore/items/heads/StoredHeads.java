@@ -3,8 +3,8 @@ package com.skytonia.SkyCore.items.heads;
 import com.skytonia.SkyCore.items.HeadUtil;
 import com.skytonia.SkyCore.items.construction.ItemContainer;
 import com.skytonia.SkyCore.items.construction.ItemContainerConstructor;
+import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,7 +25,7 @@ public class StoredHeads
 		public ItemContainer asItemContainer()
 		{
 			return new ItemContainerConstructor.ItemContainerBuilder()
-				       .material(Material.SKULL_ITEM)
+				       .material(StaticNMS.getNMSItemUtil().getSkullMaterial())
 					   .damage(3)
 				       .skullTexture(skullTexture).build();
 		}

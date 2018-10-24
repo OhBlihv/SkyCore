@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.bukkit.Material.AIR;
-import static org.bukkit.Material.SKULL_ITEM;
 
 /**
  * Created by Chris Brown (OhBlihv) on 1/20/2017.
@@ -185,7 +184,7 @@ public class ItemContainerConstructor
 		String owner = null;
 		String skullTexture = null;
 		Color armorColor = null;
-		if(itemStack.getType() == SKULL_ITEM)
+		if(itemStack.getType() == StaticNMS.getNMSItemUtil().getSkullMaterial())
 		{
 			try
 			{

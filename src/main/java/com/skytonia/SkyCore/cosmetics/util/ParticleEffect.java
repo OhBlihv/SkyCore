@@ -3,6 +3,7 @@ package com.skytonia.SkyCore.cosmetics.util;
 import com.skytonia.SkyCore.SkyCore;
 import com.skytonia.SkyCore.cosmetics.util.ParticlePacket.ParticlePacket;
 import com.skytonia.SkyCore.util.StaticNMS;
+import com.skytonia.SkyCore.util.SupportedVersion;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -578,7 +579,16 @@ public enum ParticleEffect
 	private static boolean isWater(Location location)
 	{
 		Material material = location.getBlock().getType();
-		return material == Material.WATER || material == Material.STATIONARY_WATER;
+
+		if(SkyCore.getCurrentVersion().isAtLeast(SupportedVersion.ONE_THIRTEEN))
+		{
+			//Stationary Water was removed in 1.13
+			return material == Material.WATER;
+		}
+		else
+		{
+			return material == Material.WATER || material == Material.STATIONARY_WATER;
+		}
 	}
 	
 	/**

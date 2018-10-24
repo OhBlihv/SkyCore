@@ -80,4 +80,10 @@ public class NMSItemUtil_1_8_R3 implements NMSItemUtil
 		return Material.POTATO_ITEM;
 	}
 
+	@Override
+	public Material getSkullMaterial()
+	{
+		return Material.SKULL_ITEM;
+	}
+
 }
