@@ -3,5 +3,6 @@ version: ${project.version}
 author: OhBlihv
 main: ${project.groupId}.${project.artifactId}.${project.artifactId}
 softdepend: [ProtocolLib, LilyPad-Connect]
+api-version: 1.13
 commands:
     ${project.artifactId}:

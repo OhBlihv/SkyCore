@@ -4,6 +4,7 @@ import com.skytonia.SkyCore.gui.actions.ElementAction;
 import com.skytonia.SkyCore.gui.variables.GUIVariable;
 import com.skytonia.SkyCore.items.construction.ItemContainer;
 import com.skytonia.SkyCore.items.construction.ItemContainerConstructor.ItemContainerBuilder;
+import com.skytonia.SkyCore.util.StaticNMS;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -23,7 +24,7 @@ public class GUIElement
 {
 	
 	public static final GUIElement DEFAULT_GUI_ELEMENT =
-		new GUIElement(new ItemContainerBuilder().material(Material.POTATO_ITEM).build(),
+		new GUIElement(new ItemContainerBuilder().material(StaticNMS.getNMSItemUtil().getDefaultMaterial()).build(),
 		               new ArrayDeque<>());
 	
 	@Getter

@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.skytonia.SkyCore.items.EnchantStatus;
 import com.skytonia.SkyCore.items.GUIUtil;
 import com.skytonia.SkyCore.util.BUtil;
+import com.skytonia.SkyCore.util.StaticNMS;
 import com.skytonia.SkyCore.util.file.FlatFile;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -268,7 +269,7 @@ public class ItemContainerConstructor
 				}
 				
 				//Still override the material for now, even if we aren't asked to
-				material = Material.POTATO_ITEM;
+				material = StaticNMS.getNMSItemUtil().getDefaultMaterial();
 			}
 		}
 		int damage = overriddenValues.containsKey(ItemContainerVariable.DAMAGE) ?

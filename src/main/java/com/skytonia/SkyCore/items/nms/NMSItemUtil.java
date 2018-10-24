@@ -1,5 +1,6 @@
 package com.skytonia.SkyCore.items.nms;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.INBTBase;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,6 +14,8 @@ public interface NMSItemUtil
 	ItemStack setSpawnedEntity(ItemStack itemStack, int damage);
 	
 	Object addEnchantmentEffect(Object enchTag);
+
+	Material getDefaultMaterial();
 
 	default void addNBTFlag(ItemMeta itemMeta, String key, INBTBase value)
 	{

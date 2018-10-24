@@ -7,7 +7,7 @@ import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-public class NMSItemUtil_1_13_R1 implements NMSItemUtil
+public class NMSItemUtil_1_13_R1 extends NMSItemUtil_1_13_X
 {
 
 	@Override

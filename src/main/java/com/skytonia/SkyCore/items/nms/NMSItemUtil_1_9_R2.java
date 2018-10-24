@@ -2,6 +2,7 @@ package com.skytonia.SkyCore.items.nms;
 
 import net.minecraft.server.v1_9_R2.NBTTagCompound;
 import net.minecraft.server.v1_9_R2.NBTTagList;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -49,6 +50,12 @@ public class NMSItemUtil_1_9_R2 implements NMSItemUtil
 		((net.minecraft.server.v1_9_R2.NBTTagList) enchTag).add(new net.minecraft.server.v1_9_R2.NBTTagInt(-1));
 		
 		return enchTag;
+	}
+
+	@Override
+	public Material getDefaultMaterial()
+	{
+		return Material.POTATO_ITEM;
 	}
 	
 }

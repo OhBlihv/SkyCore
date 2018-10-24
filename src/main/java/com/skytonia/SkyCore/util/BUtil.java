@@ -129,7 +129,7 @@ public class BUtil
 		}
 
 		BUtil.log("Invalid material: " + materialString);
-		return Material.POTATO_ITEM;
+		return StaticNMS.getNMSItemUtil().getDefaultMaterial();
 	}
 
 	public static String getLargestUnitAgo(long comparedMillis)

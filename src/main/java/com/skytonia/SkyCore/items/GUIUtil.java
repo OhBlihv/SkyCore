@@ -63,7 +63,7 @@ public class GUIUtil
 	}
 
 	private static final int STACK_SIZE = 64;
-	public static final ItemStack DEFAULT_ITEMSTACK = addEnchantmentEffect(new ItemStack(Material.POTATO_ITEM, 1, (short) 15));
+	//public static final ItemStack DEFAULT_ITEMSTACK = addEnchantmentEffect(new ItemStack(Material.POTATO_ITEM, 1, (short) 15));
 
 	public static String getErrorMessage(ConfigurationSection configurationSection, String path, String inputValue)
 	{
