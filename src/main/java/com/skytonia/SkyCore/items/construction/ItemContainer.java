@@ -63,9 +63,11 @@ public class ItemContainer
 	@Getter
 	private Map<String, INBTBase> nbtFlags = new HashMap<>();
 
+	private Set<ItemFlag> itemFlags = EnumSet.noneOf(ItemFlag.class);
+
 	public ItemContainer(Material material, int damage, int amount, String displayName, List<String> lore, EnchantStatus enchantStatus,
 	                     Map<Enchantment, Integer> enchantmentMap, String owner, String skullTexture, Color armorColor,
-	                     Map<String, INBTBase> nbtFlags)
+	                     Map<String, INBTBase> nbtFlags, Set<ItemFlag> itemsFlags)
 	{
 		this.material = material;
 		this.damage = damage;
@@ -78,6 +80,7 @@ public class ItemContainer
 		this.skullTexture = skullTexture;
 		this.armorColor = armorColor;
 		this.nbtFlags = nbtFlags;
+		this.itemFlags = itemsFlags;
 	}
 	
 	private Object getOverriddenValue(Map<ItemContainerVariable, Object> overriddenValues, ItemContainerVariable itemVariable, Object defaultValue)
@@ -138,7 +141,8 @@ public class ItemContainer
 		ItemStack itemStack = new ItemStack(material, amount, (short) damage);
 		
 		//Handle NBT Tags early on before we customise it too much
-		if((material == MONSTER_EGG || material == MOB_SPAWNER) && damage > 0)
+		if((StaticNMS.getNMSItemUtil().isMonsterEggMaterial(material) || material == StaticNMS.getNMSItemUtil().getSpawnerMaterial()) &&
+			damage > 0)
 		{
 			itemStack = StaticNMS.getNMSItemUtil().setSpawnedEntity(itemStack, damage);
 		}
@@ -149,7 +153,7 @@ public class ItemContainer
 		{
 			itemMeta.setDisplayName(displayName);
 		}
-		if((material == Material.SKULL_ITEM || material == Material.SKULL) && damage == 3)
+		if((StaticNMS.getNMSItemUtil().isSkullMaterial(material)) && damage == 3)
 		{
 			if(skullTexture == null)
 			{
@@ -240,6 +244,11 @@ public class ItemContainer
 				ItemFlag.HIDE_POTION_EFFECTS);
 		}
 
+		for(ItemFlag itemFlag : itemFlags)
+		{
+			itemMeta.addItemFlags(itemFlag);
+		}
+
 		if(nbtFlags != null && !nbtFlags.isEmpty() && SkyCore.getCurrentVersion().isExact(SupportedVersion.ONE_EIGHT))
 		{
 			for(Map.Entry<String, INBTBase> entry : nbtFlags.entrySet())
@@ -283,7 +292,7 @@ public class ItemContainer
 		{
 			original.setType(material);
 		}
-		if((material == Material.SKULL_ITEM || material == Material.SKULL) && playerName != null)
+		if((StaticNMS.getNMSItemUtil().isSkullMaterial(material)) && playerName != null)
 		{
 			((SkullMeta) meta).setOwner(playerName);
 		}

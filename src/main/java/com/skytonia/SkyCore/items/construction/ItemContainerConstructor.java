@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.INBTBase;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,6 +24,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.bukkit.Material.AIR;
@@ -65,6 +67,8 @@ public class ItemContainerConstructor
 
 		@Getter
 		private Map<String, INBTBase> nbtFlags = new HashMap<>();
+
+		private Set<ItemFlag> itemFlags = EnumSet.noneOf(ItemFlag.class);
 		
 		public ItemContainerBuilder material(Material material)
 		{
@@ -142,13 +146,20 @@ public class ItemContainerConstructor
 
 			return this;
 		}
+
+		public ItemContainerBuilder itemFlag(ItemFlag itemFlag)
+		{
+			itemFlags.add(itemFlag);
+
+			return this;
+		}
 		
 		public ItemContainer build()
 		{
 			return new ItemContainer(material, damage, amount,
 			                         displayName, lore,
 			                         enchantStatus, enchantments,
-			                         owner, skullTexture, armorColor, nbtFlags);
+			                         owner, skullTexture, armorColor, nbtFlags, itemFlags);
 		}
 		
 	}
@@ -344,10 +355,26 @@ public class ItemContainerConstructor
 				}
 			}
 		}
+
+		Set<ItemFlag> itemFlags = EnumSet.noneOf(ItemFlag.class);
+		if(configurationSection.contains("item-flags") && configurationSection.isList("item-flags"))
+		{
+			for(String itemFlagName : configurationSection.getStringList("item-flags"))
+			{
+				try
+				{
+					itemFlags.add(ItemFlag.valueOf(itemFlagName));
+				}
+				catch(IllegalArgumentException e)
+				{
+					BUtil.log("Unknown item flag name'" + itemFlagName + "' at " + configurationSection.getCurrentPath() + ".item-flags");
+				}
+			}
+		}
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(isEnchanted), enchantmentMap,
-		                         owner, skullTexture, armorColor, null);
+		                         owner, skullTexture, armorColor, null, itemFlags);
 	}
 	
 	private static final Pattern PATTERN_SEPERATOR = Pattern.compile(":");
@@ -422,7 +449,7 @@ public class ItemContainerConstructor
 		
 		return new ItemContainer(material, damage, amount, displayName, lore,
 		                         EnchantStatus.getEnchantStatus(enchanted), enchantmentMap,
-		                         owner, skullTexture, null, null);
+		                         owner, skullTexture, null, null, null);
 	}
 	
 }
