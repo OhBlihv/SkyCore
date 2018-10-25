@@ -52,4 +52,28 @@ public abstract class NMSItemUtil_1_13_X implements NMSItemUtil
 		return skullMaterial;
 	}
 
+	@Override
+	public boolean isSkullMaterial(Material material)
+	{
+		return material == getSkullMaterial();
+	}
+
+	private Material spawnerMaterial = null;
+
+	@Override
+	public Material getSpawnerMaterial()
+	{
+		if(spawnerMaterial == null)
+		{
+			spawnerMaterial = getMaterialFromString("SPAWNER"); //TODO
+		}
+
+		return spawnerMaterial;
+	}
+
+	@Override
+	public boolean isMonsterEggMaterial(Material material)
+	{
+		return material.name().startsWith("INFESTED_");
+	}
 }

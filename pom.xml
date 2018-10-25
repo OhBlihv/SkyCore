@@ -100,10 +100,10 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>Spigot-v1_13_R2</artifactId>
-			<version>1.13.1-R0.1-SNAPSHOT</version>
+			<version>1.13.2-R0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<optional>true</optional>
-			<systemPath>${project.basedir}/../../lib/spigot-1.13.1.jar</systemPath>
+			<systemPath>${project.basedir}/../../lib/paper-1.13.2.jar</systemPath>
 		</dependency>
 		
 		<!-- Redis -->

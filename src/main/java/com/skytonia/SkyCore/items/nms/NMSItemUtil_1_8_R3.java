@@ -86,4 +86,22 @@ public class NMSItemUtil_1_8_R3 implements NMSItemUtil
 		return Material.SKULL_ITEM;
 	}
 
+	@Override
+	public boolean isSkullMaterial(Material material)
+	{
+		return material == Material.SKULL || material == Material.SKULL_ITEM;
+	}
+
+	@Override
+	public Material getSpawnerMaterial()
+	{
+		return Material.MOB_SPAWNER;
+	}
+
+	@Override
+	public boolean isMonsterEggMaterial(Material material)
+	{
+		return material == Material.MONSTER_EGGS;
+	}
+
 }

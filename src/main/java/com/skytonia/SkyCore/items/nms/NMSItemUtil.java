@@ -19,6 +19,12 @@ public interface NMSItemUtil
 
 	Material getSkullMaterial();
 
+	boolean isSkullMaterial(Material material);
+
+	Material getSpawnerMaterial();
+
+	boolean isMonsterEggMaterial(Material material);
+
 	default void addNBTFlag(ItemMeta itemMeta, String key, INBTBase value)
 	{
 		throw new UnsupportedOperationException("NBT Flags are unsupported outside of TW 1.8.8");
