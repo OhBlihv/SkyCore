@@ -244,9 +244,12 @@ public class ItemContainer
 				ItemFlag.HIDE_POTION_EFFECTS);
 		}
 
-		for(ItemFlag itemFlag : itemFlags)
+		if(itemFlags != null && !itemFlags.isEmpty())
 		{
-			itemMeta.addItemFlags(itemFlag);
+			for(ItemFlag itemFlag : itemFlags)
+			{
+				itemMeta.addItemFlags(itemFlag);
+			}
 		}
 
 		if(nbtFlags != null && !nbtFlags.isEmpty() && SkyCore.getCurrentVersion().isExact(SupportedVersion.ONE_EIGHT))
