@@ -124,8 +124,8 @@ public class GUIContainer implements Listener
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
 	{
-		if(event.getInventory() != null && event.getInventory().getTitle() != null &&
-				   compareGUITitle(event.getInventory().getTitle()) &&
+		if(event.getInventory() != null && event.getView().getTitle() != null &&
+				   compareGUITitle(event.getView().getTitle()) &&
 					guiSize.isWithinRange(event.getRawSlot()))
 		{
 			event.setCancelled(true);

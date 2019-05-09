@@ -662,26 +662,38 @@ public class BUtil
 	public static JavaPlugin getCallingJavaPlugin()
 	{
 		String mainClassName = getCallingPlugin();
-		
+
+		Plugin javaPlugin = null;
 		try
 		{
-			Plugin javaPlugin = Bukkit.getPluginManager().getPlugin(mainClassName);
-			if(javaPlugin instanceof JavaPlugin)
+			javaPlugin = Bukkit.getPluginManager().getPlugin(mainClassName);
+			if(javaPlugin == null)
 			{
-				return (JavaPlugin) javaPlugin;
-			}
-			else
-			{
-				throw new IllegalArgumentException("Plugin '" + mainClassName + "' was not found or not currently loaded.");
+				//TODO: Fix Java11 support
+				if(mainClassName.equals("reflect"))
+				{
+					log("TODO: Fix Java11 Support. Reflect Library detected. Using SkyCore/Encompassing Plugin");
+					javaPlugin = SkyCore.getPluginInstance(); //Still support other calling plugins though
+				}
+				else
+				{
+					throw new IllegalArgumentException("Plugin '" + mainClassName + "' was not found or not currently loaded.");
+				}
 			}
 		}
 		catch(Exception e)
 		{
-			logMessage("Package Structure seems to be invalid for the calling plugin: '" + mainClassName + "'. Please notify the author to correct this issue.");
+			log("Package Structure seems to be invalid for the calling plugin: '" + mainClassName + "'. Please notify the author to correct this issue.");
 			logStackTrace(e);
 		}
-		
-		return null;
+
+		if(javaPlugin == null)
+		{
+			return null;
+		}
+
+		//Safe Cast
+		return (JavaPlugin) javaPlugin;
 	}
 
 	// ------------------------------------------------------------------------------------------------------

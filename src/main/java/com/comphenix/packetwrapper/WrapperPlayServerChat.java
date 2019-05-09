@@ -35,11 +35,11 @@ public class WrapperPlayServerChat extends AbstractPacket {
 	}
 
 	/**
-	 * Retrieve the chat message.
+	 * Retrieve the chat messaging.
 	 * <p>
 	 * Limited to 32767 bytes
 	 * 
-	 * @return The current message
+	 * @return The current messaging
 	 */
 	public WrappedChatComponent getMessage() {
 		return handle.getChatComponents().read(0);
@@ -54,7 +54,7 @@ public class WrapperPlayServerChat extends AbstractPacket {
 	}
 
 	/**
-	 * Set the message.
+	 * Set the messaging.
 	 * 
 	 * @param value - new value.
 	 */

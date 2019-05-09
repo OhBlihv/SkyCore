@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class FlatFile
 	protected FileConfiguration save = null;
 	
 	protected final String pluginString;
-	protected final JavaPlugin plugin;
+	protected final Plugin plugin;
 	
 	@Getter
 	String fileName = "config.yml";
@@ -121,18 +121,18 @@ public class FlatFile
 			this.fileName = fileName;
 		}
 
-		JavaPlugin tempOwningPlugin;
+		Plugin tempOwningPlugin;
 		String tempPluginString;
 
 		if(owningPlugin != null)
 		{
 			tempPluginString = owningPlugin;
-			tempOwningPlugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(owningPlugin);
+			tempOwningPlugin = Bukkit.getPluginManager().getPlugin(owningPlugin);
 		}
 		else
 		{
 			tempPluginString = BUtil.getCallingPlugin();
-			tempOwningPlugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin(tempPluginString);
+			tempOwningPlugin = Bukkit.getPluginManager().getPlugin(tempPluginString);
 		}
 
 		if(tempOwningPlugin == null)

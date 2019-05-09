@@ -147,6 +147,17 @@ public class TextUtil
 		}
 		
 	}
+
+	public static int getLineLength(String line)
+	{
+		int lineLength = 0;
+		for(char character : line.toCharArray())
+		{
+			lineLength += MinecraftFontInfo.getDefaultFontInfo(character).getLength();
+		}
+
+		return lineLength;
+	}
 	
 	private static final int CENTER_PX = 154;
 	
@@ -155,7 +166,7 @@ public class TextUtil
 	
 	public static String center(final String message)
 	{
-		//message = ChatColor.translateAlternateColorCodes('&', message);
+		//messaging = ChatColor.translateAlternateColorCodes('&', messaging);
 		String strippedMessage = COLOUR_CODE_PATTERN.matcher(message).replaceAll("");
 		
 		int messagePxSize = 0;

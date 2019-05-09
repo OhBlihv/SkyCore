@@ -62,7 +62,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	@Setter
 	private boolean isRunning = true;
 	
-	//Holds message statistics for the past 5 seconds
+	//Holds messaging statistics for the past 5 seconds
 	private final int[] MESSAGE_REPORTS = new int[100];
 	
 	/*
@@ -320,13 +320,13 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 							}
 							catch(Throwable e)
 							{
-								BUtil.log("Unable to receive message " + message.toString());
+								BUtil.log("Unable to receive messaging " + message.toString());
 								e.printStackTrace();
 
 								sentMessages--;
 							}
 						}
-						else //if(message.getDirection() == CommunicationDirection.OUTBOUND)
+						else //if(messaging.getDirection() == CommunicationDirection.OUTBOUND)
 						{
 							pendingSendMessages.add((OutboundCommunicationMessage) message);
 						}
@@ -340,7 +340,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 					}
 				}
 				
-				//Hold our message throughput
+				//Hold our messaging throughput
 				if(tick == MESSAGE_REPORTS.length)
 				{
 					tick = 0;
@@ -392,7 +392,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	}
 	
 	/**
-	 * Retrieves the message count statistics for the past 5 seconds
+	 * Retrieves the messaging count statistics for the past 5 seconds
 	 *
 	 * @return List of Integers containing the amount of messages sent/received during
 	 *         operation containing one array index for every tick (50 milliseconds)
@@ -417,7 +417,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 	/**
 	 *
 	 * @param messages
-	 * @return A pair of the message and exception encountered for each failed message
+	 * @return A pair of the messaging and exception encountered for each failed messaging
 	 * @throws MessageException
 	 */
 	public Deque<Pair<OutboundCommunicationMessage, Exception>> sendMessages(Deque<OutboundCommunicationMessage> messages) throws MessageException
@@ -450,7 +450,7 @@ public abstract class AbstractCommunicationHandler extends Thread implements Com
 
 		/*if(!channel.equals("SC_InfoRep"))
 		{
-			BUtil.log("Received message: (" + channel + ") - <" + MessageUtil.mergeArguments(message.getMessageArgs()) + ">");
+			BUtil.log("Received messaging: (" + channel + ") - <" + MessageUtil.mergeArguments(messaging.getMessageArgs()) + ">");
 		}*/
 
 		switch(channel)

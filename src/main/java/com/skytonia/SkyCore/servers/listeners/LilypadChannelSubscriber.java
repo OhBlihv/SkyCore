@@ -35,7 +35,7 @@ public class LilypadChannelSubscriber extends ChannelSubscriber
 			}
 			catch(Throwable e)
 			{
-				BUtil.log("Unable to handle message on channel '" + event.getChannel() + "' with '" + Arrays.toString(event.getMessage()) + "'");
+				BUtil.log("Unable to handle messaging on channel '" + event.getChannel() + "' with '" + Arrays.toString(event.getMessage()) + "'");
 				e.printStackTrace();
 			}
 		}

@@ -2,7 +2,7 @@ package com.skytonia.SkyCore.items.nms;
 
 import org.bukkit.Material;
 
-public abstract class NMSItemUtil_1_13_X implements NMSItemUtil
+public abstract class NMSItemUtil_Post_1_13 implements NMSItemUtil
 {
 
 	private Material getMaterialFromString(String materialName)
@@ -46,7 +46,7 @@ public abstract class NMSItemUtil_1_13_X implements NMSItemUtil
 	{
 		if(skullMaterial == null)
 		{
-			skullMaterial = getMaterialFromString("SKELETON_SKULL");
+			skullMaterial = getMaterialFromString("PLAYER_HEAD");
 		}
 
 		return skullMaterial;

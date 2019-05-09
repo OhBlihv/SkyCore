@@ -25,6 +25,18 @@ public class UtilTest
 {
 
 	@Test
+	public void jsonParserTest2()
+	{
+		JSONContentParser parser = new JSONContentParser(Arrays.asList("&e&l(!) &e&lMATH: &e{player} has solved {math-problem} = {math-solution}!"));
+
+		parser.replace("{player}", "+CAM-")
+			  .replace("{math-problem}", "1 + 2")
+			  .replace("{math-solution}", "3");
+
+		BUtil.log(Arrays.toString(parser.parseLines()));
+	}
+
+	@Test
 	public void jsonParserTest()
 	{
 		final String original = BUtil.translateColours("&e&l(!) &e&lUNSCRAMBLE: &e{hov;Hover to see the word!;{scrambled-word}} &7Be the first to unscramble this word!");

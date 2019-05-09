@@ -25,10 +25,10 @@ public class GUIListener implements Listener
 		//If the inventory is modified, attempt to cancel all events to avoid players
 		//taking items out of the inventory/gui.
 		//Handle this early (LOWEST) so other plugins can re-enable this event.
-		if(event.getInventory() != null && event.getInventory().getTitle() != null &&
-			   isInventoryModified(event.getInventory().getTitle()))
+		if(event.getInventory() != null && event.getView().getTitle() != null &&
+			   isInventoryModified(event.getView().getTitle()))
 		{
-			BUtil.log("Blocking: " + event.getInventory().getTitle());
+			BUtil.log("Blocking: " + event.getView().getTitle());
 			event.setCancelled(true);
 		}
 	}

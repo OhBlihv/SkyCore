@@ -96,7 +96,7 @@ public class TimeUtil
 			long timeValue = timeCounts.get(usedUnit);
 			if(timeValue > 0)
 			{
-				stringBuilder.append(String.valueOf(timeValue)).append(" ");
+				stringBuilder.append(timeValue).append(" ");
 				
 				String timeUnit = BUtil.capitaliseAllFirst(usedUnit.name().toLowerCase());
 				if(timeValue == 1)

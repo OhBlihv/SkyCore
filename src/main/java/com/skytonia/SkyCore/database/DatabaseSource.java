@@ -97,6 +97,11 @@ public class DatabaseSource
 		
 		super.finalize();
 	}
+
+	public QueryBuilder build()
+	{
+		return new QueryBuilder(this);
+	}
 	
 	/**
 	 * MySQL Execution API containing proper setup and cleanup for ease-of-use.

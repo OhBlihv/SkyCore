@@ -45,8 +45,8 @@ import java.util.Set;
 public class SkyCore extends JavaPlugin implements Listener
 {
 
-	private static JavaPlugin instance = null;
-	public static JavaPlugin getPluginInstance()
+	private static Plugin instance = null;
+	public static Plugin getPluginInstance()
 	{
 		//We're shaded!
 		if(instance == null)
@@ -56,7 +56,7 @@ public class SkyCore extends JavaPlugin implements Listener
 			Plugin plugin = Bukkit.getPluginManager().getPlugin(callingPlugin);
 			if(plugin != null)
 			{
-				instance = (JavaPlugin) plugin;
+				instance = plugin;
 			}
 			else
 			{

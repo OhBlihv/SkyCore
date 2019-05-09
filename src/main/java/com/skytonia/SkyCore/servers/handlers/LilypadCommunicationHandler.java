@@ -135,7 +135,7 @@ public class LilypadCommunicationHandler extends AbstractCommunicationHandler im
 		}
 		catch(Exception e)
 		{
-			BUtil.log("Unable to receive incoming message from '" + event.getSender() + "' on channel " + event.getChannel() + " => '" +
+			BUtil.log("Unable to receive incoming messaging from '" + event.getSender() + "' on channel " + event.getChannel() + " => '" +
 				          Arrays.toString(event.getMessage()) + "'");
 			e.printStackTrace();
 		}

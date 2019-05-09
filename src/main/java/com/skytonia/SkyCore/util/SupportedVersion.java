@@ -15,6 +15,7 @@ public enum SupportedVersion
 	ONE_ELEVEN(11),
 	ONE_TWELVE(12),
 	ONE_THIRTEEN(13),
+	ONE_FOURTEEN(14),
 
 	;
 	

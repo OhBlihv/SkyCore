@@ -270,6 +270,12 @@ public class ItemContainerConstructor
 			{
 				material = Material.getMaterial(materialString);
 			}
+
+			//Attempt to add LEGACY_ before this material for backwards compatibility
+			if(material == null)
+			{
+				material = Material.getMaterial("LEGACY_" + materialString);
+			}
 			
 			if(material == null)
 			{
